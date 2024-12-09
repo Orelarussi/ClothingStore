@@ -1,20 +1,22 @@
 package models;
 
 public class Customer extends User {
-    private String type;
+    private Type type;
     private String branchID;
 
-    public Customer(int id, String firstName, String lastName, String phoneNumber, String passwordHash, String type, String branchID) {
+    public enum Type { VIP,NEW,RETURNING}
+
+    public Customer(int id, String firstName, String lastName, String phoneNumber, String passwordHash, Type type, String branchID) {
         super(id, firstName, lastName, phoneNumber, passwordHash);
         this.type = type;
         this.branchID = branchID;
     }
 
-    public String getType() {
+    public Type getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Type type) {
         this.type = type;
     }
 
