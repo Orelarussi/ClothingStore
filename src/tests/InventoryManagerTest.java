@@ -1,0 +1,38 @@
+package tests;
+import models.Product;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import services.InventoryManager;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class InventoryManagerTest {
+    private InventoryManager inventoryManager;
+
+    @BeforeEach
+    public void setUp() {
+        inventoryManager = new InventoryManager();
+    }
+
+    @Test
+    public void testAddProduct() {
+        Product product = new Product(1, "T-Shirt", "Clothing", 19.99, 50);
+        inventoryManager.addProduct(product);
+
+        assertEquals(1, inventoryManager.getAllProducts().size());
+    }
+
+    @Test
+    public void testUpdateProductQuantity() {
+        Product product = new Product(1, "T-Shirt", "Clothing", 19.99, 50);
+        inventoryManager.addProduct(product);
+
+        inventoryManager.updateProductQuantity(1, 20);
+        assertEquals(70, product.getQuantity());
+    }
+
+    @Test
+    public void testProductNotFound() {
+        assertThrows(IllegalArgumentException.class, () -> inventoryManager.updateProductQuantity(99, 10));
+    }
+}

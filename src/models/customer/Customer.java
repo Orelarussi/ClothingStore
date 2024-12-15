@@ -1,23 +1,20 @@
-package models;
+package models.customer;
 
 public class Customer extends User {
     private Type type;
     private String branchID;
+    protected PurchasePlan purchasePlan;
 
-    public enum Type { VIP,NEW,RETURNING}
-
-    public Customer(int id, String firstName, String lastName, String phoneNumber, String passwordHash, Type type, String branchID) {
+    public Customer(int id, String firstName, String lastName, String phoneNumber, String branchID, String passwordHash) {
         super(id, firstName, lastName, phoneNumber, passwordHash);
-        this.type = type;
         this.branchID = branchID;
+        this.purchasePlan = createPurchasePlan();
     }
 
-    public Type getType() {
-        return type;
-    }
+    protected abstract PurchasePlan createPurchasePlan();
 
-    public void setType(Type type) {
-        this.type = type;
+    public Customer(int id, String firstName, String lastName, String phoneNumber, String branchID) {
+        this(id, firstName, lastName, phoneNumber, branchID, null);
     }
 
     public String getBranchID() {

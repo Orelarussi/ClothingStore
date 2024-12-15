@@ -1,21 +1,21 @@
 package models;
 
-public abstract class  User {
-    protected final int id;
-    protected String firstName;
-    protected String lastName;
-    protected String passwordHash;
-    protected String phoneNumber;
+public class User {
+    private final int id;
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
+    private String passwordHash;
 
-    public User(int id, String firstName, String lastName, String phoneNumber,String passwordHash ) {
+    public User(int id, String firstName, String lastName, String phoneNumber, String passwordHash) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
         this.passwordHash = passwordHash;
-
     }
 
+    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -51,18 +51,4 @@ public abstract class  User {
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", passwordHash='" + passwordHash + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                '}';
-    }
-
 }
-
-
