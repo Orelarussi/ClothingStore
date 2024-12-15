@@ -1,42 +1,32 @@
 package utils;
-import java.util.regex.Pattern;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class PasswordValidator {
-    // Password criteria
-    private static final int MIN_LENGTH = 8; // Minimum length
-    private static final Pattern UPPER_CASE = Pattern.compile(".*[A-Z].*"); // At least one uppercase letter
-    private static final Pattern LOWER_CASE = Pattern.compile(".*[a-z].*"); // At least one lowercase letter
-    private static final Pattern DIGIT = Pattern.compile(".*[0-9].*"); // At least one digit
-    private static final Pattern SPECIAL_CHAR = Pattern.compile(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*"); // At least one special character
 
-    /**
-     * Validates if a password meets the criteria
-     * @param password The password to validate
-     * @return true if the password is valid, false otherwise
-     */
-    public static boolean validate(String password) {
-        if (password == null || password.length() < MIN_LENGTH) {
-            System.out.println("Error: Password must be at least " + MIN_LENGTH + " characters long.");
-            return false;
-        }
-        if (!UPPER_CASE.matcher(password).matches()) {
-            System.out.println("Error: Password must contain at least one uppercase letter.");
-            return false;
-        }
-        if (!LOWER_CASE.matcher(password).matches()) {
-            System.out.println("Error: Password must contain at least one lowercase letter.");
-            return false;
-        }
-        if (!DIGIT.matcher(password).matches()) {
-            System.out.println("Error: Password must contain at least one digit.");
-            return false;
-        }
-        if (!SPECIAL_CHAR.matcher(password).matches()) {
-            System.out.println("Error: Password must contain at least one special character.");
-            return false;
-        }
+    // Convert the password to a hash using SHA-256
+    public static String convertToHash(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashedBytes = digest.digest(password.getBytes());
+            StringBuilder hexString = new StringBuilder();
 
-        // If all criteria are met
-        return true;
+            // Convert the byte array to a hexadecimal string
+            for (byte b : hashedBytes) {
+                hexString.append(String.format("%02x", b));
+            }
+
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error while hashing the password", e);
+        }
+    }
+
+    // Validate the password by comparing the provided password hash with the stored hash
+    public static boolean validate(String password, String storedHash) {
+        // Convert the provided password to hash and compare with stored hash
+        String hashedPassword = convertToHash(password);
+        return hashedPassword.equals(storedHash);
     }
 }

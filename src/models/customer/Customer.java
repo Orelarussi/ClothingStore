@@ -1,7 +1,10 @@
 package models.customer;
 
-public class Customer extends User {
-    private Type type;
+import models.User;
+import models.purchase_plan.PurchasePlan;
+
+public abstract class Customer extends User {
+
     private String branchID;
     protected PurchasePlan purchasePlan;
 
@@ -25,11 +28,19 @@ public class Customer extends User {
         this.branchID = branchID;
     }
 
+    public PurchasePlan getPurchasePlan() {
+        return purchasePlan;
+    }
+
+    public void setPurchasePlan(PurchasePlan purchasePlan) {
+        this.purchasePlan = purchasePlan;
+    }
+
     @Override
     public String toString() {
         return super.toString() + "Customer{" +
-                "type='" + type + '\'' +
                 ", branchID='" + branchID + '\'' +
+                ", plan='" + purchasePlan +'\'' +
                 '}';
     }
 }
