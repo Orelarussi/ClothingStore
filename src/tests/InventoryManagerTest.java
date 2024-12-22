@@ -32,6 +32,22 @@ public class InventoryManagerTest {
     }
 
     @Test
+    public void testRemoveProduct() {
+        Product product = new Product(1, "T-Shirt", "Clothing", 19.99, 50);
+        inventoryManager.addProduct(product);
+
+        // Ensure the product is added
+        assertEquals(1, inventoryManager.getAllProducts().size());
+
+        // Remove the product
+        inventoryManager.removeProduct(product);
+
+        // Verify the product is removed
+        assertEquals(0, inventoryManager.getAllProducts().size());
+    }
+
+
+    @Test
     public void testProductNotFound() {
         assertThrows(IllegalArgumentException.class, () -> inventoryManager.updateProductQuantity(99, 10));
     }

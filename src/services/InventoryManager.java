@@ -18,6 +18,15 @@ public class InventoryManager {
         System.out.println("Product added: " + product.getName());
     }
 
+    public void removeProduct(Product product) {
+        if (products.remove(product)) {
+            System.out.println("Product removed: " + product.getName());
+        } else {
+            System.out.println("Product not found: " + product.getName());
+        }
+    }
+
+
     // Update product quantity
     public void updateProductQuantity(int productId, int quantityChange) {
         for (Product product : products) {
