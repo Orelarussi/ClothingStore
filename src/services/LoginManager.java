@@ -1,29 +1,31 @@
 package services;
 
+import models.Employee;
 import models.User;
 import java.util.HashMap;
+import java.util.Map;
 
 public class LoginManager {
-    private HashMap<Integer, User> users;
+    private Map<Integer, Employee> employees;
 
     public LoginManager() {
-        this.users = new HashMap<>();
+        this.employees = new HashMap<>();
     }
 
-    // Add a new user to the system
-    public void addUser(User user) {
-        if (!users.containsKey(user.getId())) {
-            users.put(user.getId(), user);
+    // Add a new employee to the system
+    public void addUser(Employee employee) {
+        if (!employees.containsKey(employee.getId())) {
+            employees.put(employee.getId(), employee);
         } else {
-            System.out.println("User with ID " + user.getId() + " already exists.");
+            System.out.println("User with ID " + employee.getId() + " already exists.");
         }
     }
 
     // Authenticate user by ID and password hash
-    public boolean authenticate(int id, String passwordHash) {
-        User user = users.get(id);
-        if (user != null && user.getPasswordHash().equals(passwordHash)) {
-            System.out.println("Login successful for user: " + user.getFirstName());
+    public boolean authenticate(int id, String password) {
+        Employee employee = employees.get(id);
+        if (employee != null && employee.getPassword().equals(password)) {
+            System.out.println("Login successful for employee: " + employee.getFirstName());
             return true;
         } else {
             System.out.println("Authentication failed. Please check your ID or password.");

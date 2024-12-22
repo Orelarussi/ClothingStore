@@ -1,14 +1,10 @@
 package services;
 
 import models.Employee;
-import models.User;
-import org.mindrot.jbcrypt.BCrypt;
 import utils.PasswordValidator;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class AdminManager {
     private Map<Integer, Employee> employees;
@@ -22,7 +18,7 @@ public class AdminManager {
         // Validate the plain password (check against any predefined password rules)
         if (PasswordValidator.validate(plainPassword, "")) {  // Assuming you are validating the password against some rule, we pass an empty string as the second argument
             String hashedPassword = PasswordValidator.convertToHash(plainPassword);
-            employee.setPasswordHash(hashedPassword);
+            employee.setPassword(hashedPassword);
             employees.put(employee.getId(), employee);
             System.out.println("Employee " + employee.getFirstName() + " added successfully.");
         } else {
@@ -36,7 +32,7 @@ public class AdminManager {
         if (employee != null) {
             if (PasswordValidator.validate(newPlainPassword,"")) {
                 String hashedPassword = PasswordValidator.convertToHash(newPlainPassword);
-                employee.setPasswordHash(hashedPassword);
+                employee.setPassword(hashedPassword);
                 System.out.println("Password updated successfully for employee: " + employee.getFirstName());
             } else {
                 System.out.println("New password does not meet the required criteria.");
@@ -91,7 +87,7 @@ public class AdminManager {
     public boolean verifyEmployeePassword(int id, String passwordHash) {
         Employee employee = findEmployeeById(id);
         if (employee != null) {
-            return passwordHash.equals(employee.getPasswordHash());
+            return passwordHash.equals(employee.getPassword());
         }
         return false;
     }

@@ -7,16 +7,27 @@ public class Employee extends User {
     private long accountNumber;
     private long employeeNumber;
     private Position position;
+    private String password;
+
 
     public enum Position {SHIFTMGR, CASHIER, SELLER;}
 
-    public Employee(int id, String firstName, String lastName, String phoneNumber, String passwordHash,
+    public Employee(int id, String firstName, String lastName, String phoneNumber, String password,
                     String branchID, long accountNumber, long employeeNumber, Position position) {
-        super(id, firstName, lastName, phoneNumber, passwordHash);
+        super(id, firstName, lastName, phoneNumber);
         this.branchID = branchID;
         this.accountNumber = accountNumber;
         this.employeeNumber = employeeNumber;
         this.position = position;
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     // Getters and Setters

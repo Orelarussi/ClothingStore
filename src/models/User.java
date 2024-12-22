@@ -5,14 +5,12 @@ public class User {
     private String firstName;
     private String lastName;
     private String phoneNumber;
-    private String passwordHash;
 
-    public User(int id, String firstName, String lastName, String phoneNumber, String passwordHash) {
+    public User(int id, String firstName, String lastName, String phoneNumber) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
-        this.passwordHash = passwordHash;
     }
 
     // Getters and Setters
@@ -42,13 +40,5 @@ public class User {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
     }
 }

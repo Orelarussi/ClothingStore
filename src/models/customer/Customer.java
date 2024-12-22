@@ -9,7 +9,7 @@ public abstract class Customer extends User {
     protected PurchasePlan purchasePlan;
 
     public Customer(int id, String firstName, String lastName, String phoneNumber, String branchID, String passwordHash) {
-        super(id, firstName, lastName, phoneNumber, passwordHash);
+        super(id, firstName, lastName, phoneNumber);
         this.branchID = branchID;
         this.purchasePlan = createPurchasePlan();
     }
