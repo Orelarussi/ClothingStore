@@ -1,5 +1,7 @@
 package models;
 
+import com.google.gson.Gson;
+
 import java.util.Objects;
 
 public class Employee extends User {
@@ -8,6 +10,14 @@ public class Employee extends User {
     private long employeeNumber;
     private Position position;
     private String password;
+
+    public static Employee deserializeFromString(String jsonStr) {
+        return new Gson().fromJson(jsonStr, Employee.class);
+    }
+
+    public String serializeToString() {
+        return new Gson().toJson(this);
+    }
 
 
     public enum Position {SHIFTMGR, CASHIER, SELLER;}
@@ -70,6 +80,8 @@ public class Employee extends User {
     public void setPosition(Position position) {
         this.position = position;
     }
+
+
 
     // Override toString for detailed employee info
     @Override

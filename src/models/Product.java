@@ -1,5 +1,6 @@
 package models;
 
+import com.google.gson.Gson;
 import exceptions.InvalidQuantityException;
 
 public class Product {
@@ -15,6 +16,10 @@ public class Product {
         this.category = category;
         this.price = price;
         this.quantity = quantity;
+    }
+
+    public static Product deserializeFromString(String objectString) {
+        return new Gson().fromJson(objectString, Product.class);
     }
 
     // Getters and Setters
@@ -59,5 +64,9 @@ public class Product {
             throw new InvalidQuantityException("Quantity cannot be negative for product: " + name);
         }
         this.quantity = quantity;
+    }
+
+    public String serializeToString() {
+        return new Gson().toJson(this);
     }
 }
