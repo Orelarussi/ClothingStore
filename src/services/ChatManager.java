@@ -1,31 +1,56 @@
 package services;
 
+import database.ChatSession;
+import database.SocketData;
 import models.Chat;
 import models.Employee;
 import models.Message;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import server.Server;
+
+import java.util.*;
 
 public class ChatManager {
-    private Queue<Employee> availableEmployees;
+    private static ChatManager instance;
+    private Map<SocketData, ChatSession> chattingEmployees;
+    private Map<String, List<Employee>> waitingEmployees;
+    private Map<SocketData, Employee> availableEmployees;
     private List<Chat> activeChats;
 
-    public ChatManager() {
-        this.availableEmployees = new LinkedList<>();
+    private ChatManager() {
+        this.availableEmployees = new HashMap<>();
         this.activeChats = new ArrayList<>();
+        chattingEmployees = new HashMap<>();
+        waitingEmployees = new HashMap<>();
+    }
+    public static Set<String> getAvailableBranches(String branch) {
+        Set<String> branches = new HashSet<>();
+        for (Map.Entry<Employee, SocketData> entry : Server.getConnections().entrySet()) {
+            Employee emp = entry.getKey();
+
+            if(!emp.getBranchID().equals(branch))
+                branches.add(emp.getBranchID());
+        }
+        return branches;
+    }
+
+
+    public static synchronized ChatManager getInstance() {
+        if (instance == null) {
+            instance = new ChatManager();
+        }
+        return instance;
     }
 
     // Add an available employee
     public void addAvailableEmployee(Employee employee) {
-        availableEmployees.add(employee);
+//        TODO put employee with socket
+//        availableEmployees.add(employee);
         System.out.println(employee.getFirstName() + " is now available for chat.");
     }
 
     // Start a chat between two employees
     public void startChat(Employee employee1, Employee employee2) {
-        if (!availableEmployees.contains(employee1) || !availableEmployees.contains(employee2)) {
+        if (!availableEmployees.containsKey(employee1) || !availableEmployees.containsKey(employee2)) {
             System.out.println("One or both employees are not available for chat.");
             return;
         }
@@ -38,6 +63,10 @@ public class ChatManager {
         availableEmployees.remove(employee2);
 
         System.out.println("Chat started between " + employee1.getFirstName() + " and " + employee2.getFirstName());
+    }
+
+    public Map<SocketData, Employee> getAvailableEmployees() {
+        return availableEmployees;
     }
 
     // Employee sends a message in an active chat
@@ -57,7 +86,7 @@ public class ChatManager {
         for (Chat chat : activeChats) {
             if (chat.getEmployee1() == employee || chat.getEmployee2() == employee) {
                 activeChats.remove(chat);
-                availableEmployees.add(employee);
+//                availableEmployees.add(employee);
                 System.out.println(employee.getFirstName() + " is now available for a new chat.");
                 return;
             }
@@ -70,4 +99,102 @@ public class ChatManager {
         System.out.println("Message added: " + message);
     }
 
+    public Set<ChatSession> getAvailableChats(String branch) {
+        Set<ChatSession> chats = new HashSet<>();
+        for (Map.Entry<SocketData, ChatSession> entry : chattingEmployees.entrySet()) {
+            //ChatSession chat = entry.getValue();
+            //Employee emp = chat.getCreatorEmployee();
+            Employee emp = Server.getEmployeeBySocketData(entry.getKey());
+
+            if (emp.getBranchID().equals(branch))
+                chats.add(entry.getValue());
+        }
+        return chats;
+    }
+
+    public Map<SocketData, ChatSession> getChattingEmployees() {
+        return chattingEmployees;
+    }
+
+    public ChatSession getChatSessionBySocketData(SocketData socketData) {
+        return chattingEmployees.get(socketData);
+    }
+
+    public boolean isAvailableEmployeesForChat(String branch) {
+        for (Map.Entry<SocketData, Employee> entry : availableEmployees.entrySet()) {
+            Employee emp = entry.getValue();
+            if (emp.getBranchID().equals(branch))
+                return true;
+        }
+
+        return false;
+    }
+    public void addEmployeeToWaitingList(Employee emp, String branch) {
+        boolean foundBranch = false;
+        for (Map.Entry<String, List<Employee>> entry : waitingEmployees.entrySet()) {
+            List<Employee> waitingForChat = entry.getValue();
+
+            if(entry.getKey().equals(branch)) {
+                List<Employee> employees = entry.getValue();
+                employees.add(emp);
+                waitingEmployees.put(branch,employees);
+                foundBranch = true;
+            }
+        }
+
+        if(!foundBranch) {
+            List<Employee> employees = new ArrayList<Employee>();
+            employees.add(emp);
+            waitingEmployees.put(branch,employees);
+        }
+    }
+
+    public void validateChatSession(ChatSession chat) {
+        int chattingCount = 0;
+        for (Map.Entry<SocketData, ChatSession> entry : chattingEmployees.entrySet()) {
+            int tempSessionID = entry.getValue().getSessionID();
+            int sessionID = chat.getSessionID();
+
+            if(tempSessionID == sessionID)
+                chattingCount++;
+        }
+
+        if(chattingCount < 2) { // Close chat because not enough employees for chat
+            endChatSession(chat);
+        }
+    }
+
+    public void endChatSession(ChatSession chat) {
+        for (Map.Entry<SocketData, ChatSession> entry : chattingEmployees.entrySet()) {
+            if (entry.getValue() == chat) {
+                SocketData socketData = entry.getKey();
+                chat.removeListener(socketData);
+                chattingEmployees.remove(socketData);
+
+                String command = "CHAT@@@abortCurrentChat###";
+                socketData.getOutputStream().println(command);
+            }
+        }
+    }
+    public ChatSession getChatSessionByID(int sessionID) {
+        for (Map.Entry<SocketData, ChatSession> entry : chattingEmployees.entrySet()) {
+            ChatSession chat = entry.getValue();
+
+            if(chat.getSessionID() == sessionID)
+                return chat;
+        }
+
+        return null;
+    }
+    public SocketData getFirstAvailableEmployeeByBranch(String branch) {
+        for (Map.Entry<SocketData, Employee> entry : availableEmployees.entrySet()) {
+            Employee emp = entry.getValue();
+
+            if(emp.getBranchID().equals(branch))
+                return entry.getKey();
+
+        }
+
+        return null;
+    }
 }

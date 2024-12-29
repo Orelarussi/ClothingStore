@@ -1,13 +1,16 @@
 package client.serverCommunication;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import database.ChatSession;
 import models.Employee;
 import models.Product;
 import models.customer.Customer;
 import models.purchaseHistory.PurchasedItem;
 
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -136,14 +139,10 @@ public class Format {
         return result.toString();
     }
 
-    public static List<Employee> decodeEmployees(String str) {
-        String[] objects = str.split(objectSeparator);
-        List<Employee> arr = new ArrayList<>();
-
-        for (String objectString : objects) {
-            arr.add(Employee.deserializeFromString(objectString));
-        }
-        return arr;
+    public static List<Employee> decodeEmployees(String jsonString) {
+        Type listType = new TypeToken<List<Employee>>(){}.getType();
+        List<Employee> employees = new Gson().fromJson(jsonString, listType);
+        return employees;
     }
 
     public static String encodeEmployees(List<Employee> arr) {
@@ -155,14 +154,10 @@ public class Format {
         return result.toString();
     }
 
-    public static List<Product> decodeProducts(String str) {
-        String[] objects = str.split(objectSeparator);
-        List<Product> arr = new ArrayList<>();
-
-        for (String objectString : objects) {
-            arr.add(Product.deserializeFromString(objectString));
-        }
-        return arr;
+    public static List<Product> decodeProducts(String jsonString) {
+        Type listType = new TypeToken<List<Product>>(){}.getType();
+        List<Product> products = new Gson().fromJson(jsonString, listType);
+        return products;
     }
 
     public static String encodeProducts(List<Product> arr) {
@@ -179,7 +174,8 @@ public class Format {
         List<PurchasedItem> arr = new ArrayList<>();
 
         for (String objectString : objects) {
-            arr.add(PurchasedItem.deserializeFromString(objectString));
+            PurchasedItem pi = new PurchasedItem(objectString);
+            arr.add(pi);
         }
         return arr;
     }

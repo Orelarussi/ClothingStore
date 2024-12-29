@@ -1,6 +1,9 @@
 package client.serverCommunication.encodeCMD;
 
-import Store.Customers.Customer;
+
+import client.serverCommunication.ClassType;
+import client.serverCommunication.Format;
+import models.customer.Customer;
 
 public class EncodeCommandCustomer {
     public static String createNewCustomer(Customer customer, String customerType) {

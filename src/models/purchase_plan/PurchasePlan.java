@@ -1,6 +1,8 @@
 package models.purchase_plan;
 
-public abstract class PurchasePlan {
+import utils.JsonSerializable;
+
+public abstract class PurchasePlan implements JsonSerializable {
     protected String planDetails;
     protected int customerID;
     private int purchaseID;

@@ -3,7 +3,9 @@ package services;
 import models.Product;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InventoryManager {
     private List<Product> products;
@@ -14,8 +16,10 @@ public class InventoryManager {
 
     // Add a new product
     public void addProduct(Product product) {
-        products.add(product);
-        System.out.println("Product added: " + product.getName());
+        if (!products.contains(product)) {
+            products.add(product);
+            System.out.println("Product added: " + product.getName());
+        } else System.out.println("Product already exists");
     }
 
     public void removeProduct(Product product) {
@@ -43,7 +47,6 @@ public class InventoryManager {
     }
 
 
-
     // Display inventory
     public void displayInventory() {
         System.out.println("Inventory:");
@@ -51,7 +54,27 @@ public class InventoryManager {
             System.out.println(product.getName() + " - Quantity: " + product.getQuantity());
         }
     }
+
     public List<Product> getAllProducts() {
-        return new ArrayList<>(products); // Return a copy of the product list to avoid modifications
+        return products; // Return a copy of the product list to avoid modifications
+    }
+
+    public void updateItem(Product product) {
+        for (int i = 0; i < products.size(); i++) {
+            Product temp = products.get(i);
+            if (temp.getId() == product.getId()) {
+                products.set(i, product);
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Product not found with ID: " + product.getId());
+    }
+
+    public List<Product> getProductsByBranch(String branchID) {
+        return products.stream().filter(product -> product.getBranch().equals(branchID)).toList();
+    }
+
+    public boolean removeProduct(int productId) {
+        return products.removeIf(product -> product.getId() == productId);
     }
 }

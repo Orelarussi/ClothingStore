@@ -1,17 +1,20 @@
 package client.serverCommunication.encodeCMD;
 
-import Store.Inventories.InventoryItem;
+
+import client.serverCommunication.ClassType;
+import client.serverCommunication.Format;
+import models.Product;
 
 public class EncodeCommandInventory {
-    public static String getInventoryItemsByBranch(String branch) {
-        return Format.encode(ClassType.INVENTORY, "getInventoryItemsByBranch", branch);
+    public static String getProductsByBranch(String branch) {
+        return Format.encode(ClassType.INVENTORY, "getProductsByBranch", branch);
     }
     
-    public static String createNewItem(InventoryItem item) {
+    public static String createNewItem(Product item) {
         return Format.encode(ClassType.INVENTORY, "createNewItem", item.serializeToString());
     }
 
-    public static String updateItem(InventoryItem item) {
+    public static String updateItem(Product item) {
         return Format.encode(ClassType.INVENTORY, "updateItem" , item.serializeToString());
     }
 

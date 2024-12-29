@@ -16,7 +16,7 @@ public class InventoryManagerTest {
 
     @Test
     public void testAddProduct() {
-        Product product = new Product(1, "T-Shirt", "Clothing", 19.99, 50);
+        Product product = new Product(1, "T-Shirt", "Clothing", 19.99, 50,"holon");
         inventoryManager.addProduct(product);
 
         assertEquals(1, inventoryManager.getAllProducts().size());
@@ -24,7 +24,7 @@ public class InventoryManagerTest {
 
     @Test
     public void testUpdateProductQuantity() {
-        Product product = new Product(1, "T-Shirt", "Clothing", 19.99, 50);
+        Product product = new Product(1, "T-Shirt", "Clothing", 19.99, 50,"holon");
         inventoryManager.addProduct(product);
 
         inventoryManager.updateProductQuantity(1, 20);
@@ -33,7 +33,7 @@ public class InventoryManagerTest {
 
     @Test
     public void testRemoveProduct() {
-        Product product = new Product(1, "T-Shirt", "Clothing", 19.99, 50);
+        Product product = new Product(1, "T-Shirt", "Clothing", 19.99, 50,"tlv");
         inventoryManager.addProduct(product);
 
         // Ensure the product is added

@@ -1,14 +1,12 @@
 package models.customer;
 
-import client.serverCommunication.Format;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import models.User;
 import models.purchase_plan.PurchasePlan;
+import utils.JsonSerializable;
 
-import java.util.Map;
-
-public abstract class Customer extends User {
+public abstract class Customer extends User implements JsonSerializable {
 
     private String branchID;
     protected PurchasePlan purchasePlan;
@@ -74,4 +72,8 @@ public abstract class Customer extends User {
     }
 
     public abstract String serializeToString();
+
+    public CustomerType getType() {
+        return type;
+    }
 }

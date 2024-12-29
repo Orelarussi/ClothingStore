@@ -1,44 +1,49 @@
 package client.serverCommunication.decodeCMD;
 
-import Store.Database.InventoryDAO;
-import Store.Inventories.InventoryItem;
+
+
+import client.serverCommunication.Format;
+import models.Product;
+import services.InventoryManager;
 
 import java.sql.SQLException;
 import java.util.List;
 
 public class DecodeExecuteCommandInventory {
     public static String execute(String command) throws SQLException {
-        InventoryDAO DAO = new InventoryDAO();
-        List<InventoryItem> inventoryItems;
+        InventoryManager manager = new InventoryManager();
+        List<Product> products;
         String response = Format.encodeSuccessMessage();
+        String first = Format.getFirstParam(command);
+
         switch (Format.getMethod(command)) {
-            case "getInventoryItemsByBranch":
-                // public ArrayList<InventoryItem> getInventoryItemsByBranch(String branch) {
-                inventoryItems = DAO.getInventoryItemsByBranch(Format.getFirstParam(command));
-                if(inventoryItems.size() == 0)
+            case "getProductsByBranch":
+                // public ArrayList<Product> getProductsByBranch(String branch) {
+                products = manager.getProductsByBranch(first);
+                if(products.isEmpty())
                     response = Format.encodeEmpty("");
                 else
-                    response = Format.encodeInventoryItems(inventoryItems);
+                    response = Format.encodeProducts(products);
                 break;
             case "createNewItem":
-                // public void createNewItem(InventoryItem item) {
-                DAO.createNewItem(InventoryItem.deserializeFromString(Format.getFirstParam(command)));
+                // public void createNewItem(Product item) {
+                manager.addProduct(new Product(first));
                 break;
             case "updateItem":
-                // public void updateItem(InventoryItem item) {
-                DAO.updateItem(InventoryItem.deserializeFromString(Format.getFirstParam(command)));
+                // public void updateItem(Product item) {
+                manager.updateItem(new Product(first));
                 break;
             case "deleteItem":
                 // public void deleteItem(int productID) {
-                DAO.deleteItem(Integer.parseInt(Format.getFirstParam(command)));
+                manager.removeProduct(Integer.parseInt(first));
                 break;
             case "getItemByProductID":
-                // public InventoryItem getItemByProductID(int productID) {
-                inventoryItems = DAO.getInventoryItemsByBranch(Format.getFirstParam(command));
-                if(inventoryItems.size() == 0)
+                // public Product getItemByProductID(int productID) {
+                products = manager.getProductsByBranch(first);
+                if(products.isEmpty())
                     response = Format.encodeEmpty("");
                 else
-                    response = Format.encodeInventoryItems(inventoryItems);
+                    response = Format.encodeProducts(products);
                 break;
         }
         return response;

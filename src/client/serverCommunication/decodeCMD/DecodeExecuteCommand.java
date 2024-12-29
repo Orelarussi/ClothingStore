@@ -1,6 +1,7 @@
 package client.serverCommunication.decodeCMD;
 
 import client.serverCommunication.Format;
+import services.ChatManager;
 
 import java.sql.SQLException;
 

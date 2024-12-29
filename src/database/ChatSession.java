@@ -2,6 +2,8 @@ package database;
 
 import logger.Logger;
 import models.Employee;
+import server.Server;
+import services.ChatManager;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,19 +28,22 @@ public class ChatSession {
     public int getSessionID() {
         return this.sessionID;
     }
+
     public Employee getCreatorEmployee() {
         return this.creator;
     }
+
     public Employee getReceiverEmployee() {
         return this.receiver;
     }
+
     public Employee getEmployeeBySocketData(SocketData socketData) {
         return allListeners.get(socketData);
     }
 
     public SocketData getSocketDataByEmployee(Employee emp) {
-        for( Map.Entry<SocketData, Employee> entry: allListeners.entrySet()) {
-            if(emp.getId() == entry.getValue().getId())
+        for (Map.Entry<SocketData, Employee> entry : allListeners.entrySet()) {
+            if (emp.getId() == entry.getValue().getId())
                 return entry.getKey();
         }
 
@@ -52,8 +57,8 @@ public class ChatSession {
     public void removeListener(SocketData socketData) {
         allListeners.remove(socketData);
 
-        Server.getChatHandler().getChattingEmployees().remove(socketData);
-        Server.getChatHandler().validateChatSession(this);
+        ChatManager.getInstance().getChattingEmployees().remove(socketData);
+        ChatManager.getInstance().validateChatSession(this);
     }
 
     public void broadcast(Employee emp, String message, PrintWriter sender) {
@@ -61,7 +66,7 @@ public class ChatSession {
             for (Map.Entry<SocketData, Employee> entry : allListeners.entrySet()) {
                 SocketData socketData = entry.getKey();
                 if (socketData.getOutputStream() != sender) {
-                    socketData.getOutputStream().println("CHAT@@@receiveMessage###" + emp.serializeToString() + "&&&" + message + "&&&" );
+                    socketData.getOutputStream().println("CHAT@@@receiveMessage###" + emp.serializeToString() + "&&&" + message + "&&&");
                 }
             }
         }
@@ -71,8 +76,11 @@ public class ChatSession {
         synchronized (allListeners) {
             for (Map.Entry<SocketData, Employee> entry : allListeners.entrySet()) {
                 SocketData socketData = entry.getKey();
-                Employee emp = new Employee("מנהל המערכת", "123456789", 1111111, 1111111, "חולון", "1111111", EmployeeTitle.CASHIER);
-                socketData.getOutputStream().println("CHAT@@@receiveMessage###" + emp.serializeToString() + "&&&" + message + "&&&" );
+                Employee emp = new Employee(121212, "Bon", "Koli", "024254555",
+                        "pass", "holon", 23583454567l,
+                        69846464l, Employee.Position.CASHIER);
+                final String msg = "CHAT@@@receiveMessage###" + emp.serializeToString() + "&&&" + message + "&&&";
+                socketData.getOutputStream().println(msg);
             }
         }
     }

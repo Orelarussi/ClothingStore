@@ -1,9 +1,5 @@
 package models;
 
-import com.google.gson.Gson;
-
-import java.util.Objects;
-
 public class Employee extends User {
     private String branchID;
     private long accountNumber;
@@ -11,14 +7,19 @@ public class Employee extends User {
     private Position position;
     private String password;
 
-    public static Employee deserializeFromString(String jsonStr) {
-        return new Gson().fromJson(jsonStr, Employee.class);
+    public Employee(String json){
+        super(-1,null,null,null);
+        final Employee temp = deserializeFromString(Employee.class,json);
+        this.id = temp.id;
+        this.firstName = temp.firstName;
+        this.lastName = temp.lastName;
+        this.phoneNumber = temp.phoneNumber;
+        this.branchID = temp.branchID;
+        this.accountNumber = temp.accountNumber;
+        this.employeeNumber = temp.employeeNumber;
+        this.position = temp.position;
+        this.password = temp.password;
     }
-
-    public String serializeToString() {
-        return new Gson().toJson(this);
-    }
-
 
     public enum Position {SHIFTMGR, CASHIER, SELLER;}
 
@@ -73,41 +74,4 @@ public class Employee extends User {
         }
     }
 
-    public Position getPosition() {
-        return position;
-    }
-
-    public void setPosition(Position position) {
-        this.position = position;
-    }
-
-
-
-    // Override toString for detailed employee info
-    @Override
-    public String toString() {
-        return super.toString() + " Employee{" +
-                "branchID='" + branchID + '\'' +
-                ", accountNumber=" + accountNumber +
-                ", employeeNumber=" + employeeNumber +
-                ", position=" + position +
-                '}';
-    }
-
-    // Override equals and hashCode
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Employee employee = (Employee) o;
-        return accountNumber == employee.accountNumber &&
-                employeeNumber == employee.employeeNumber &&
-                Objects.equals(branchID, employee.branchID) &&
-                position == employee.position;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(branchID, accountNumber, employeeNumber, position);
-    }
 }

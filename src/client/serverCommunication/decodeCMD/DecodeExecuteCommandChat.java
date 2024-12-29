@@ -1,6 +1,7 @@
 package client.serverCommunication.decodeCMD;
 
 import client.serverCommunication.Format;
+import database.ChatSession;
 import database.SocketData;
 import models.Employee;
 import server.Server;
@@ -9,8 +10,8 @@ import services.ChatManager;
 import java.util.Set;
 
 public class DecodeExecuteCommandChat {
-    public static String execute(String command, ChatManager chatManager)
-    {
+    public static String execute(String command) {
+        ChatManager chatManager = ChatManager.getInstance();
         models.Employee emp;
         database.SocketData socketData;
         String branch;
@@ -19,17 +20,17 @@ public class DecodeExecuteCommandChat {
 
         switch (Format.getMethod(command)) {
             case "clientOnline":
-                emp = Employee.deserializeFromString(Format.getFirstParam(command));
+                emp = new Employee(Format.getFirstParam(command));
                 socketData = Server.getSocketDataByEmployee(emp);
                 chatManager.getAvailableEmployees().put(socketData, emp);
                 break;
             case "clientOffline":
-                emp = Employee.deserializeFromString(Format.getFirstParam(command));
+                emp = new Employee(Format.getFirstParam(command));
                 socketData = Server.getSocketDataByEmployee(emp);
                 chatManager.getAvailableEmployees().remove(socketData);
                 break;
             case "sendMessage":
-                emp = Employee.deserializeFromString(Format.getFirstParam(command));
+                emp = new Employee(Format.getFirstParam(command));
                 socketData = Server.getSocketDataByEmployee(emp);
                 String message = Format.getSecondParam(command);
                 chat = chatManager.getChatSessionBySocketData(socketData);
@@ -39,29 +40,29 @@ public class DecodeExecuteCommandChat {
                 branch = Format.getFirstParam(command);
                 Set<String> branches = chatManager.getAvailableBranches(branch);
 
-                if( branches.size() == 0 )
+                if (branches.size() == 0)
                     response = Format.encodeEmpty("");
                 else
-                    response = Format.encodeAvailableBranches(branches);    
-                
+                    response = Format.encodeAvailableBranches(branches);
+
                 break;
             case "getAvailableChats":
                 branch = Format.getFirstParam(command);
                 Set<ChatSession> availableChats = chatManager.getAvailableChats(branch);
 
-                if( availableChats.size() == 0 )
+                if (availableChats.size() == 0)
                     response = Format.encodeEmpty("");
                 else
-                    response = Format.encodeAvailableChats(availableChats);           
+                    response = Format.encodeAvailableChats(availableChats);
                 break;
             case "requestChatWithBranch":                   // Employee #1 and #2 starting a new chat between them
-                emp = Employee.deserializeFromString(Format.getFirstParam(command));
+                emp = new Employee(Format.getFirstParam(command));
                 branch = Format.getSecondParam(command);
 
-                if(chatManager.isAvailablesEmployeesForChat(branch)) {
-                    SocketData otherEmpSocketData = chatManager.getFirstAvailableEmployeByBranch(branch);
+                if (chatManager.isAvailableEmployeesForChat(branch)) {
+                    SocketData otherEmpSocketData = chatManager.getFirstAvailableEmployeeByBranch(branch);
 
-                    if(otherEmpSocketData != null) {
+                    if (otherEmpSocketData != null) {
                         chat = new ChatSession(emp, Server.getEmployeeBySocketData(otherEmpSocketData));
                         chat.addListener(otherEmpSocketData, Server.getEmployeeBySocketData(otherEmpSocketData));
                         chat.addListener(Server.getSocketDataByEmployee(emp), emp);
@@ -76,12 +77,12 @@ public class DecodeExecuteCommandChat {
                         response = "CHAT@@@setCurrentChat###" + chat.getSessionID();
                     }
                 } else {
-                    chatManager.addEmployeToWaitingList(emp, branch);
+                    chatManager.addEmployeeToWaitingList(emp, branch);
                     response = "CHAT@@@waitingList###" + branch;
                 }
                 break;
             case "leaveChat":
-                emp = Employee.deserializeFromString(Format.getFirstParam(command));
+                emp = new Employee(Format.getFirstParam(command));
                 socketData = Server.getSocketDataByEmployee(emp);
                 chat = chatManager.getChatSessionBySocketData(socketData);
                 chat.removeListener(socketData);
@@ -89,9 +90,9 @@ public class DecodeExecuteCommandChat {
                 break;
             case "joinChatSession":
                 int sessionID = Integer.parseInt(Format.getSecondParam(command));
-                emp = Employee.deserializeFromString(Format.getFirstParam(command));
+                emp = new Employee(Format.getFirstParam(command));
                 socketData = Server.getSocketDataByEmployee(emp);
-                chat = Server.getChatHandler().getChatSessionByID(sessionID);
+                chat = ChatManager.getInstance().getChatSessionByID(sessionID);
 
                 chat.addListener(socketData, emp);
                 chatManager.getChattingEmployees().put(socketData, chat);
@@ -101,7 +102,7 @@ public class DecodeExecuteCommandChat {
             default:
                 break;
         }
-        
+
         return response;
     }
 }

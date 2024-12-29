@@ -1,10 +1,12 @@
 package models;
 
-public class User {
-    private final int id;
-    private String firstName;
-    private String lastName;
-    private String phoneNumber;
+import utils.JsonSerializable;
+
+public class User implements JsonSerializable {
+    protected int id;
+    protected String firstName;
+    protected String lastName;
+    protected String phoneNumber;
 
     public User(int id, String firstName, String lastName, String phoneNumber) {
         this.id = id;

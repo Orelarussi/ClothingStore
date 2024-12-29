@@ -1,6 +1,7 @@
 package logger;
 
 import models.Employee;
+import models.Purchase;
 import models.purchase_plan.PurchasePlan;
 
 import java.io.BufferedWriter;
@@ -50,7 +51,7 @@ public class Logger {
      *
      * @param purchase The purchase instance.
      */
-    public static void logPurchase(PurchasePlan purchase) {
+    public static void logPurchase(Purchase purchase) {
         log("Customer " + purchase.getCustomerID()+ " purchased " + purchase.getPurchaseID());
     }
 

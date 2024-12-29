@@ -2,12 +2,12 @@ package models.purchaseHistory;
 
 
 import com.google.gson.Gson;
+import utils.JsonSerializable;
 
 /**
  * Represents an item that has been purchased, detailing the purchase ID and the product ID.
  */
-public class PurchasedItem {
-
+public class PurchasedItem implements JsonSerializable {
 
     private int purchaseID;
     private int productID;
@@ -21,6 +21,10 @@ public class PurchasedItem {
     public PurchasedItem(int purchaseID, int productID) {
         this.purchaseID = purchaseID;
         this.productID = productID;
+    }
+
+    public PurchasedItem(String objectString) {
+        this.deserializeFromString(PurchasedItem.class,objectString);
     }
 
     /**
@@ -82,9 +86,9 @@ public class PurchasedItem {
         * @param serializedString The serialized string representation of the purchased item.
         * @return The deserialized PurchasedItem object.
         */
-    public static PurchasedItem deserializeFromString(String serializedString) {
-        return new Gson().fromJson(serializedString, PurchasedItem.class);
-    }
+//    public static PurchasedItem deserializeFromString(String serializedString) {
+//        return new Gson().fromJson(serializedString, PurchasedItem.class);
+//    }
 }
 
 

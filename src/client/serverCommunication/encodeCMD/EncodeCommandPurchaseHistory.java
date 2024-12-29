@@ -1,11 +1,15 @@
 package client.serverCommunication.encodeCMD;
 
-import Store.PurchaseHistory.Purchase;
 
+import client.serverCommunication.ClassType;
+import client.serverCommunication.Format;
+import models.purchase_plan.PurchasePlan;
 
 public class EncodeCommandPurchaseHistory {
-    public static String createNewPurchase(Purchase purchase) {
-        return Format.encode(ClassType.PURCHASE_HISTORY, "createNewPurchase", purchase.serializeToString(1));
+    public static String createNewPurchase(PurchasePlan purchase) {
+        return Format.encode(ClassType.PURCHASE_HISTORY,
+                "createNewPurchase",
+                purchase.serializeToString());
     }
 
     public static String getItemsFromOrdersByBranchAndDays(String branch, int days) {

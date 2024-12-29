@@ -20,7 +20,7 @@ public class EmployeeManagerTest {
     @Test
     public void testAddEmployee() {
         Employee employee = new Employee(1, "John", "Doe", "123456789", "password123", "Branch001", 123456789L, 987654321L, Position.SHIFTMGR);
-        employeeManager.addEmployee(employee, "password123");
+        employeeManager.addEmployee(employee);
 
         // Ensure the employee is added
         assertNotNull(employeeManager.findEmployeeById(1));
@@ -30,7 +30,7 @@ public class EmployeeManagerTest {
     @Test
     public void testVerifyPassword() {
         Employee employee = new Employee(2, "Jane", "Smith", "987654321", "securePassword", "Branch002", 234567890L, 876543210L, Position.CASHIER);
-        employeeManager.addEmployee(employee, "securePassword");
+        employeeManager.addEmployee(employee);
 
         // Verify the password is correct
         assertTrue(employeeManager.verifyPassword(employee, "securePassword"));
@@ -42,7 +42,7 @@ public class EmployeeManagerTest {
     @Test
     public void testUpdatePassword() {
         Employee employee = new Employee(3, "Alice", "Johnson", "456789123", "oldPassword", "Branch003", 345678901L, 654321098L, Position.SELLER);
-        employeeManager.addEmployee(employee, "oldPassword");
+        employeeManager.addEmployee(employee);
 
         // Update the password
         employeeManager.updatePassword(3, "newPassword");
@@ -57,7 +57,7 @@ public class EmployeeManagerTest {
     @Test
     public void testFindEmployeeById() {
         Employee employee = new Employee(4, "Bob", "Brown", "789456123", "anotherPassword", "Branch004", 456789012L, 321098765L, Position.CASHIER);
-        employeeManager.addEmployee(employee, "anotherPassword");
+        employeeManager.addEmployee(employee);
 
         // Find employee by ID
         Employee foundEmployee = employeeManager.findEmployeeById(4);
@@ -70,8 +70,8 @@ public class EmployeeManagerTest {
         Employee employee1 = new Employee(5, "Emma", "Wilson", "321654987", "password1", "Branch005", 567890123L, 210987654L, Position.SELLER);
         Employee employee2 = new Employee(6, "Liam", "Davis", "654987321", "password2", "Branch006", 678901234L, 109876543L, Position.SHIFTMGR);
 
-        employeeManager.addEmployee(employee1, "password1");
-        employeeManager.addEmployee(employee2, "password2");
+        employeeManager.addEmployee(employee1);
+        employeeManager.addEmployee(employee2);
 
         // Get all employees
         assertEquals(2, employeeManager.getAllEmployees().size());

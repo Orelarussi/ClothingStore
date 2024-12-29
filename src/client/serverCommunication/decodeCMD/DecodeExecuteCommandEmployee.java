@@ -1,37 +1,39 @@
 package client.serverCommunication.decodeCMD;
 
-import Store.Database.EmployeeDAO;
-import Store.Employees.Employee;
+
+import client.serverCommunication.Format;
+import models.Employee;
+import services.EmployeeManager;
 
 import java.sql.SQLException;
 import java.util.List;
 
 public class DecodeExecuteCommandEmployee {
     public static String execute(String command) throws SQLException {
-        EmployeeDAO DAO = new EmployeeDAO();
+        EmployeeManager EMP_mgr = new EmployeeManager();
         Employee emp;
         int id;
         String response = Format.encodeSuccessMessage();
         switch (Format.getMethod(command)) {
             //public static String createNewEmployee(Employee emp)
             case "createNewEmployee":
-                emp = Employee.deserializeFromString(Format.getFirstParam(command));
-                DAO.createNewEmployee(emp);
+                emp = new Employee(Format.getFirstParam(command));
+                EMP_mgr.addEmployee(emp);
                 break;
             //public static String updateEmployee(Employee emp)
             case "updateEmployee":
-                emp = Employee.deserializeFromString(Format.getFirstParam(command));
-                DAO.updateEmployee(emp);
+                emp = new Employee(Format.getFirstParam(command));
+                EMP_mgr.updateEmployee(emp);
                 break;
             //public static String deleteEmployee(int id)
             case "deleteEmployee":
                 id = Integer.parseInt(Format.getFirstParam(command));
-                DAO.deleteEmployee(id);
+                EMP_mgr.deleteEmployee(id);
                 break;
             //public static String getEmployeeByID(int id)
             case "getEmployeeByID":
                 id = Integer.parseInt(Format.getFirstParam(command));
-                emp = DAO.getEmployeeByID(id);
+                emp = EMP_mgr.findEmployeeById(id);
                 if(emp == null)
                     response = Format.encodeEmpty("");
                 else
@@ -39,7 +41,7 @@ public class DecodeExecuteCommandEmployee {
                 break;
             case "getEmployees":
                 //public List<Employee> getEmployees() {
-                List<Employee> employees = DAO.getEmployees();
+                List<Employee> employees = EMP_mgr.getAllEmployees();
                 if( employees.size() == 0)
                     response = Format.encodeEmpty("");
                 else
@@ -48,7 +50,7 @@ public class DecodeExecuteCommandEmployee {
             //public static String getEmployeesByBranch(String branch)
             case "getEmployeesByBranch":
                 String branch = Format.getFirstParam(command);
-                List<Employee> empList = DAO.getEmployeesByBranch(branch);
+                List<Employee> empList = EMP_mgr.getEmployeesByBranch(branch);
                 if(empList.size() == 0)
                     response = Format.encodeEmpty("");
                 else
@@ -58,7 +60,7 @@ public class DecodeExecuteCommandEmployee {
             case "Login":
                 String username = Format.getFirstParam(command);
                 String password = Format.getSecondParam(command);
-                response =  DAO.Login(username, password);
+                response =  EMP_mgr.login(username, password);
                 break;
         }
         return response;

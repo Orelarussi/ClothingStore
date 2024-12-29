@@ -1,6 +1,8 @@
 package client.serverCommunication.encodeCMD;
 
-import Store.Employees.Employee;
+import client.serverCommunication.ClassType;
+import client.serverCommunication.Format;
+import models.Employee;
 
 public class EncodeCommandChat {
     public static String clientOnline(Employee emp) {
