@@ -2,7 +2,9 @@ package client;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import server.models.Admin;
 import server.models.Employee;
+import server.models.User;
 
 import java.io.*;
 import java.net.Socket;
@@ -18,7 +20,8 @@ public class Client {
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Connected to server at " + SERVER_HOST + ":" + SERVER_PORT);
-            Employee employee = login(in,out,consoleInput);
+            User user = login(in,out,consoleInput);
+            System.out.println(user);
             startClientListener(in,out,consoleInput);
 
         }catch (IOException e){
@@ -26,14 +29,11 @@ public class Client {
         }
     }
 
-    private static Employee login(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException{
-        Employee employee;
-        System.out.print("Username id: ");
-
+    private static User login(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException{
         JsonObject requestJson = new JsonObject();
-
         requestJson.addProperty("action","login");
 
+        System.out.print("Username id: ");
         int id = Integer.parseInt(consoleInput.readLine());
         requestJson.addProperty("id",id);
 
@@ -41,11 +41,24 @@ public class Client {
         String password = consoleInput.readLine();
         requestJson.addProperty("password", password);
         // Send JSON request to server
-        out.println(gson.toJson(requestJson));
-//TODO : CHANGE TO USER
+        out.println(requestJson);
         String response = in.readLine();
-        employee = new Employee(response);
-        return employee;
+
+        JsonObject responseJson = gson.fromJson(response, JsonObject.class);
+        if (response.contains("error")){
+            System.out.println(responseJson.get("error"));
+            return null;
+        }
+
+        String usertype = responseJson.get("usertype").getAsString();
+        String jsonUser = responseJson.get("user").getAsString();
+
+        User user = switch (usertype) {
+            case "employee" -> gson.fromJson(jsonUser, Employee.class);
+            case "admin" -> gson.fromJson(jsonUser, Admin.class);
+            default -> null;
+        };
+        return user;
     }
 
     private static void startClientListener(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException{

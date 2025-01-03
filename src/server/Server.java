@@ -5,7 +5,8 @@ import com.google.gson.JsonObject;
 import server.database.SocketData;
 import server.logger.Logger;
 import server.models.Employee;
-import server.services.ChatManager;
+import server.models.User;
+import server.services.LoginManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,11 +19,9 @@ import java.util.Map;
 
 public class Server {
     private static final int PORT = 12345;
+    private static final Map<Employee, SocketData> connections = new HashMap<>();
 
-    private static Map<Employee, SocketData> connections = new HashMap<>();
-    private static ChatManager chatManager = ChatManager.getInstance();
-
-
+    @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) {
         System.out.println("--> Server is running...");
         Logger.initLogger();
@@ -30,35 +29,36 @@ public class Server {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             while (true) {
                 //TODO: Getting Employee When Client-Login Here
-                //Employee emp = new Employee("ישראל ישראלי", "0528921319", 123456789, 212444, "חולון", "1111", EmployeeTitle.CASHIER);
-                new ClientHandler(serverSocket.accept(),connections).start();
+                new ClientHandler(serverSocket.accept(), connections).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            System.out.println("--> Server is shutting down...");
         }
     }
 
     public static SocketData getSocketDataByEmployee(Employee emp) {
-        for(Map.Entry<Employee, SocketData> entry : connections.entrySet()) {
+        for (Map.Entry<Employee, SocketData> entry : connections.entrySet()) {
             Employee temp = entry.getKey();
-            if(temp.getId() == emp.getId())
+            if (temp.getId() == emp.getId())
                 return entry.getValue();
         }
         return null;
     }
 
     private static void handleClient(Socket clientSocket) {
-      try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-           PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
 
             String request;
-           while ((request = in.readLine()) != null) {
+            while ((request = in.readLine()) != null) {
                 System.out.println("Received: " + request);
                 Gson gson = new Gson();
                 // Parse JSON request
                 JsonObject requestJson = gson.fromJson(request, JsonObject.class);
                 String action = requestJson.get("action").getAsString();
-                                // Process request based on action
+                // Process request based on action
                 JsonObject responseJson = processRequest(action, requestJson);
 
                 // Send response as JSON
@@ -74,14 +74,15 @@ public class Server {
     }
 
     public static Employee getEmployeeBySocketData(SocketData socketData) {
-        for(Map.Entry<Employee, SocketData> entry : connections.entrySet()) {
+        for (Map.Entry<Employee, SocketData> entry : connections.entrySet()) {
             SocketData temp = entry.getValue();
 
-            if(temp.equals(socketData))
+            if (temp.equals(socketData))
                 return entry.getKey();
         }
         return null;
     }
+
     public static Map<Employee, SocketData> getConnections() {
         return connections;
     }
@@ -91,9 +92,18 @@ public class Server {
 
         switch (action) {
             case "login":
-                int userID =requestJson.get("id").getAsInt();
-                String userPassword =requestJson.get("password").getAsString();
+                int userID = requestJson.get("id").getAsInt();
+                String userPassword = requestJson.get("password").getAsString();
 
+                User user = LoginManager.getInstance().login(userID, userPassword);
+                if (user != null) {
+                    String simpleName = user.getClass().getSimpleName();
+                    response.addProperty("usertype", simpleName);
+                    response.addProperty("user", user.serializeToString());
+                } else {
+                    response.addProperty("error", "no user found");
+                }
+                break;
             case "ping":
                 response.addProperty("status", "success");
                 response.addProperty("message", "Pong!");

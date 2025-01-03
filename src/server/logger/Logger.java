@@ -1,28 +1,31 @@
 package server.logger;
 
+import server.database.PropertiesHandler;
 import server.models.Employee;
 import server.models.Purchase;
+import server.models.customer.Customer;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * A utility class responsible for logging various activities within the application.
  */
 public class Logger {
 
-    private static final String basicPath = "src/Store/Server/Logger/";
+    private static final String basicPath = "src/server/logger/";
     private static final String LOG_FILE_PATH = basicPath + "log.txt";
     private static String saveChatConversation;
-    private static server.database.PropertiesHandler propertiesHandler;
+    private static PropertiesHandler propertiesHandler;
 
     /**
      * Initializes the server.logger with configurations.
      */
     public static void initLogger() {
-        propertiesHandler = new server.database.PropertiesHandler(basicPath + "Preferences.properties");
+        propertiesHandler = new PropertiesHandler(basicPath + "Preferences.properties");
         saveChatConversation = propertiesHandler.getProperty("SAVE_CHAT_CONVERSATIONS");
         System.out.println("Logger is live");
     }
@@ -32,7 +35,7 @@ public class Logger {
      *
      * @param emp The registered employee.
      */
-    public static void registerEmployee(server.models.Employee emp) {
+    public static void registerEmployee(Employee emp) {
         log("Employee Registered: " + emp.getId());
     }
 
@@ -41,7 +44,7 @@ public class Logger {
      *
      * @param customer The registered customer.
      */
-    public static void registerCustomer(server.models.customer.Customer customer) {
+    public static void registerCustomer(Customer customer) {
         log("Customer Registered: " + customer.getId());
     }
 
@@ -62,7 +65,7 @@ public class Logger {
      * @param conversation The conversation content.
      */
     public static void saveChat(String fileName, String conversation) {
-        if (saveChatConversation == "Yes") {
+        if (Objects.equals(saveChatConversation, "Yes")) {
             // Save the entire chat to separate file
 
         }

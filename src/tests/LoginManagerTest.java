@@ -14,7 +14,7 @@ public class LoginManagerTest {
 
     @BeforeEach
     public void setUp() {
-        loginManager = new LoginManager();
+        loginManager = LoginManager.getInstance();
     }
 
     @Test
@@ -24,7 +24,7 @@ public class LoginManagerTest {
         loginManager.addUser(employee);
 
         // Ensure the user is added
-        assertTrue(loginManager.login(1, "hash123"));
+        assertNotNull(loginManager.login(1, "hash123"));
     }
 
     @Test
@@ -39,8 +39,8 @@ public class LoginManagerTest {
         loginManager.addUser(employee2);
 
         // Ensure only the first user is added
-        assertTrue(loginManager.login(3, "hash456"));
-        assertFalse(loginManager.login(3, "wrongpassword"));
+        assertNotNull(loginManager.login(3, "hash456"));
+        assertNull(loginManager.login(3, "wrongpassword"));
     }
 
     @Test
@@ -50,7 +50,7 @@ public class LoginManagerTest {
         loginManager.addUser(employee);
 
         // Test successful authentication
-        assertTrue(loginManager.login(2, "password123"));
+        assertNotNull(loginManager.login(2, "password123"));
     }
 
     @Test
@@ -61,15 +61,15 @@ public class LoginManagerTest {
         loginManager.addUser(employee);
 
         // Test failed authentication with wrong password
-        assertFalse(loginManager.login(4, "wrongPassword"));
+        assertNull(loginManager.login(4, "wrongPassword"));
 
         // Test failed authentication with non-existent ID
-        assertFalse(loginManager.login(5, "securePass"));
+        assertNull(loginManager.login(5, "securePass"));
     }
 
     @Test
     public void testLoginEmptyManager() {
         // Test authentication on an empty LoginManager
-        assertFalse(loginManager.login(1, "hash123"));
+        assertNull(loginManager.login(1, "hash123"));
     }
 }
