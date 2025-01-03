@@ -2,12 +2,13 @@ package models.purchaseHistory;
 
 
 import com.google.gson.Gson;
+import models.Purchase;
 import utils.JsonSerializable;
 
 /**
  * Represents an item that has been purchased, detailing the purchase ID and the product ID.
  */
-public class PurchasedItem implements JsonSerializable {
+public class PurchasedItem extends JsonSerializable {
 
     private int purchaseID;
     private int productID;
@@ -23,8 +24,15 @@ public class PurchasedItem implements JsonSerializable {
         this.productID = productID;
     }
 
-    public PurchasedItem(String objectString) {
-        this.deserializeFromString(PurchasedItem.class,objectString);
+    public PurchasedItem(String jsonStr) {
+        populateFromJson(jsonStr);
+    }
+
+    @Override
+    protected void populateFromJson(String json) {
+        PurchasedItem tmp = gson.fromJson(json,PurchasedItem.class);
+        this.productID = tmp.productID;
+        this.purchaseID = tmp.purchaseID;
     }
 
     /**

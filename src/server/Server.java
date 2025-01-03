@@ -2,11 +2,10 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import database.ChatSession;
 import database.SocketData;
 import logger.Logger;
 import models.Employee;
-import services.ChatManager;
+import server.services.ChatManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,7 +14,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Server {
@@ -92,6 +90,10 @@ public class Server {
         JsonObject response = new JsonObject();
 
         switch (action) {
+            case "login":
+                int userID =requestJson.get("id").getAsInt();
+                String userPassword =requestJson.get("password").getAsString();
+
             case "ping":
                 response.addProperty("status", "success");
                 response.addProperty("message", "Pong!");

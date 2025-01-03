@@ -3,14 +3,15 @@ package client.serverCommunication.decodeCMD;
 
 import client.serverCommunication.Format;
 import models.Employee;
-import services.EmployeeManager;
+import server.services.AdminManager;
+import server.services.EmployeeManager;
 
 import java.sql.SQLException;
 import java.util.List;
 
 public class DecodeExecuteCommandEmployee {
     public static String execute(String command) throws SQLException {
-        EmployeeManager EMP_mgr = new EmployeeManager();
+        AdminManager manager = new AdminManager();
         Employee emp;
         int id;
         String response = Format.encodeSuccessMessage();
@@ -18,22 +19,22 @@ public class DecodeExecuteCommandEmployee {
             //public static String createNewEmployee(Employee emp)
             case "createNewEmployee":
                 emp = new Employee(Format.getFirstParam(command));
-                EMP_mgr.addEmployee(emp);
+                manager.addEmployee(emp);
                 break;
             //public static String updateEmployee(Employee emp)
             case "updateEmployee":
                 emp = new Employee(Format.getFirstParam(command));
-                EMP_mgr.updateEmployee(emp);
+                manager.updateEmployee(emp);
                 break;
             //public static String deleteEmployee(int id)
             case "deleteEmployee":
                 id = Integer.parseInt(Format.getFirstParam(command));
-                EMP_mgr.deleteEmployee(id);
+                manager.deleteEmployee(id);
                 break;
             //public static String getEmployeeByID(int id)
             case "getEmployeeByID":
                 id = Integer.parseInt(Format.getFirstParam(command));
-                emp = EMP_mgr.findEmployeeById(id);
+                emp = manager.findEmployeeById(id);
                 if(emp == null)
                     response = Format.encodeEmpty("");
                 else
@@ -41,8 +42,8 @@ public class DecodeExecuteCommandEmployee {
                 break;
             case "getEmployees":
                 //public List<Employee> getEmployees() {
-                List<Employee> employees = EMP_mgr.getAllEmployees();
-                if( employees.size() == 0)
+                List<Employee> employees = manager.getAllEmployees();
+                if(employees.isEmpty())
                     response = Format.encodeEmpty("");
                 else
                     response = Format.encodeEmployees(employees);
@@ -50,17 +51,17 @@ public class DecodeExecuteCommandEmployee {
             //public static String getEmployeesByBranch(String branch)
             case "getEmployeesByBranch":
                 String branch = Format.getFirstParam(command);
-                List<Employee> empList = EMP_mgr.getEmployeesByBranch(branch);
-                if(empList.size() == 0)
+                List<Employee> empList = manager.getEmployeesByBranch(branch);
+                if(empList.isEmpty())
                     response = Format.encodeEmpty("");
                 else
                     response = Format.encodeEmployees(empList);
                 break;
-            //public static String Login(String username, String password)
+            //public static String Login(String uid, String password)
             case "Login":
-                String username = Format.getFirstParam(command);
+                int uid = Integer.parseInt(Format.getFirstParam(command));
                 String password = Format.getSecondParam(command);
-                response =  EMP_mgr.login(username, password);
+                response = manager.login(uid, password).serializeToString();
                 break;
         }
         return response;

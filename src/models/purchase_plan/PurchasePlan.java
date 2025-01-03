@@ -2,10 +2,10 @@ package models.purchase_plan;
 
 import utils.JsonSerializable;
 
-public abstract class PurchasePlan implements JsonSerializable {
+public abstract class PurchasePlan extends JsonSerializable {
     protected String planDetails;
     protected int customerID;
-    private int purchaseID;
+    protected int purchaseID;
 
 
     public int getCustomerID() {

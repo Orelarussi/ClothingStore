@@ -5,7 +5,7 @@ import database.ChatSession;
 import database.SocketData;
 import models.Employee;
 import server.Server;
-import services.ChatManager;
+import server.services.ChatManager;
 
 import java.util.Set;
 

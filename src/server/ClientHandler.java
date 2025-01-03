@@ -5,7 +5,7 @@ import client.serverCommunication.decodeCMD.DecodeExecuteCommand;
 import database.ChatSession;
 import database.SocketData;
 import models.Employee;
-import services.ChatManager;
+import server.services.ChatManager;
 
 import java.io.IOException;
 import java.net.Socket;

@@ -3,7 +3,7 @@ package tests;
 import models.SaleReport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import services.SalesManager;
+import server.services.SalesManager;
 
 import java.time.LocalDate;
 

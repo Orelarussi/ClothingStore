@@ -1,11 +1,9 @@
-package services;
+package server.services;
 
 import models.Product;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class InventoryManager {
     private List<Product> products;

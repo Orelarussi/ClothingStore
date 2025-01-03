@@ -1,7 +1,7 @@
-package services;
+package server.services;
 
 import models.Employee;
-import models.User;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +22,7 @@ public class LoginManager {
     }
 
     // Authenticate user by ID and password hash
-    public boolean authenticate(int id, String password) {
+    public boolean login(int id, String password) {
         Employee employee = employees.get(id);
         if (employee != null && employee.getPassword().equals(password)) {
             System.out.println("Login successful for employee: " + employee.getFirstName());

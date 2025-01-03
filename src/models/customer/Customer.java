@@ -2,15 +2,16 @@ package models.customer;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import models.Person;
 import models.User;
 import models.purchase_plan.PurchasePlan;
 import utils.JsonSerializable;
 
-public abstract class Customer extends User implements JsonSerializable {
+public abstract class Customer extends Person {
 
     private String branchID;
     protected PurchasePlan purchasePlan;
-    protected final CustomerType type;
+    protected CustomerType type;
 
     public Customer(int id, String firstName, String lastName, String phoneNumber, String branchID, CustomerType type) {
         super(id, firstName, lastName, phoneNumber);
@@ -71,9 +72,16 @@ public abstract class Customer extends User implements JsonSerializable {
                 '}';
     }
 
-    public abstract String serializeToString();
-
     public CustomerType getType() {
         return type;
+    }
+
+    @Override
+    protected void populateFromJson(String json) {
+        super.populateFromJson(json);
+        Customer temp = gson.fromJson(json,Customer.class);
+        this.branchID = temp.branchID;
+        this.purchasePlan = temp.purchasePlan;
+        this.type = temp.type;
     }
 }

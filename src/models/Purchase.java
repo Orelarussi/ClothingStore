@@ -12,7 +12,7 @@ import java.util.List;
  * Represents a purchase made by a customer, detailing the items bought,
  * the date of purchase, the branch where the purchase was made, and more.
  */
-public class Purchase implements JsonSerializable {
+public class Purchase extends JsonSerializable {
 
     private int purchaseID;
     private int customerID;
@@ -31,6 +31,7 @@ public class Purchase implements JsonSerializable {
      * @param branch Branch where the purchase was made.
      * @param purchasedItems List of items that were purchased.
      */
+    //New purchase
     public Purchase(int customerID, LocalDateTime date, String branch, List<Product> purchasedItems) {
         this.customerID = customerID;
         this.date = date;
@@ -46,6 +47,7 @@ public class Purchase implements JsonSerializable {
      * @param date Date and time of the purchase.
      * @param branch Branch where the purchase was made.
      */
+    //Creating a purchase object from the database
     public Purchase(int purchaseID, int customerID, LocalDateTime date, String branch) {
         this.purchaseID = purchaseID;
         this.customerID = customerID;
@@ -54,7 +56,12 @@ public class Purchase implements JsonSerializable {
     }
 
     public Purchase(String jsonStr) {
-        Purchase tmp = deserializeFromString(Purchase.class,jsonStr);
+        populateFromJson(jsonStr);
+    }
+
+    @Override
+    protected void populateFromJson(String json) {
+        Purchase tmp = gson.fromJson(json,Purchase.class);
         this.purchaseID = tmp.purchaseID;
         this.customerID = tmp.customerID;
         this.date = tmp.date;
@@ -116,7 +123,7 @@ public class Purchase implements JsonSerializable {
     }
 
     /**
-    * Returns a string representation of the a purchase.
+    * Returns a string representation of the purchase.
     *
     * @return The string representation of the purchase.
     */
@@ -132,34 +139,12 @@ public class Purchase implements JsonSerializable {
     public String toString(int type) {
         String response = customerID + Format.fieldSeparator + Format.dateToString(date) + Format.fieldSeparator + branch;
 
-        switch(type) {
-            case 1:
-                return response + Format.paramsSeparator + Format.encodeProducts(purchasedItems) + Format.paramsSeparator;
-            case 2:
-                return purchaseID + Format.paramsSeparator + response + Format.paramsSeparator;
-        }
-        return null;
-    }
-
-    /**
-        * Serializes the purchase object to a string representation.
-        *
-        * @return The serialized string representation of the purchase.
-        */
-    @Override
-    public String serializeToString() {
-        return new Gson().toJson(this);
-    }
-
-    /**
-        * Deserializes a string representation of an purchased item back to an PurchasedItem object.
-        *
-        * @param serializedString The serialized string representation of the purchased item.
-        * @return The deserialized PurchasedItem object.
-        */
-    @Override
-    public <T> T deserializeFromString(Class<T> type,String serializedString) {
-        return new Gson().fromJson(serializedString,type);
+        return switch (type) {
+            case 1 ->
+                    response + Format.paramsSeparator + Format.encodeProducts(purchasedItems) + Format.paramsSeparator;
+            case 2 -> purchaseID + Format.paramsSeparator + response + Format.paramsSeparator;
+            default -> null;
+        };
     }
 
 }

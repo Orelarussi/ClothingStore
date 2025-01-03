@@ -2,8 +2,7 @@ package database;
 
 import logger.Logger;
 import models.Employee;
-import server.Server;
-import services.ChatManager;
+import server.services.ChatManager;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -77,8 +76,7 @@ public class ChatSession {
             for (Map.Entry<SocketData, Employee> entry : allListeners.entrySet()) {
                 SocketData socketData = entry.getKey();
                 Employee emp = new Employee(121212, "Bon", "Koli", "024254555",
-                        "pass", "holon", 23583454567l,
-                        69846464l, Employee.Position.CASHIER);
+                        "pass", "holon", 23583454567L, Employee.Position.CASHIER);
                 final String msg = "CHAT@@@receiveMessage###" + emp.serializeToString() + "&&&" + message + "&&&";
                 socketData.getOutputStream().println(msg);
             }

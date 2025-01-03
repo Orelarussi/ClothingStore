@@ -1,4 +1,4 @@
-package services;
+package server.services;
 
 import models.SaleReport;
 

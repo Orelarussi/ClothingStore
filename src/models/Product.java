@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import exceptions.InvalidQuantityException;
 import utils.JsonSerializable;
 
-public class Product implements JsonSerializable {
+public class Product extends JsonSerializable {
     private int id;
     private String name;
     private String category;
@@ -21,13 +21,19 @@ public class Product implements JsonSerializable {
         this.branch = branch;
     }
     public Product(String jsonString){
-        Product tmp = deserializeFromString(Product.class,jsonString);
-        this.id = tmp.id;
-        this.name = tmp.name;
-        this.category = tmp.category;
-        this.price = tmp.price;
-        this.quantity = tmp.quantity;
-        this.branch = tmp.branch;
+        populateFromJson(jsonString);
+    }
+
+
+    @Override
+    protected void populateFromJson(String json) {
+        Product temp = gson.fromJson(json,Product.class);
+        this.id = temp.id;
+        this.name = temp.name;
+        this.category = temp.category;
+        this.price = temp.price;
+        this.quantity = temp.quantity;
+        this.branch = temp.branch;
     }
 
     // Getters and Setters
@@ -77,9 +83,5 @@ public class Product implements JsonSerializable {
     public String getBranch(){return branch;}
     public void setBranch(String branch){
         this.branch = branch;
-    }
-
-    public String serializeToString() {
-        return new Gson().toJson(this);
     }
 }

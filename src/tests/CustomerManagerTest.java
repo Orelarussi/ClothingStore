@@ -1,13 +1,12 @@
 package tests;
 
-import models.*;
 import models.customer.Customer;
 import models.customer.NewCustomer;
 import models.customer.ReturningCustomer;
 import models.customer.VIPCustomer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import services.CustomerManager;
+import server.services.CustomerManager;
 
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class CustomerManagerTest {
 
     @Test
     public void testAddVIPCustomer() {
-        Customer vipCustomer = new VIPCustomer(1, "John", "Doe", "123456789", "Branch01",null);
+        Customer vipCustomer = new VIPCustomer(1, "John", "Doe", "123456789", "Branch01");
         customerManager.addCustomer(vipCustomer);
 
         List<Customer> customers = customerManager.getAllCustomers();
@@ -35,7 +34,7 @@ public class CustomerManagerTest {
 
     @Test
     public void testAddNewCustomer() {
-        Customer newCustomer = new NewCustomer(2, "Alice", "Smith", "987654321", "Branch02",null);
+        Customer newCustomer = new NewCustomer(2, "Alice", "Smith", "987654321", "Branch02");
         customerManager.addCustomer(newCustomer);
 
         List<Customer> customers = customerManager.getAllCustomers();
@@ -47,7 +46,7 @@ public class CustomerManagerTest {
 
     @Test
     public void testAddReturningCustomer() {
-        Customer returningCustomer = new ReturningCustomer(3, "Bob", "Johnson", "555123456", "Branch03",null);
+        Customer returningCustomer = new ReturningCustomer(3, "Bob", "Johnson", "555123456", "Branch03");
         customerManager.addCustomer(returningCustomer);
 
         List<Customer> customers = customerManager.getAllCustomers();
@@ -59,7 +58,7 @@ public class CustomerManagerTest {
 
     @Test
     public void testFindCustomerById() {
-        Customer vipCustomer = new VIPCustomer(1, "John", "Doe", "123456789", "Branch01",null);
+        Customer vipCustomer = new VIPCustomer(1, "John", "Doe", "123456789", "Branch01");
         customerManager.addCustomer(vipCustomer);
 
         Customer found = customerManager.findCustomerById(1);
@@ -70,7 +69,7 @@ public class CustomerManagerTest {
 
     @Test
     public void testDeleteCustomer() {
-        Customer returningCustomer = new ReturningCustomer(3, "Bob", "Johnson", "555123456", "Branch03",null);
+        Customer returningCustomer = new ReturningCustomer(3, "Bob", "Johnson", "555123456", "Branch03");
         customerManager.addCustomer(returningCustomer);
 
         customerManager.deleteCustomer(3);
@@ -80,8 +79,8 @@ public class CustomerManagerTest {
 
     @Test
     public void testGetAllCustomers() {
-        Customer vipCustomer = new VIPCustomer(1, "John", "Doe", "123456789", "Branch01",null);
-        Customer newCustomer = new NewCustomer(2, "Alice", "Smith", "987654321", "Branch02",null);
+        Customer vipCustomer = new VIPCustomer(1, "John", "Doe", "123456789", "Branch01");
+        Customer newCustomer = new NewCustomer(2, "Alice", "Smith", "987654321", "Branch02");
 
         customerManager.addCustomer(vipCustomer);
         customerManager.addCustomer(newCustomer);

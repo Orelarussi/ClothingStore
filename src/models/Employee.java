@@ -1,49 +1,47 @@
 package models;
 
 public class Employee extends User {
+    private static long employeesNum = 0;
     private String branchID;
     private long accountNumber;
     private long employeeNumber;
     private Position position;
-    private String password;
+
+    public Employee(){
+        super();
+    }
 
     public Employee(String json){
-        super(-1,null,null,null);
-        final Employee temp = deserializeFromString(Employee.class,json);
-        this.id = temp.id;
-        this.firstName = temp.firstName;
-        this.lastName = temp.lastName;
-        this.phoneNumber = temp.phoneNumber;
-        this.branchID = temp.branchID;
-        this.accountNumber = temp.accountNumber;
-        this.employeeNumber = temp.employeeNumber;
-        this.position = temp.position;
-        this.password = temp.password;
+        this();
+        employeesNum++;
+        populateFromJson(json);
     }
 
     public enum Position {SHIFTMGR, CASHIER, SELLER;}
 
     public Employee(int id, String firstName, String lastName, String phoneNumber, String password,
-                    String branchID, long accountNumber, long employeeNumber, Position position) {
-        super(id, firstName, lastName, phoneNumber);
+                    String branchID, long accountNumber, Position position) {
+        super(id, firstName, lastName, phoneNumber,password);
         this.branchID = branchID;
         this.accountNumber = accountNumber;
-        this.employeeNumber = employeeNumber;
+        this.employeeNumber = ++employeesNum;
         this.position = position;
-        this.password = password;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    public String getBranchID() {
+        return branchID;
     }
 
     // Getters and Setters
-    public String getBranchID() {
-        return branchID;
+    @Override
+    protected void populateFromJson(String json) {
+        super.populateFromJson(json);
+        Employee temp = gson.fromJson(json,Employee.class);
+
+        this.branchID = temp.branchID;
+        this.accountNumber = temp.accountNumber;
+        this.employeeNumber = temp.employeeNumber;
+        this.position = temp.position;
     }
 
     public void setBranchID(String branchID) {
@@ -73,5 +71,4 @@ public class Employee extends User {
             throw new IllegalArgumentException("Employee number must be positive.");
         }
     }
-
 }

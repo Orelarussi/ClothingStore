@@ -1,6 +1,6 @@
 package models;
 
-import services.InventoryManager;
+import server.services.InventoryManager;
 
 public class Branch {
     private String id;

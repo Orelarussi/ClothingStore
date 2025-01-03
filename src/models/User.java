@@ -1,50 +1,40 @@
 package models;
 
-import utils.JsonSerializable;
+public abstract class User extends Person {
+    private String password;
 
-public class User implements JsonSerializable {
-    protected int id;
-    protected String firstName;
-    protected String lastName;
-    protected String phoneNumber;
-
-    public User(int id, String firstName, String lastName, String phoneNumber) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phoneNumber = phoneNumber;
+    public User(int id, String firstName, String lastName, String phoneNumber, String password) {
+        super(id, firstName, lastName, phoneNumber);
+        this.password = password;
     }
 
-    // Getters and Setters
-    public int getId() {
-        return id;
+    protected User() {
+        super();
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getPassword() {
+        return password;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public String getLastName() {
-        return lastName;
+    @Override
+    public String toString() {
+        return "User{" +
+                "password='" + password + '\'' +
+                ", id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                '}';
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getFullName() {
-        return getFirstName() + " " + getLastName();
+    @Override
+    protected void populateFromJson(String json) {
+        super.populateFromJson(json);
+        User temp = gson.fromJson(json,User.class);
+        this.password = temp.password;
     }
 }

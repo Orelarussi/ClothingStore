@@ -1,19 +1,22 @@
-package services;
+package server.services;
+
+import client.serverCommunication.Format;
+import models.Employee;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import models.customer.Customer;
 import models.customer.CustomerType;
+import server.Server;
 
-import java.util.ArrayList;
-import java.util.List;
+public class EmployeeManager {
+    private Map<Integer, Employee> employees = new HashMap<>();
+    private List<Customer> customers = new ArrayList<>();
 
-public class CustomerManager {
-    private List<Customer> customers;
-
-    public CustomerManager() {
-        this.customers = new ArrayList<>();
-    }
-
-    // Add a new customer
     public void addCustomer(Customer customer) {
         for (Customer existingCustomer : customers) {
             if (existingCustomer.getId() == customer.getId()) {
@@ -62,7 +65,25 @@ public class CustomerManager {
             System.out.println(customer);
         }
     }
+
     public List<Customer> getAllCustomers() {
         return new ArrayList<>(customers); // Return a copy of the customer list to avoid external modifications
+    }
+
+
+    public String login(String username, String password) {
+
+        Employee emp = getEmployeeByID(Integer.parseInt(username));
+        if (emp == null) return Format.encodeException("There's no such user");
+
+        if (!emp.getPassword().equals(password)) return Format.encodeException("wrong password");
+
+        if (Server.getSocketDataByEmployee(emp) != null) return Format.encodeException("User already logged in");
+
+        return emp.serializeToString();
+    }
+
+    public Employee getEmployeeByID(int id) {
+        return employees.get(id);
     }
 }
