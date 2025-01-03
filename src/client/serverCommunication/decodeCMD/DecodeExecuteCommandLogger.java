@@ -2,7 +2,7 @@ package client.serverCommunication.decodeCMD;
 
 import client.serverCommunication.ClassType;
 import client.serverCommunication.Format;
-import logger.Logger;
+import server.logger.Logger;
 
 import java.sql.SQLException;
 

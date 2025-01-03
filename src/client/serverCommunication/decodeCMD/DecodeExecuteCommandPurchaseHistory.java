@@ -1,9 +1,9 @@
 package client.serverCommunication.decodeCMD;
 
 import client.serverCommunication.Format;
-import database.PurchaseHistoryDAO;
-import models.Purchase;
-import models.purchaseHistory.PurchasedItem;
+import server.database.PurchaseHistoryDAO;
+import server.models.Purchase;
+import server.models.purchaseHistory.PurchasedItem;
 
 import java.sql.SQLException;
 import java.util.List;

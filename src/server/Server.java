@@ -2,9 +2,9 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import database.SocketData;
-import logger.Logger;
-import models.Employee;
+import server.database.SocketData;
+import server.logger.Logger;
+import server.models.Employee;
 import server.services.ChatManager;
 
 import java.io.BufferedReader;

@@ -1,16 +1,15 @@
 package server.services;
 
 import client.serverCommunication.Format;
-import models.Employee;
+import server.models.Employee;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import models.customer.Customer;
-import models.customer.CustomerType;
+import server.models.customer.Customer;
+import server.models.customer.CustomerType;
 import server.Server;
 
 public class EmployeeManager {

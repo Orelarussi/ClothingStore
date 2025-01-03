@@ -1,9 +1,9 @@
 package client.serverCommunication.decodeCMD;
 
 import client.serverCommunication.Format;
-import database.ChatSession;
-import database.SocketData;
-import models.Employee;
+import server.database.ChatSession;
+import server.database.SocketData;
+import server.models.Employee;
 import server.Server;
 import server.services.ChatManager;
 
@@ -12,8 +12,8 @@ import java.util.Set;
 public class DecodeExecuteCommandChat {
     public static String execute(String command) {
         ChatManager chatManager = ChatManager.getInstance();
-        models.Employee emp;
-        database.SocketData socketData;
+        server.models.Employee emp;
+        server.database.SocketData socketData;
         String branch;
         ChatSession chat;
         String response = Format.encodeSuccessMessage();

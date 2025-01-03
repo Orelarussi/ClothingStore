@@ -2,7 +2,7 @@ package client;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import models.Employee;
+import server.models.Employee;
 
 import java.io.*;
 import java.net.Socket;

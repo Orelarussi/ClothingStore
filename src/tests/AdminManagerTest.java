@@ -1,7 +1,7 @@
 package tests;
 
-import models.Employee;
-import models.Employee.Position;
+import server.models.Employee;
+import server.models.Employee.Position;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.services.AdminManager;

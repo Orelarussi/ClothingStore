@@ -1,7 +1,7 @@
 package server.services;
 
-import models.customer.Customer;
-import models.customer.CustomerType;
+import server.models.customer.Customer;
+import server.models.customer.CustomerType;
 
 import java.util.ArrayList;
 import java.util.List;

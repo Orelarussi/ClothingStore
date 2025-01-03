@@ -1,10 +1,10 @@
 package server.services;
 
-import database.ChatSession;
-import database.SocketData;
-import models.Chat;
-import models.Employee;
-import models.Message;
+import server.database.ChatSession;
+import server.database.SocketData;
+import server.models.Chat;
+import server.models.Employee;
+import server.models.Message;
 import server.Server;
 
 import java.util.*;

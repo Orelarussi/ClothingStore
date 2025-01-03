@@ -3,7 +3,7 @@ package client.serverCommunication.decodeCMD;
 
 
 import client.serverCommunication.Format;
-import models.Product;
+import server.models.Product;
 import server.services.InventoryManager;
 
 import java.sql.SQLException;

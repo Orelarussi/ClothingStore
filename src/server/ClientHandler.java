@@ -2,9 +2,9 @@ package server;
 
 import client.serverCommunication.Format;
 import client.serverCommunication.decodeCMD.DecodeExecuteCommand;
-import database.ChatSession;
-import database.SocketData;
-import models.Employee;
+import server.database.ChatSession;
+import server.database.SocketData;
+import server.models.Employee;
 import server.services.ChatManager;
 
 import java.io.IOException;

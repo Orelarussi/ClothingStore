@@ -1,5 +1,5 @@
 package tests;
-import models.Product;
+import server.models.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.services.InventoryManager;

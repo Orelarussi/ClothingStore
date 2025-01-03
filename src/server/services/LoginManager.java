@@ -1,6 +1,6 @@
 package server.services;
 
-import models.Employee;
+import server.models.Employee;
 
 import java.util.HashMap;
 import java.util.Map;

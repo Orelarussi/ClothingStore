@@ -1,6 +1,6 @@
 package server.services;
 
-import models.Product;
+import server.models.Product;
 
 import java.util.ArrayList;
 import java.util.List;

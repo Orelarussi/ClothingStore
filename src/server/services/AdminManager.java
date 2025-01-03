@@ -1,8 +1,8 @@
 package server.services;
 
-import models.Admin;
-import models.Employee;
-import models.User;
+import server.models.Admin;
+import server.models.Employee;
+import server.models.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;

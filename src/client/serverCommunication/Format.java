@@ -4,11 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import database.ChatSession;
-import models.Employee;
-import models.Product;
-import models.customer.Customer;
-import models.purchaseHistory.PurchasedItem;
+import server.database.ChatSession;
+import server.models.Employee;
+import server.models.Product;
+import server.models.customer.Customer;
+import server.models.purchaseHistory.PurchasedItem;
 
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;

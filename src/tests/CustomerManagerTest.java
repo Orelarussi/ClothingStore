@@ -1,9 +1,9 @@
 package tests;
 
-import models.customer.Customer;
-import models.customer.NewCustomer;
-import models.customer.ReturningCustomer;
-import models.customer.VIPCustomer;
+import server.models.customer.Customer;
+import server.models.customer.NewCustomer;
+import server.models.customer.ReturningCustomer;
+import server.models.customer.VIPCustomer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.services.CustomerManager;

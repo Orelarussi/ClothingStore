@@ -1,6 +1,6 @@
 package tests;
 
-import models.SaleReport;
+import server.models.SaleReport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.services.SalesManager;

@@ -3,7 +3,7 @@ package client.serverCommunication.encodeCMD;
 
 import client.serverCommunication.ClassType;
 import client.serverCommunication.Format;
-import models.Employee;
+import server.models.Employee;
 
 public class EncodeCommandEmployee {
     public static String createNewEmployee(Employee emp)

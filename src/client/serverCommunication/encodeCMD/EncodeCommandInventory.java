@@ -3,7 +3,7 @@ package client.serverCommunication.encodeCMD;
 
 import client.serverCommunication.ClassType;
 import client.serverCommunication.Format;
-import models.Product;
+import server.models.Product;
 
 public class EncodeCommandInventory {
     public static String getProductsByBranch(String branch) {

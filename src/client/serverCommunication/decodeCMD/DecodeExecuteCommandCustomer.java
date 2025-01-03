@@ -1,6 +1,6 @@
 package client.serverCommunication.decodeCMD;
 import client.serverCommunication.Format;
-import models.customer.Customer;
+import server.models.customer.Customer;
 import server.services.CustomerManager;
 
 import java.sql.SQLException;

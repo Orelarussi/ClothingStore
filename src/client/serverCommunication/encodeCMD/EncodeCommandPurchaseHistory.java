@@ -3,7 +3,7 @@ package client.serverCommunication.encodeCMD;
 
 import client.serverCommunication.ClassType;
 import client.serverCommunication.Format;
-import models.purchase_plan.PurchasePlan;
+import server.models.purchase_plan.PurchasePlan;
 
 public class EncodeCommandPurchaseHistory {
     public static String createNewPurchase(PurchasePlan purchase) {

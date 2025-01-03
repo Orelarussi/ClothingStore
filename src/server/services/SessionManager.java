@@ -1,6 +1,6 @@
 package server.services;
 
-import models.Person;
+import server.models.Person;
 import java.util.HashSet;
 import java.util.Set;
 
