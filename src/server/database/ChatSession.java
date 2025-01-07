@@ -2,6 +2,7 @@ package server.database;
 
 import server.logger.Logger;
 import server.models.Employee;
+import server.models.User;
 import server.services.ChatManager;
 
 import java.io.IOException;
@@ -12,12 +13,12 @@ import java.util.Map;
 public class ChatSession {
     private static int sessionCounter = 0;
     private int sessionID;
-    private Map<SocketData, Employee> allListeners;
-    private Employee creator;
-    private Employee receiver;
+    private Map<SocketData, User> allListeners;
+    private User creator;
+    private User receiver;
 
-    public ChatSession(Employee creator, Employee receiver) {
-        this.allListeners = new HashMap<SocketData, Employee>();
+    public ChatSession(Employee creator, User receiver) {
+        this.allListeners = new HashMap<SocketData, User>();
         this.creator = creator;
         this.receiver = receiver;
         sessionID = sessionCounter++;
@@ -28,20 +29,20 @@ public class ChatSession {
         return this.sessionID;
     }
 
-    public Employee getCreatorEmployee() {
+    public User getCreatorEmployee() {
         return this.creator;
     }
 
-    public Employee getReceiverEmployee() {
+    public User getReceiverEmployee() {
         return this.receiver;
     }
 
-    public Employee getEmployeeBySocketData(SocketData socketData) {
+    public User getEmployeeBySocketData(SocketData socketData) {
         return allListeners.get(socketData);
     }
 
     public SocketData getSocketDataByEmployee(Employee emp) {
-        for (Map.Entry<SocketData, Employee> entry : allListeners.entrySet()) {
+        for (Map.Entry<SocketData, User> entry : allListeners.entrySet()) {
             if (emp.getId() == entry.getValue().getId())
                 return entry.getKey();
         }
@@ -49,7 +50,7 @@ public class ChatSession {
         return null;
     }
 
-    public void addListener(SocketData socketData, Employee emp) {
+    public void addListener(SocketData socketData, User emp) {
         allListeners.put(socketData, emp);
     }
 
@@ -62,7 +63,7 @@ public class ChatSession {
 
     public void broadcast(Employee emp, String message, PrintWriter sender) {
         synchronized (allListeners) {
-            for (Map.Entry<SocketData, Employee> entry : allListeners.entrySet()) {
+            for (Map.Entry<SocketData, User> entry : allListeners.entrySet()) {
                 SocketData socketData = entry.getKey();
                 if (socketData.getOutputStream() != sender) {
                     socketData.getOutputStream().println("CHAT@@@receiveMessage###" + emp.serializeToString() + "&&&" + message + "&&&");
@@ -73,7 +74,7 @@ public class ChatSession {
 
     public void broadcast(String message) {
         synchronized (allListeners) {
-            for (Map.Entry<SocketData, Employee> entry : allListeners.entrySet()) {
+            for (Map.Entry<SocketData, User> entry : allListeners.entrySet()) {
                 SocketData socketData = entry.getKey();
                 Employee emp = new Employee(121212, "Bon", "Koli", "024254555",
                         "pass", "holon", 23583454567L, Employee.Position.CASHIER);

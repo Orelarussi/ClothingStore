@@ -5,6 +5,7 @@ import server.database.ChatSession;
 import server.database.SocketData;
 import server.models.Employee;
 import server.Server;
+import server.models.User;
 import server.services.ChatManager;
 
 import java.util.Set;
@@ -21,17 +22,17 @@ public class DecodeExecuteCommandChat {
         switch (Format.getMethod(command)) {
             case "clientOnline":
                 emp = new Employee(Format.getFirstParam(command));
-                socketData = Server.getSocketDataByEmployee(emp);
+                socketData = Server.getSocketDataByUser(emp);
                 chatManager.getAvailableEmployees().put(socketData, emp);
                 break;
             case "clientOffline":
                 emp = new Employee(Format.getFirstParam(command));
-                socketData = Server.getSocketDataByEmployee(emp);
+                socketData = Server.getSocketDataByUser(emp);
                 chatManager.getAvailableEmployees().remove(socketData);
                 break;
             case "sendMessage":
                 emp = new Employee(Format.getFirstParam(command));
-                socketData = Server.getSocketDataByEmployee(emp);
+                socketData = Server.getSocketDataByUser(emp);
                 String message = Format.getSecondParam(command);
                 chat = chatManager.getChatSessionBySocketData(socketData);
                 chat.broadcast(emp, message, socketData.getOutputStream());
@@ -63,15 +64,16 @@ public class DecodeExecuteCommandChat {
                     SocketData otherEmpSocketData = chatManager.getFirstAvailableEmployeeByBranch(branch);
 
                     if (otherEmpSocketData != null) {
-                        chat = new ChatSession(emp, Server.getEmployeeBySocketData(otherEmpSocketData));
-                        chat.addListener(otherEmpSocketData, Server.getEmployeeBySocketData(otherEmpSocketData));
-                        chat.addListener(Server.getSocketDataByEmployee(emp), emp);
+                        User user = Server.getUserBySocketData(otherEmpSocketData);
+                        chat = new ChatSession(emp, user);
+                        chat.addListener(otherEmpSocketData, user);
+                        chat.addListener(Server.getSocketDataByUser(emp), emp);
 
                         chatManager.getChattingEmployees().put(otherEmpSocketData, chat);
-                        chatManager.getChattingEmployees().put(Server.getSocketDataByEmployee(emp), chat);
+                        chatManager.getChattingEmployees().put(Server.getSocketDataByUser(emp), chat);
 
                         chatManager.getAvailableEmployees().remove(otherEmpSocketData);
-                        chatManager.getAvailableEmployees().remove(Server.getSocketDataByEmployee(emp));
+                        chatManager.getAvailableEmployees().remove(Server.getSocketDataByUser(emp));
 
                         otherEmpSocketData.getOutputStream().println("CHAT@@@setCurrentChat###" + chat.getSessionID());
                         response = "CHAT@@@setCurrentChat###" + chat.getSessionID();
@@ -83,7 +85,7 @@ public class DecodeExecuteCommandChat {
                 break;
             case "leaveChat":
                 emp = new Employee(Format.getFirstParam(command));
-                socketData = Server.getSocketDataByEmployee(emp);
+                socketData = Server.getSocketDataByUser(emp);
                 chat = chatManager.getChatSessionBySocketData(socketData);
                 chat.removeListener(socketData);
                 response = "CHAT@@@abortCurrentChat###";
@@ -91,7 +93,7 @@ public class DecodeExecuteCommandChat {
             case "joinChatSession":
                 int sessionID = Integer.parseInt(Format.getSecondParam(command));
                 emp = new Employee(Format.getFirstParam(command));
-                socketData = Server.getSocketDataByEmployee(emp);
+                socketData = Server.getSocketDataByUser(emp);
                 chat = ChatManager.getInstance().getChatSessionByID(sessionID);
 
                 chat.addListener(socketData, emp);

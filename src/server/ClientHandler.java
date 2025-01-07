@@ -5,6 +5,7 @@ import client.serverCommunication.decodeCMD.DecodeExecuteCommand;
 import server.database.ChatSession;
 import server.database.SocketData;
 import server.models.Employee;
+import server.models.User;
 import server.services.ChatManager;
 
 import java.io.IOException;
@@ -13,10 +14,9 @@ import java.util.Map;
 
 
 public class ClientHandler extends Thread {
-    private final Map<Employee, SocketData> connections;
+    private final Map<User, SocketData> connections;
     private SocketData socketData;
-
-    public ClientHandler(Socket socket, Map<Employee, SocketData> connections) {
+    public ClientHandler(Socket socket, Map<User, SocketData> connections) {
         this.socketData = new SocketData(socket);
         this.connections = connections;
     }
@@ -24,10 +24,11 @@ public class ClientHandler extends Thread {
     @Override
     public void run() {
         try {
+
             String inputString;
             boolean notLoggedIn = true;
-
-            // Handle login
+            // adminManager.login(314965553,"bla bla");
+            // Handle client input request
             while ((inputString = socketData.getInputStream().readLine()) != null) {
                 if (notLoggedIn) {
                     String loginResponse = DecodeExecuteCommand.decode_and_execute(inputString);
@@ -67,7 +68,7 @@ public class ClientHandler extends Thread {
                 e.printStackTrace();
             }
             synchronized (connections) {
-                connections.remove(Server.getEmployeeBySocketData(socketData));
+                connections.remove(Server.getUserBySocketData(socketData));
             }
             final ChatManager chatManager = ChatManager.getInstance();
             if (chatManager.getChattingEmployees().containsKey(socketData)) {

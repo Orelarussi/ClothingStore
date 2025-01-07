@@ -10,7 +10,7 @@ import java.util.List;
 
 public class DecodeExecuteCommandEmployee {
     public static String execute(String command) throws SQLException {
-        AdminManager manager = new AdminManager();
+        AdminManager manager = AdminManager.getInstance();
         Employee emp;
         int id;
         String response = Format.encodeSuccessMessage();
@@ -22,8 +22,7 @@ public class DecodeExecuteCommandEmployee {
                 break;
             //public static String updateEmployee(Employee emp)
             case "updateEmployee":
-                emp = new Employee(Format.getFirstParam(command));
-                manager.updateEmployee(emp);
+//                TODO update employee
                 break;
             //public static String deleteEmployee(int id)
             case "deleteEmployee":
@@ -60,7 +59,7 @@ public class DecodeExecuteCommandEmployee {
             case "Login":
                 int uid = Integer.parseInt(Format.getFirstParam(command));
                 String password = Format.getSecondParam(command);
-                response = manager.login(uid, password).serializeToString();
+                response = String.valueOf(manager.login(uid, password));
                 break;
         }
         return response;

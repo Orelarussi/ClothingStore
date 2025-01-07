@@ -3,6 +3,7 @@ package server.logger;
 import server.database.PropertiesHandler;
 import server.models.Employee;
 import server.models.Purchase;
+import server.models.User;
 import server.models.customer.Customer;
 
 import java.io.BufferedWriter;
@@ -76,7 +77,7 @@ public class Logger {
     /**
      * Logs the initiation of a chat.
      */
-    public static void logChatStarted(Employee sender, Employee receiver) {
+    public static void logChatStarted(Employee sender, User receiver) {
         log("Chat started from: " + sender.getId() + " To -> "+ receiver.getId());
     }
 

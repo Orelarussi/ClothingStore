@@ -12,28 +12,30 @@ import java.util.Map;
 public class AdminManager {
     private Map<Integer, Employee> employees = new HashMap<>();
     private static final Admin admin = new Admin(1, "Eran", "", "000", "1234");
+    private static AdminManager instance;
 
-    // Verify the employee's password during login
-    public User login(int id, String pass) {
-        if (admin.getId() == id && admin.getPassword().equals(pass))
-            return admin;
+    private AdminManager(){}
 
-        Employee emp = employees.get(id);
-        if (emp != null && emp.getPassword().equals(pass))
-            return emp;
-
-        return null;
-    }
-
-    // Update password for a employee
-    public void updatePassword(int id, String password) {
-        Employee employee = employees.get(id);
-        if (employee != null) {
-            employee.setPassword(password);
-            System.out.println("Password updated successfully for employee: " + employee.getFirstName());
-        } else {
-            System.out.println("Employee not found.");
+    public static synchronized AdminManager getInstance() {
+        if (instance == null) {
+            instance = new AdminManager();
         }
+        return instance;
+    }
+    public LoginResult login(int id, String pass) {
+        // Check if the login is for the admin
+        if (admin.getId() == id && admin.getPassword().equals(pass)) {
+            return LoginResult.ADMIN;
+        }
+
+        // Check if the login is for an employee
+        Employee emp = employees.get(id);
+        if (emp != null && emp.getPassword().equals(pass)) {
+            return LoginResult.EMPLOYEE;
+        }
+
+        // Return FAILURE if login credentials are incorrect
+        return LoginResult.FAILURE;
     }
 
     public List<Employee> getAllEmployees() {
@@ -42,11 +44,11 @@ public class AdminManager {
         return onlyEmployees; // Return a copy to prevent external modifications
     }
 
-    public void updateEmployee(Employee emp) {
-        employees.put(emp.getId(), emp);
-        System.out.println("Employee updated successfully for employee: " + emp.getFirstName());
+    public void listEmployees() {
+        for (Employee employee : employees.values()) {
+            System.out.println(employee);
+        }
     }
-
 
     public List<Employee> getEmployeesByBranch(String branchID) {
         List<Employee> employees = getAllEmployees();
@@ -54,24 +56,11 @@ public class AdminManager {
         return filtered;
     }
 
-    // Add a new employee
     public void addEmployee(Employee employee) {
         employees.put(employee.getId(), employee);
         System.out.println("Employee " + employee.getFullName() + " added successfully.");
     }
 
-    // Update employee password
-    public void updateEmployeePassword(int id, String pass) {
-        Employee employee = employees.get(id);
-        if (employee != null) {
-            employee.setPassword(pass);
-            System.out.println("Password updated successfully for employee: " + employee.getFirstName());
-        } else {
-            System.out.println("Employee not found.");
-        }
-    }
-
-    // Delete an employee
     public void deleteEmployee(int id) {
         Employee employee = employees.remove(id);
         if (employee != null) {
@@ -81,39 +70,54 @@ public class AdminManager {
         }
     }
 
-//    // Validate password (minimum length, contains digits, special characters, etc.)
-//    private boolean isPasswordValid(String password) {
-//        if (password.length() < 8) {
-//            System.out.println("Password must be at least 8 characters long.");
-//            return false;
-//        }
-//        if (!password.matches(".*[A-Z].*")) {
-//            System.out.println("Password must contain at least one uppercase letter.");
-//            return false;
-//        }
-//        if (!password.matches(".*\\d.*")) {
-//            System.out.println("Password must contain at least one digit.");
-//            return false;
-//        }
-//        if (!password.matches(".*[!@#$%^&*(),.?\":{}|<>].*")) {
-//            System.out.println("Password must contain at least one special character.");
-//            return false;
-//        }
-//        return true;
-//    }
-
-    // List all employees
-    public void listEmployees() {
-        for (Employee employee : employees.values()) {
-            System.out.println(employee);
+    public <T> void updateEmployee(int employeeID, String attribute, T value) {
+        Employee employee = employees.get(employeeID);
+        if (employee == null) {
+            throw new IllegalArgumentException("Employee not found with ID: " + employeeID);
         }
+
+        // Update the specified attribute
+        switch (attribute.toLowerCase()) {
+            case "firstname":
+                if (value instanceof String) {
+                    employee.setFirstName((String) value);
+                } else {
+                    throw new IllegalArgumentException("Invalid value type for 'firstname'. Expected: String.");
+                }
+                break;
+            case "lastname":
+                if (value instanceof String) {
+                    employee.setLastName((String) value);
+                } else {
+                    throw new IllegalArgumentException("Invalid value type for 'lastname'. Expected: String.");
+                }
+                break;
+            case "branchid":
+                if (value instanceof String) {
+                    employee.setBranchID((String) value);
+                } else {
+                    throw new IllegalArgumentException("Invalid value type for 'branchid'. Expected: String.");
+                }
+                break;
+            case "password":
+                if (value instanceof String) {
+                    employee.setPassword((String) value);
+                } else {
+                    throw new IllegalArgumentException("Invalid value type for 'password'. Expected: String.");
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid attribute: " + attribute);
+        }
+
+        // Save the updated employee back to the map
+        employees.put(employeeID, employee);
     }
 
     public Employee findEmployeeById(int id) {
         return employees.get(id);
     }
 
-    // Verify employee password
     public boolean verifyEmployeePassword(int id, String passwordHash) {
         Employee employee = findEmployeeById(id);
         if (employee != null) {

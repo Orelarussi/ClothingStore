@@ -8,7 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LoginManager {
-    private static LoginManager instance = new LoginManager();
+    // singleton
+    private static LoginManager instance;
+    public static LoginManager getInstance() {
+        return instance != null ? instance : (instance = new LoginManager());
+    }
 
     private final Map<Integer, User> users;
 
@@ -16,9 +20,7 @@ public class LoginManager {
         this.users = new HashMap<>();
         users.put(1,new Admin(1, "Eran", "", "000", "1234"));//TODO remove after testing
     }
-    public static LoginManager getInstance() {
-        return instance != null ? instance : (instance = new LoginManager());
-    }
+
 
     // Add a new employee to the system
     public void addUser(Employee employee) {

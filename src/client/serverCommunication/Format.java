@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken;
 import server.database.ChatSession;
 import server.models.Employee;
 import server.models.Product;
+import server.models.User;
 import server.models.customer.Customer;
 import server.models.purchaseHistory.PurchasedItem;
 
@@ -230,8 +231,8 @@ public class Format {
             object = new JsonObject();
             object.addProperty("sessionID", chat.getSessionID());
 
-            Employee employee = chat.getReceiverEmployee();
-            object.addProperty("branchID", employee.getBranchID());
+            User employee = chat.getReceiverEmployee();
+//            object.addProperty("branchID", employee.getBranchID()); TODO fix
             object.addProperty("fullName", employee.getFullName());
 
             employee = chat.getCreatorEmployee();

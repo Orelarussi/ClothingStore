@@ -6,6 +6,7 @@ import server.models.Chat;
 import server.models.Employee;
 import server.models.Message;
 import server.Server;
+import server.models.User;
 
 import java.util.*;
 
@@ -22,13 +23,16 @@ public class ChatManager {
         chattingEmployees = new HashMap<>();
         waitingEmployees = new HashMap<>();
     }
+
     public static Set<String> getAvailableBranches(String branch) {
         Set<String> branches = new HashSet<>();
-        for (Map.Entry<Employee, SocketData> entry : Server.getConnections().entrySet()) {
-            Employee emp = entry.getKey();
+        for (Map.Entry<User, SocketData> entry : Server.getConnections().entrySet()) {
+            if (entry.getKey() instanceof Employee) {
+                Employee emp = (Employee) entry.getKey();
 
-            if(!emp.getBranchID().equals(branch))
-                branches.add(emp.getBranchID());
+                if (!emp.getBranchID().equals(branch))
+                    branches.add(emp.getBranchID());
+            }
         }
         return branches;
     }
@@ -104,10 +108,15 @@ public class ChatManager {
         for (Map.Entry<SocketData, ChatSession> entry : chattingEmployees.entrySet()) {
             //ChatSession chat = entry.getValue();
             //Employee emp = chat.getCreatorEmployee();
-            Employee emp = Server.getEmployeeBySocketData(entry.getKey());
 
-            if (emp.getBranchID().equals(branch))
-                chats.add(entry.getValue());
+            User user = Server.getUserBySocketData(entry.getKey());
+            if (user instanceof Employee) {
+                Employee emp = (Employee) user;
+
+
+                if (emp.getBranchID().equals(branch))
+                    chats.add(entry.getValue());
+            }
         }
         return chats;
     }
@@ -129,23 +138,24 @@ public class ChatManager {
 
         return false;
     }
+
     public void addEmployeeToWaitingList(Employee emp, String branch) {
         boolean foundBranch = false;
         for (Map.Entry<String, List<Employee>> entry : waitingEmployees.entrySet()) {
             List<Employee> waitingForChat = entry.getValue();
 
-            if(entry.getKey().equals(branch)) {
+            if (entry.getKey().equals(branch)) {
                 List<Employee> employees = entry.getValue();
                 employees.add(emp);
-                waitingEmployees.put(branch,employees);
+                waitingEmployees.put(branch, employees);
                 foundBranch = true;
             }
         }
 
-        if(!foundBranch) {
+        if (!foundBranch) {
             List<Employee> employees = new ArrayList<Employee>();
             employees.add(emp);
-            waitingEmployees.put(branch,employees);
+            waitingEmployees.put(branch, employees);
         }
     }
 
@@ -155,11 +165,11 @@ public class ChatManager {
             int tempSessionID = entry.getValue().getSessionID();
             int sessionID = chat.getSessionID();
 
-            if(tempSessionID == sessionID)
+            if (tempSessionID == sessionID)
                 chattingCount++;
         }
 
-        if(chattingCount < 2) { // Close chat because not enough employees for chat
+        if (chattingCount < 2) { // Close chat because not enough employees for chat
             endChatSession(chat);
         }
     }
@@ -176,21 +186,23 @@ public class ChatManager {
             }
         }
     }
+
     public ChatSession getChatSessionByID(int sessionID) {
         for (Map.Entry<SocketData, ChatSession> entry : chattingEmployees.entrySet()) {
             ChatSession chat = entry.getValue();
 
-            if(chat.getSessionID() == sessionID)
+            if (chat.getSessionID() == sessionID)
                 return chat;
         }
 
         return null;
     }
+
     public SocketData getFirstAvailableEmployeeByBranch(String branch) {
         for (Map.Entry<SocketData, Employee> entry : availableEmployees.entrySet()) {
             Employee emp = entry.getValue();
 
-            if(emp.getBranchID().equals(branch))
+            if (emp.getBranchID().equals(branch))
                 return entry.getKey();
 
         }

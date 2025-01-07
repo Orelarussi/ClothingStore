@@ -10,9 +10,7 @@ public class DecodeExecuteCommand {
         try {
             response = switch (Format.getType(command)) {
                 case CHAT -> DecodeExecuteCommandChat.execute(command);
-                case CUSTOMER -> DecodeExecuteCommandCustomer.execute(command);
                 case EMPLOYEE -> DecodeExecuteCommandEmployee.execute(command);
-                case INVENTORY -> DecodeExecuteCommandInventory.execute(command);
                 case LOGGER -> DecodeExecuteCommandLogger.execute(command);
                 case PURCHASE_HISTORY -> DecodeExecuteCommandPurchaseHistory.execute(command);
                 default -> response;

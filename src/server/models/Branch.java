@@ -1,16 +1,13 @@
 package server.models;
 
-import server.services.InventoryManager;
 
 public class Branch {
     private String id;
     private String name;
-    private InventoryManager inventoryManager;
 
     public Branch(String id, String name) {
         this.id = id;
         this.name = name;
-        this.inventoryManager = new InventoryManager();
     }
 
     // Getters and Setters
@@ -30,7 +27,4 @@ public class Branch {
         this.name = name;
     }
 
-    public InventoryManager getInventoryManager() {
-        return inventoryManager;
-    }
 }

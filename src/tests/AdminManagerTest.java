@@ -14,7 +14,7 @@ public class AdminManagerTest {
 
     @BeforeEach
     public void setUp() {
-        adminManager = new AdminManager();
+        adminManager = AdminManager.getInstance();
     }
 
     @Test
@@ -31,7 +31,7 @@ public class AdminManagerTest {
                 "SecurePass1!", "Branch01", 12345, Position.CASHIER);
         adminManager.addEmployee(employee);
         final String PASS = "NewPass123!";
-        adminManager.updateEmployeePassword(1, PASS);
+        adminManager.updateEmployee(1,"password", PASS);
         assertTrue(adminManager.verifyEmployeePassword(1, PASS));
     }
 
