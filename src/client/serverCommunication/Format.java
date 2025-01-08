@@ -2,6 +2,7 @@ package client.serverCommunication;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import server.database.ChatSession;
@@ -108,12 +109,14 @@ public class Format {
         return encode(ClassType.SUCCESS, "", "הפעולה בוצעה בהצלחה!");
     }
 
-    public static List<Customer> decodeCustomers(String str) {
-        String[] objects = str.split(objectSeparator);
+    public static List<Customer> decodeCustomers(String jsonString) {
+        Gson gson = new Gson();
+        JsonArray jarr = gson.fromJson(jsonString,JsonArray.class);
+
         List<Customer> arr = new ArrayList<>();
 
-        for (String objectString : objects) {
-            arr.add(Customer.deserializeFromString(objectString));
+        for (JsonElement json : jarr) {
+            arr.add(Customer.deserializeFromString(json.getAsString()));
         }
         return arr;
     }
