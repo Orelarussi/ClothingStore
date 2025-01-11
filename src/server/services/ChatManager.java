@@ -24,6 +24,13 @@ public class ChatManager {
         waitingEmployees = new HashMap<>();
     }
 
+    public static synchronized ChatManager getInstance() {
+        if (instance == null) {
+            instance = new ChatManager();
+        }
+        return instance;
+    }
+
     public static Set<String> getAvailableBranches(String branch) {
         Set<String> branches = new HashSet<>();
         for (Map.Entry<User, SocketData> entry : Server.getConnections().entrySet()) {
@@ -37,13 +44,6 @@ public class ChatManager {
         return branches;
     }
 
-
-    public static synchronized ChatManager getInstance() {
-        if (instance == null) {
-            instance = new ChatManager();
-        }
-        return instance;
-    }
 
     // Add an available employee
     public void addAvailableEmployee(Employee employee) {
