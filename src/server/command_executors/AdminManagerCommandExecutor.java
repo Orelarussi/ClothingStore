@@ -1,7 +1,6 @@
 package server.command_executors;
 
 import com.google.gson.JsonObject;
-import server.database.SocketData;
 import server.services.AdminManager;
 import server.services.LoginResult;
 
@@ -22,8 +21,7 @@ public class AdminManagerCommandExecutor implements IExecute{
                 response.addProperty ("id", id);
                 response.addProperty("result", result.toString());
                 return response.toString();
+            default: return "";
         }
-
-        return "";
     }
 }

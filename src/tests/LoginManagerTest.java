@@ -19,7 +19,7 @@ public class LoginManagerTest {
 
     @Test
     public void testAddUser() {
-        Employee employee = new Employee(1, "John", "Doe", "123456789",
+        Employee employee = new Employee(1, 1, "Doe", "123456789",
                 "hash123", "Branch001", 123456789L, Position.SHIFTMGR);
         loginManager.addUser(employee);
 
@@ -29,10 +29,10 @@ public class LoginManagerTest {
 
     @Test
     public void testAddDuplicateUser() {
-        Employee employee1 = new Employee(3, "Jane", "Smith", "987654321",
+        Employee employee1 = new Employee(3, 1, "Smith", "987654321",
                 "hash456", "Branch002",
                 876543210L, Position.CASHIER);
-        Employee employee2 = new Employee(3, "Jane", "Smith", "987654321",
+        Employee employee2 = new Employee(3, 1, "Smith", "987654321",
                 "hash456", "Branch002",
                 876543210L, Position.CASHIER);
         loginManager.addUser(employee1);
@@ -45,7 +45,7 @@ public class LoginManagerTest {
 
     @Test
     public void testLoginSuccessful() {
-        Employee employee = new Employee(2, "Alice", "Johnson", "123123123",
+        Employee employee = new Employee(2, 2, "Johnson", "123123123",
                 "password123", "Branch003", 654321098L, Position.CASHIER);
         loginManager.addUser(employee);
 
@@ -55,7 +55,7 @@ public class LoginManagerTest {
 
     @Test
     public void testLoginFailure() {
-        Employee employee = new Employee(4, "Bob", "Brown", "987987987",
+        Employee employee = new Employee(4, 1, "Brown", "987987987",
                 "securePass", "Branch004"
                 , 321098765L, Position.SELLER);
         loginManager.addUser(employee);

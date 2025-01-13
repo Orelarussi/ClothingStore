@@ -19,7 +19,7 @@ public class AdminManagerTest {
 
     @Test
     public void testAddEmployee() {
-        Employee employee = new Employee(1, "John", "Doe", "123456789",
+        Employee employee = new Employee(1, 1, "Doe", "123456789",
                 "SecurePass1!","Branch01", 12345, Position.CASHIER);
         adminManager.addEmployee(employee);
         assertNotNull(adminManager.findEmployeeById(1));
@@ -27,7 +27,7 @@ public class AdminManagerTest {
 
     @Test
     public void testUpdatePassword() {
-        Employee employee = new Employee(1, "John", "Doe", "123456789",
+        Employee employee = new Employee(1, 1, "Doe", "123456789",
                 "SecurePass1!", "Branch01", 12345, Position.CASHIER);
         adminManager.addEmployee(employee);
         final String PASS = "NewPass123!";
@@ -37,7 +37,7 @@ public class AdminManagerTest {
 
     @Test
     public void testDeleteEmployee() {
-        Employee employee = new Employee(1, "John", "Doe", "123456789",
+        Employee employee = new Employee(1, 1, "Doe", "123456789",
                 "SecurePass1!", "Branch01", 12345, Position.CASHIER);
         adminManager.addEmployee(employee);
         adminManager.deleteEmployee(1);

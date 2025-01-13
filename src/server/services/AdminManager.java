@@ -1,4 +1,5 @@
 package server.services;
+import server.services.BranchManager;
 
 import server.models.Admin;
 import server.models.Employee;
@@ -12,16 +13,19 @@ import java.util.Map;
 public class AdminManager {
     private Map<Integer, Employee> employees = new HashMap<>();
     private static final Admin admin = new Admin(1, "Eran", "", "000", "1234");
+
+    //singleton
     private static AdminManager instance;
-
-    private AdminManager(){}
-
     public static synchronized AdminManager getInstance() {
         if (instance == null) {
             instance = new AdminManager();
         }
         return instance;
     }
+
+    private AdminManager(){}
+
+
     public LoginResult login(int id, String pass) {
         // Check if the login is for the admin
         if (admin.getId() == id && admin.getPassword().equals(pass)) {
@@ -50,14 +54,18 @@ public class AdminManager {
         }
     }
 
-    public List<Employee> getEmployeesByBranch(String branchID) {
+    public List<Employee> getEmployeesByBranch(int branchID) {
         List<Employee> employees = getAllEmployees();
-        List<Employee> filtered = employees.stream().filter(emp -> emp.getBranchID().equals(branchID)).toList();
+        List<Employee> filtered = employees.stream()
+                .filter(emp -> emp.getBranchID() == branchID)
+                .toList();
         return filtered;
     }
 
     public void addEmployee(Employee employee) {
         employees.put(employee.getId(), employee);
+        BranchManager.getInstance().getBranchById(employee.getBranchID()).increaseEmployeNumberBy1();
+
         System.out.println("Employee " + employee.getFullName() + " added successfully.");
     }
 
@@ -93,8 +101,8 @@ public class AdminManager {
                 }
                 break;
             case "branchid":
-                if (value instanceof String) {
-                    employee.setBranchID((String) value);
+                if (value instanceof Integer) {
+                    employee.setBranchID((int) value);
                 } else {
                     throw new IllegalArgumentException("Invalid value type for 'branchid'. Expected: String.");
                 }

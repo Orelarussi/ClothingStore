@@ -6,6 +6,7 @@ import server.models.Employee;
 import server.services.AdminManager;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DecodeExecuteCommandEmployee {
@@ -48,8 +49,9 @@ public class DecodeExecuteCommandEmployee {
                 break;
             //public static String getEmployeesByBranch(String branch)
             case "getEmployeesByBranch":
-                String branch = Format.getFirstParam(command);
-                List<Employee> empList = manager.getEmployeesByBranch(branch);
+//                String branch = Format.getFirstParam(command);
+                List<Employee> empList = new ArrayList<>();
+//                        manager.getEmployeesByBranch(branch);
                 if(empList.isEmpty())
                     response = Format.encodeEmpty("");
                 else

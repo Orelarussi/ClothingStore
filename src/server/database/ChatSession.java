@@ -73,15 +73,15 @@ public class ChatSession {
     }
 
     public void broadcast(String message) {
-        synchronized (allListeners) {
-            for (Map.Entry<SocketData, User> entry : allListeners.entrySet()) {
-                SocketData socketData = entry.getKey();
-                Employee emp = new Employee(121212, "Bon", "Koli", "024254555",
-                        "pass", "holon", 23583454567L, Employee.Position.CASHIER);
-                final String msg = "CHAT@@@receiveMessage###" + emp.serializeToString() + "&&&" + message + "&&&";
-                socketData.getOutputStream().println(msg);
-            }
-        }
+//        synchronized (allListeners) {
+//            for (Map.Entry<SocketData, User> entry : allListeners.entrySet()) {
+//                SocketData socketData = entry.getKey();
+//                Employee emp = new Employee(121212, "Bon", "Koli", "024254555",
+//                        "pass", "holon", 23583454567L, Employee.Position.CASHIER);
+//                final String msg = "CHAT@@@receiveMessage###" + emp.serializeToString() + "&&&" + message + "&&&";
+//                socketData.getOutputStream().println(msg);
+//            }
+//        }
     }
 
     public void respondToClient(PrintWriter clientWriter, String response) {

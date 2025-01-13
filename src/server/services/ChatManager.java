@@ -1,5 +1,6 @@
 package server.services;
 
+import server.ClientHandler;
 import server.database.ChatSession;
 import server.database.SocketData;
 import server.models.Chat;
@@ -12,6 +13,13 @@ import java.util.*;
 
 public class ChatManager {
     private static ChatManager instance;
+    public static synchronized ChatManager getInstance() {
+        if (instance == null) {
+            instance = new ChatManager();
+        }
+        return instance;
+    }
+
     private Map<SocketData, ChatSession> chattingEmployees;
     private Map<String, List<Employee>> waitingEmployees;
     private Map<SocketData, Employee> availableEmployees;
@@ -24,22 +32,14 @@ public class ChatManager {
         waitingEmployees = new HashMap<>();
     }
 
-    public static synchronized ChatManager getInstance() {
-        if (instance == null) {
-            instance = new ChatManager();
-        }
-        return instance;
-    }
 
-    public static Set<String> getAvailableBranches(String branch) {
-        Set<String> branches = new HashSet<>();
-        for (Map.Entry<User, SocketData> entry : Server.getConnections().entrySet()) {
-            if (entry.getKey() instanceof Employee) {
-                Employee emp = (Employee) entry.getKey();
 
-                if (!emp.getBranchID().equals(branch))
-                    branches.add(emp.getBranchID());
-            }
+    public static Set<Integer> getAvailableBranches(int branch) {
+        Set<Integer> branches = new HashSet<>();
+        for (Map.Entry<Integer, SocketData> entry : ClientHandler.getConnections().entrySet()) {
+            Employee emp = AdminManager.getInstance().findEmployeeById(entry.getKey());
+            if (emp.getBranchID() != branch)
+                branches.add(emp.getBranchID());
         }
         return branches;
     }
@@ -103,21 +103,22 @@ public class ChatManager {
         System.out.println("Message added: " + message);
     }
 
-    public Set<ChatSession> getAvailableChats(String branch) {
+    public Set<ChatSession> getAvailableChats(int branch) {
         Set<ChatSession> chats = new HashSet<>();
-        for (Map.Entry<SocketData, ChatSession> entry : chattingEmployees.entrySet()) {
-            //ChatSession chat = entry.getValue();
-            //Employee emp = chat.getCreatorEmployee();
-
-            User user = Server.getUserBySocketData(entry.getKey());
-            if (user instanceof Employee) {
-                Employee emp = (Employee) user;
-
-
-                if (emp.getBranchID().equals(branch))
-                    chats.add(entry.getValue());
-            }
-        }
+//        for (Map.Entry<SocketData, ChatSession> entry : chattingEmployees.entrySet()) {
+//            //ChatSession chat = entry.getValue();
+//            //Employee emp = chat.getCreatorEmployee();
+//
+//            User user = ClientHandler.getUserBySocketData(entry.getKey());
+//            if (user instanceof Employee) {
+//                Employee emp = (Employee) user;
+//
+//
+//                if (emp.getBranchID() == branch){
+//                    chats.add(entry.getValue());
+//                }
+//            }
+//        }
         return chats;
     }
 
@@ -129,10 +130,10 @@ public class ChatManager {
         return chattingEmployees.get(socketData);
     }
 
-    public boolean isAvailableEmployeesForChat(String branch) {
+    public boolean isAvailableEmployeesForChat(int branch) {
         for (Map.Entry<SocketData, Employee> entry : availableEmployees.entrySet()) {
             Employee emp = entry.getValue();
-            if (emp.getBranchID().equals(branch))
+            if (emp.getBranchID() == branch)
                 return true;
         }
 
@@ -198,11 +199,11 @@ public class ChatManager {
         return null;
     }
 
-    public SocketData getFirstAvailableEmployeeByBranch(String branch) {
+    public SocketData getFirstAvailableEmployeeByBranch(int branch) {
         for (Map.Entry<SocketData, Employee> entry : availableEmployees.entrySet()) {
             Employee emp = entry.getValue();
 
-            if (emp.getBranchID().equals(branch))
+            if (emp.getBranchID() == branch)
                 return entry.getKey();
 
         }

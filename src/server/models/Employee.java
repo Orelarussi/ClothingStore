@@ -2,7 +2,7 @@ package server.models;
 
 public class Employee extends User {
     private static long employeesNum = 0;
-    private String branchID;
+    private int branchID;
     private long accountNumber;
     private long employeeNumber;
     private Position position;
@@ -19,8 +19,8 @@ public class Employee extends User {
 
     public enum Position {SHIFTMGR, CASHIER, SELLER;}
 
-    public Employee(int id, String firstName, String lastName, String phoneNumber, String password,
-                    String branchID, long accountNumber, Position position) {
+    public Employee(int id, int branchID,String firstName, String lastName, String phoneNumber, String password,
+                     long accountNumber, Position position) {
         super(id, firstName, lastName, phoneNumber,password);
         this.branchID = branchID;
         this.accountNumber = accountNumber;
@@ -28,7 +28,7 @@ public class Employee extends User {
         this.position = position;
     }
 
-    public String getBranchID() {
+    public int getBranchID() {
         return branchID;
     }
 
@@ -44,7 +44,7 @@ public class Employee extends User {
         this.position = temp.position;
     }
 
-    public void setBranchID(String branchID) {
+    public void setBranchID(int branchID) {
         this.branchID = branchID;
     }
 

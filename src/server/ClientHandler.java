@@ -1,14 +1,8 @@
 package server;
 
-import client.serverCommunication.Format;
-import client.serverCommunication.decodeCMD.DecodeExecuteCommand;
 import com.google.gson.JsonObject;
 import server.command_executors.*;
-import server.database.ChatSession;
 import server.database.SocketData;
-import server.models.Employee;
-import server.models.User;
-import server.services.ChatManager;
 import server.services.LoginResult;
 
 import java.io.IOException;
@@ -18,7 +12,7 @@ import java.util.Map;
 
 
 public class ClientHandler extends Thread {
-    public static final Map<Integer, SocketData> connections = new HashMap<>();
+    private static final Map<Integer, SocketData> connections = new HashMap<>();
     private Integer userId;
     private LoginResult loginResult = LoginResult.FAILURE;
     private SocketData socketData;
@@ -91,6 +85,9 @@ public class ClientHandler extends Thread {
                 connections.put(id,socketData);
             }
         }
+    }
 
+    public static Map<Integer, SocketData> getConnections() {
+        return connections;
     }
 }
