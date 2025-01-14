@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Chat {
-    private Employee employee1;
-    private Employee employee2;
-    private List<Message> messages;
+    private final int employee1ID;
+    private final int employee2ID;
+    private final List<Message> messages;
 
-    public Chat(Employee employee1, Employee employee2) {
-        this.employee1 = employee1;
-        this.employee2 = employee2;
+    public Chat(int employee1ID, int employee2ID) {
+        this.employee1ID = employee1ID;
+        this.employee2ID = employee2ID;
         this.messages = new ArrayList<>();
     }
 
@@ -22,19 +22,19 @@ public class Chat {
 
     // Display the chat
     public void displayChat() {
-        System.out.println("Chat between " + employee1.getFirstName() + " and " + employee2.getFirstName() + ":");
+        System.out.println("Chat between " + employee1ID + " and " + employee2ID + ":");
         for (Message message : messages) {
             System.out.println(message);
         }
     }
 
     // Getters
-    public Employee getEmployee1() {
-        return employee1;
+    public int getEmployee1ID() {
+        return employee1ID;
     }
 
-    public Employee getEmployee2() {
-        return employee2;
+    public int getEmployee2ID() {
+        return employee2ID;
     }
 
     public List<Message> getMessages() {

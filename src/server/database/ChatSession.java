@@ -94,7 +94,7 @@ public class ChatSession {
             public void run() {
                 try {
                     String message;
-                    while ((message = socketData.getInputStream().readLine()) != null && !message.equals("")) {
+                    while ((message = socketData.getInputStream().readLine()) != null && !message.isEmpty()) {
                         //String[] messageSplit = message.split(": ");
                         //appendMessage(messageSplit[0], messageSplit[1], false);
                     }

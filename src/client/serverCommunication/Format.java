@@ -8,7 +8,6 @@ import com.google.gson.reflect.TypeToken;
 import server.database.ChatSession;
 import server.models.Employee;
 import server.models.Product;
-import server.models.User;
 import server.models.customer.Customer;
 import server.models.purchaseHistory.PurchasedItem;
 
@@ -46,40 +45,11 @@ public class Format {
 
     public static ClassType getType(String str) {
         String typeStr = str.split(typeSeparator)[0];
-        ClassType result = null;
-        switch (typeStr) {
-            case "CHAT":
-                result = ClassType.CHAT;
-                break;
-            case "CUSTOMER":
-                result = ClassType.CUSTOMER;
-                break;
-            case "EMPLOYEE":
-                result = ClassType.EMPLOYEE;
-                break;
-            case "EXCEPTION":
-                result = ClassType.EXCEPTION;
-                break;
-            case "INVENTORY":
-                result = ClassType.INVENTORY;
-                break;
-            case "PURCHASE_HISTORY":
-                result = ClassType.PURCHASE_HISTORY;
-                break;
-            case "SUCCESS":
-                result = ClassType.SUCCESS;
-                break;
-            case "EMPTY":
-                result = ClassType.EMPTY;
-                break;
-            case "LOGGER":
-                result = ClassType.LOGGER;
-                break;
-            default:
-                result = ClassType.OBJECT;
-                break;
+        try {
+            return ClassType.valueOf(typeStr);
+        } catch (IllegalArgumentException e) {
+            return ClassType.OBJECT;
         }
-        return result;
     }
 
     public static String getMethod(String str) {
