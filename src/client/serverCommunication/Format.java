@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import server.database.ChatSession;
 import server.models.Employee;
 import server.models.Product;
+import server.models.User;
 import server.models.customer.Customer;
 import server.models.purchaseHistory.PurchasedItem;
 
