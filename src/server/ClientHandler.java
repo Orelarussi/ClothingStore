@@ -28,6 +28,7 @@ public class ClientHandler extends Thread {
                 // generic handler for all cases
                 ServiceType serviceType = ServerDecoder.getServiceType(request);
                 MethodType methodType = ServerDecoder.getMethodType(request);
+
                 IExecute commandExecutor = CommandExecutorFactory.getCommandExecutor(serviceType);
                 String response = commandExecutor.execute(userId,loginResult,request);
                 if(methodType == MethodType.LOGIN){

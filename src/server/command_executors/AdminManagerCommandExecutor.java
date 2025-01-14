@@ -15,12 +15,14 @@ public class AdminManagerCommandExecutor implements IExecute{
         switch (method){
             case LOGIN:
                 JsonObject response = new JsonObject();
-                Integer id = data.get("id").getAsInt();
+                int id = data.get("id").getAsInt();
                 String password = data.get("password").getAsString();
                 LoginResult result = adminManager.login(id,password);
                 response.addProperty ("id", id);
                 response.addProperty("result", result.toString());
                 return response.toString();
+            case ADD_EMP:
+                return null;
             default: return "";
         }
     }
