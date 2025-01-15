@@ -8,7 +8,7 @@ public abstract class User extends Person {
         this.password = password;
     }
 
-    protected User() {
+    public User() {
         super();
     }
 

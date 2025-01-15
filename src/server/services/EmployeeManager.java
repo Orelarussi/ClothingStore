@@ -3,10 +3,8 @@ package server.services;
 import client.serverCommunication.Format;
 import server.models.Employee;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import server.models.customer.Customer;
 import server.models.customer.CustomerType;
@@ -44,5 +42,11 @@ public class EmployeeManager {
 
     public Map<Integer, Customer> getCustomers() {
         return customers;
+    }
+
+    public void setCustomers(List< Customer> customers) {
+        this.customers = customers.stream()
+                .map(c-> new AbstractMap.SimpleEntry<>(c.getId(), c))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

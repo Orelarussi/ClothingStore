@@ -7,6 +7,7 @@ public abstract class PurchasePlan extends JsonSerializable {
     protected int customerID;
     protected int purchaseID;
 
+    public PurchasePlan(){}
 
     public int getCustomerID() {
         return customerID;
