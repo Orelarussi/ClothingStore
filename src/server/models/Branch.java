@@ -11,9 +11,9 @@ public class Branch {
     private Map<Integer, Integer> inventory; // Map<ProductID, Quantity>
     private Map<Integer, Integer> sales; // Map<ProductID, Sales Amount>
 
-    public Branch(int branchID, int employeeAmount, String address) {
+    public Branch(int branchID, String address) {
         this.branchID = branchID;
-        this.employeeAmount = employeeAmount;
+        this.employeeAmount = 0;
         this.address = address;
         this.inventory = new HashMap<>();
         this.sales = new HashMap<>();
@@ -60,10 +60,11 @@ public class Branch {
         inventory.forEach((productId, quantity) -> System.out.println("Product ID: " + productId + ", Quantity: " + quantity));
     }
 
-    public void increaseEmployeNumberBy1() {
+    public void increaseEmployeeNumberBy1() {
         this.employeeAmount++;
     }
-    public void ReduceEmployeNumberBy1() {
+
+    public void decreaseEmployeeNumberBy1() {
         this.employeeAmount--;
     }
 }

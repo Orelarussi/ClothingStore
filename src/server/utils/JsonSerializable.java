@@ -1,6 +1,7 @@
 package server.utils;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 public abstract class JsonSerializable {
     protected static final Gson gson = new Gson();
@@ -13,6 +14,10 @@ public abstract class JsonSerializable {
     // Serialize the object to a JSON string
     public String serializeToString() {
         return gson.toJson(this);
+    }
+
+    public JsonObject toJson() {
+        return gson.toJsonTree(this).getAsJsonObject();
     }
 
     // Abstract method to create an instance from JSON
