@@ -18,6 +18,12 @@ public class AdminHandler extends HandlerBase {
         return super.encodeRequest(MethodType.LOGIN,data);
     }
 
+    public String logout(Integer id) {
+        JsonObject data = new JsonObject();
+        data.addProperty("id", id);
+        return super.encodeRequest(MethodType.LOGOUT,data);
+    }
+
     public String createEmployee(Employee employee){
         JsonObject data = new Gson().fromJson(employee.serializeToString(), JsonObject.class);
         return super.encodeRequest(MethodType.ADD_EMP,data);
@@ -28,4 +34,6 @@ public class AdminHandler extends HandlerBase {
         data.addProperty("id", id);
         return super.encodeRequest(MethodType.REMOVE_EMP,data);
     }
+
+
 }
