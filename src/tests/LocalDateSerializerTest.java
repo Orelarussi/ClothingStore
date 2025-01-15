@@ -3,7 +3,7 @@ package tests;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.Test;
-import services.LocalDateSerializer;
+import server.services.LocalDateSerializer;
 
 import java.time.LocalDate;
 
