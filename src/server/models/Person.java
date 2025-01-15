@@ -1,5 +1,6 @@
 package server.models;
 
+import com.google.gson.JsonObject;
 import server.utils.JsonSerializable;
 
 public abstract class Person extends JsonSerializable {
@@ -54,10 +55,10 @@ public abstract class Person extends JsonSerializable {
 
     @Override
     protected void populateFromJson(String json) {
-        User temp = gson.fromJson(json,User.class);
-        this.id = temp.id;
-        this.firstName = temp.firstName;
-        this.lastName = temp.lastName;
-        this.phoneNumber = temp.phoneNumber;
+        JsonObject temp = gson.fromJson(json,JsonObject.class);
+        this.id = temp.get("id").getAsInt();
+        this.firstName = temp.get("firstName").getAsString();
+        this.lastName = temp.get("lastName").getAsString();
+        this.phoneNumber = temp.get("phoneNumber").getAsString();
     }
 }
