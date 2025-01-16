@@ -5,9 +5,9 @@ import com.google.gson.JsonObject;
 import server.models.purchase_plan.PurchasePlan;
 import server.models.purchase_plan.VIPCustomerPurchasePlan;
 
-public class VIPCustomer extends Customer{
+public class VIPCustomer extends Customer {
     public VIPCustomer(int id, String first, String last, String phone, int branch) {
-        super(id, first, last, phone, branch,CustomerType.VIP);
+        super(id, first, last, phone, branch, CustomerType.VIP);
     }
 
     public VIPCustomer(JsonObject jsonObject) {

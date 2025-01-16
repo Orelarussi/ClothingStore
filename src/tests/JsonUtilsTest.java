@@ -3,14 +3,16 @@ package tests;
 import org.junit.jupiter.api.Test;
 import server.models.Branch;
 import server.models.Employee;
-import server.models.customer.*;
+import server.models.customer.Customer;
+import server.models.customer.NewCustomer;
+import server.models.customer.ReturningCustomer;
+import server.models.customer.VIPCustomer;
 import server.services.AdminManager;
 import server.services.BranchManager;
 import server.services.EmployeeManager;
 import server.utils.JsonUtils;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -32,9 +34,9 @@ class JsonUtilsTest {
                 85796898, Employee.Position.SELLER);
         manager.addEmployee(employee2);
 //        Add customers
-        NewCustomer nc = new NewCustomer(1,"new","last","23345",222);
-        ReturningCustomer rc = new ReturningCustomer(2,"returned","last","6581651",222);
-        VIPCustomer vc = new VIPCustomer(3,"vip","last","651666",222);
+        NewCustomer nc = new NewCustomer(1, "new", "last", "23345", 222);
+        ReturningCustomer rc = new ReturningCustomer(2, "returned", "last", "6581651", 222);
+        VIPCustomer vc = new VIPCustomer(3, "vip", "last", "651666", 222);
 
         EmployeeManager.getInstance().setCustomers(List.of(nc, rc, vc));
 

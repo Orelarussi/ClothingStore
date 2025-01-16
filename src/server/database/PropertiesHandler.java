@@ -4,8 +4,8 @@ import java.io.*;
 import java.util.Properties;
 
 public class PropertiesHandler {
-    private Properties properties;
-    private String filePath;
+    private final Properties properties;
+    private final String filePath;
 
     public PropertiesHandler(String filePath) {
         this.filePath = filePath;

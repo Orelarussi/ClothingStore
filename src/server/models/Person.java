@@ -55,7 +55,7 @@ public abstract class Person extends JsonSerializable {
 
     @Override
     protected void populateFromJson(String json) {
-        JsonObject temp = gson.fromJson(json,JsonObject.class);
+        JsonObject temp = gson.fromJson(json, JsonObject.class);
         this.id = temp.get("id").getAsInt();
         this.firstName = temp.get("firstName").getAsString();
         this.lastName = temp.get("lastName").getAsString();

@@ -7,21 +7,21 @@ public class Employee extends User {
     private long employeeNumber;
     private Position position;
 
-    public Employee(){
+    public Employee() {
         super();
     }
 
-    public Employee(String json){
+    public Employee(String json) {
         this();
         employeesNum++;
         populateFromJson(json);
     }
 
-    public enum Position {SHIFTMGR, CASHIER, SELLER;}
+    public enum Position {SHIFTMGR, CASHIER, SELLER}
 
-    public Employee(int id, int branchID,String firstName, String lastName, String phoneNumber, String password,
-                     long accountNumber, Position position) {
-        super(id, firstName, lastName, phoneNumber,password);
+    public Employee(int id, int branchID, String firstName, String lastName, String phoneNumber, String password,
+                    long accountNumber, Position position) {
+        super(id, firstName, lastName, phoneNumber, password);
         this.branchID = branchID;
         this.accountNumber = accountNumber;
         this.employeeNumber = ++employeesNum;
@@ -36,7 +36,7 @@ public class Employee extends User {
     @Override
     protected void populateFromJson(String json) {
         super.populateFromJson(json);
-        Employee temp = gson.fromJson(json,Employee.class);
+        Employee temp = gson.fromJson(json, Employee.class);
 
         this.branchID = temp.branchID;
         this.accountNumber = temp.accountNumber;

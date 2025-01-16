@@ -15,10 +15,10 @@ public class PurchasePlanInstanceCreator implements InstanceCreator<PurchasePlan
 
     @Override
     public PurchasePlan createInstance(Type type) {
-       return switch (customerType){
-           case VIP -> new NewCustomerPurchasePlan();
-           case NEW -> new ReturningCustomerPurchasePlan();
-           case RETURNING -> new VIPCustomerPurchasePlan();
-       };
+        return switch (customerType) {
+            case VIP -> new NewCustomerPurchasePlan();
+            case NEW -> new ReturningCustomerPurchasePlan();
+            case RETURNING -> new VIPCustomerPurchasePlan();
+        };
     }
 }

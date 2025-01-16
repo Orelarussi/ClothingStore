@@ -34,7 +34,7 @@ public abstract class User extends Person {
     @Override
     protected void populateFromJson(String json) {
         super.populateFromJson(json);
-        User temp = gson.fromJson(json,User.class);
+        User temp = gson.fromJson(json, User.class);
         this.password = temp.password;
     }
 }

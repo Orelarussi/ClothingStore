@@ -6,13 +6,12 @@ import server.database.SocketData;
 import server.models.Chat;
 import server.models.Employee;
 import server.models.Message;
-import server.Server;
-import server.models.User;
 
 import java.util.*;
 
 public class ChatManager {
     private static ChatManager instance;
+
     public static synchronized ChatManager getInstance() {
         if (instance == null) {
             instance = new ChatManager();
@@ -20,10 +19,10 @@ public class ChatManager {
         return instance;
     }
 
-    private Map<SocketData, ChatSession> chattingEmployees;
-    private Map<String, List<Employee>> waitingEmployees;
-    private Map<SocketData, Employee> availableEmployees;
-    private List<Chat> activeChats;
+    private final Map<SocketData, ChatSession> chattingEmployees;
+    private final Map<String, List<Employee>> waitingEmployees;
+    private final Map<SocketData, Employee> availableEmployees;
+    private final List<Chat> activeChats;
 
     private ChatManager() {
         this.availableEmployees = new HashMap<>();
@@ -31,7 +30,6 @@ public class ChatManager {
         chattingEmployees = new HashMap<>();
         waitingEmployees = new HashMap<>();
     }
-
 
 
     public static Set<Integer> getAvailableBranches(int branch) {
@@ -88,7 +86,7 @@ public class ChatManager {
     // When an employee is done with a chat, make them available again
     public void endChat(Employee employee) {
         for (Chat chat : activeChats) {
-            if (chat.getEmployee1ID() == employee.getId()|| chat.getEmployee2ID() == employee.getId()) {
+            if (chat.getEmployee1ID() == employee.getId() || chat.getEmployee2ID() == employee.getId()) {
                 activeChats.remove(chat);
 //                availableEmployees.add(employee);
                 System.out.println(employee.getFirstName() + " is now available for a new chat.");

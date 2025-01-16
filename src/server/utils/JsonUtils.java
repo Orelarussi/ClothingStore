@@ -14,16 +14,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
 
 public class JsonUtils {
 
     public enum Files {
         Employees("employees"),
-        Customers("customers"),;
+        Customers("customers"),
+        ;
 
         private final String fileName;
 
@@ -36,7 +34,7 @@ public class JsonUtils {
         }
     }
 
-    private static final String dirPath = "src"+File.separator+"files";
+    private static final String dirPath = "src" + File.separator + "files";
 
     // Generic method to read a JSON file and convert it to a list of objects
     public static <T> List<T> readJsonListFromFile(

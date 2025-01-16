@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Branch {
-    private int branchID;
+    private final int branchID;
     private int employeeAmount;
-    private String address;
-    private Map<Integer, Integer> inventory; // Map<ProductID, Quantity>
-    private Map<Integer, Integer> sales; // Map<ProductID, Sales Amount>
+    private final String address;
+    private final Map<Integer, Integer> inventory; // Map<ProductID, Quantity>
+    private final Map<Integer, Integer> sales; // Map<ProductID, Sales Amount>
 
     public Branch(int branchID, String address) {
         this.branchID = branchID;

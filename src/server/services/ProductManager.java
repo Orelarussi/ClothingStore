@@ -15,7 +15,7 @@ public class ProductManager {
         return instance;
     }
 
-    private Map<Integer, Product> products;
+    private final Map<Integer, Product> products;
 
     public ProductManager() {
         this.products = new HashMap<>();
