@@ -19,6 +19,9 @@ public class EmployeeManager {
         return instance;
     }
 
+    private EmployeeManager() {
+    }
+
     // Delete a customer
     public void deleteCustomer(int id) {
         if (customers.containsKey(id)) {

@@ -1,26 +1,28 @@
 package server.models;
 
 
+import server.utils.JsonSerializable;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class Branch {
-    private final int branchID;
+public class Branch extends JsonSerializable {
+    private int id;
     private int employeeAmount;
-    private final String address;
+    private String address;
     private final Map<Integer, Integer> inventory; // Map<ProductID, Quantity>
     private final Map<Integer, Integer> sales; // Map<ProductID, Sales Amount>
 
-    public Branch(int branchID, String address) {
-        this.branchID = branchID;
+    public Branch(int id, String address) {
+        this.id = id;
         this.employeeAmount = 0;
         this.address = address;
         this.inventory = new HashMap<>();
         this.sales = new HashMap<>();
     }
 
-    public int getBranchID() {
-        return branchID;
+    public int getId() {
+        return id;
     }
 
     public int getEmployeeAmount() {
@@ -56,7 +58,7 @@ public class Branch {
     }
 
     public void showInventory() {
-        System.out.println("Inventory for Branch ID: " + branchID);
+        System.out.println("Inventory for Branch ID: " + id);
         inventory.forEach((productId, quantity) -> System.out.println("Product ID: " + productId + ", Quantity: " + quantity));
     }
 
@@ -66,5 +68,13 @@ public class Branch {
 
     public void decreaseEmployeeNumberBy1() {
         this.employeeAmount--;
+    }
+
+    @Override
+    protected void populateFromJson(String json) {
+        Branch branch = gson.fromJson(json, Branch.class);
+        this.id = branch.id;
+        this.employeeAmount = branch.employeeAmount;
+        this.address = branch.address;
     }
 }

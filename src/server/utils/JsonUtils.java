@@ -4,9 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import server.models.Branch;
 import server.models.Employee;
 import server.models.customer.Customer;
 import server.services.AdminManager;
+import server.services.BranchManager;
 import server.services.EmployeeManager;
 
 import java.io.File;
@@ -21,7 +23,7 @@ public class JsonUtils {
     public enum Files {
         Employees("employees"),
         Customers("customers"),
-        ;
+        Branches("branches");
 
         private final String fileName;
 
@@ -70,9 +72,33 @@ public class JsonUtils {
         return dirPath + File.separator + filePath;
     }
 
+//    TODO call asynchronously
     public static void save() {
+        System.out.println("Saving JSON files...");
+        System.out.println("Saving employees...");
         saveEmployees();
+        System.out.println("Saving Customers...");
         saveCustomers();
+        System.out.println("Saving Branches...");
+        saveBranches();
+        System.out.println("JSON files saved successfully.");
+    }
+
+    //    TODO call asynchronously
+    public static void load() {
+        System.out.println("Loading JSON files...");
+        System.out.println("Loading employees...");
+        loadEmployees();
+        System.out.println("Loading Customers...");
+        loadCustomers();
+        System.out.println("Loading Branches...");
+        loadBranches();
+        System.out.println("JSON files loaded successfully.");
+    }
+
+    private static void saveBranches() {
+        List<Branch> branches = BranchManager.getInstance().getBranches().values().stream().toList();
+        writeJsonFile(Files.Branches.getFileName(), branches);
     }
 
     private static void saveCustomers() {
@@ -85,38 +111,40 @@ public class JsonUtils {
         writeJsonFile(Files.Employees.getFileName(), employees);
     }
 
-    public static void load() {
-        loadEmployees();
-        loadCustomers();
+    private static void loadBranches() {
+        List<Branch> branches = basicLoad(Files.Branches, Branch.class);
+        if (branches != null) {
+            BranchManager.getInstance().setBranches(branches);
+        }
     }
 
     private static void loadCustomers() {
-        String customersFileName = Files.Customers.getFileName();
-        if (new File(customersFileName).exists()) {
-            List<JsonObject> employeesJsonList = readJsonListFromFile(customersFileName, JsonObject.class);
-            if (employeesJsonList != null) {
-                List<Customer> customers = employeesJsonList.stream()
-                        .map(json -> {
-                            String asString = json.toString();
-                            Customer customer = Customer.deserializeFromString(asString);
-                            return customer;
-                        }).toList();
+        List<JsonObject> employeesJsonList = basicLoad(Files.Customers,JsonObject.class);
 
-                EmployeeManager.getInstance().setCustomers(customers);
-            }
-        } else {
-            System.out.println("File " + customersFileName + " does not exist.");
+        if (employeesJsonList != null) {
+            List<Customer> customers = employeesJsonList.stream()
+                    .map(json -> {
+                        String asString = json.toString();
+                        Customer customer = Customer.deserializeFromString(asString);
+                        return customer;
+                    }).toList();
+
+            EmployeeManager.getInstance().setCustomers(customers);
         }
     }
 
     private static void loadEmployees() {
-        String employeesFileName = Files.Employees.getFileName();
-        if (new File(employeesFileName).exists()) {
-            List<Employee> employees = readJsonListFromFile(employeesFileName, Employee.class);
-            if (employees != null)
-                AdminManager.getInstance().setEmployees(employees);
-        } else {
-            System.out.println("File " + employeesFileName + " does not exist.");
+        List<Employee> employees = basicLoad(Files.Employees, Employee.class);
+        if (employees != null)
+            AdminManager.getInstance().setEmployees(employees);
+    }
+
+    private static <T> List<T> basicLoad(Files fileName, Class<T> objClass) {
+        String jsonFileName = fileName.getFileName();
+        if (new File(jsonFileName).exists()) {
+            return readJsonListFromFile(jsonFileName, objClass);
         }
+        System.out.println("File " + jsonFileName + " does not exist.");
+        return null;
     }
 }
