@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SalesManager {
-    private final List<SaleReport> saleReports;
+    private List<SaleReport> saleReports;
 
     public SalesManager() {
         this.saleReports = new ArrayList<>();

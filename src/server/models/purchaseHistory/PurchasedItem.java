@@ -16,7 +16,7 @@ public class PurchasedItem extends JsonSerializable {
      * Creates a new purchased item instance with the given purchase ID and product ID.
      *
      * @param purchaseID Unique identifier for the purchase.
-     * @param productID  Identifier of the purchased product.
+     * @param productID Identifier of the purchased product.
      */
     public PurchasedItem(int purchaseID, int productID) {
         this.purchaseID = purchaseID;
@@ -29,7 +29,7 @@ public class PurchasedItem extends JsonSerializable {
 
     @Override
     protected void populateFromJson(String json) {
-        PurchasedItem tmp = gson.fromJson(json, PurchasedItem.class);
+        PurchasedItem tmp = gson.fromJson(json,PurchasedItem.class);
         this.productID = tmp.productID;
         this.purchaseID = tmp.purchaseID;
     }
@@ -79,21 +79,29 @@ public class PurchasedItem extends JsonSerializable {
     }
 
     /**
-     * Serializes the purchased item object to a string representation.
-     *
-     * @return The serialized string representation of the purchased item.
-     */
+        * Serializes the purchased item object to a string representation.
+        *
+        * @return The serialized string representation of the purchased item.
+        */
     public String serializeToString() {
         return new Gson().toJson(this);
     }
 
     /**
-     * Deserializes a string representation of an purchased item back to an PurchasedItem object.
-     *
-     * @param serializedString The serialized string representation of the purchased item.
-     * @return The deserialized PurchasedItem object.
-     */
+        * Deserializes a string representation of an purchased item back to an PurchasedItem object.
+        *
+        * @param serializedString The serialized string representation of the purchased item.
+        * @return The deserialized PurchasedItem object.
+        */
 //    public static PurchasedItem deserializeFromString(String serializedString) {
 //        return new Gson().fromJson(serializedString, PurchasedItem.class);
 //    }
 }
+
+
+/*
+CREATE TABLE PurchaseHistoryItems (
+	purchaseID int NOT NULL,
+	productID int NOT NULL
+);
+ */

@@ -9,13 +9,13 @@ public class EncodeCommandInventory {
     public static String getProductsByBranch(String branch) {
         return Format.encode(ClassType.INVENTORY, "getProductsByBranch", branch);
     }
-
+    
     public static String createNewItem(Product item) {
         return Format.encode(ClassType.INVENTORY, "createNewItem", item.serializeToString());
     }
 
     public static String updateItem(Product item) {
-        return Format.encode(ClassType.INVENTORY, "updateItem", item.serializeToString());
+        return Format.encode(ClassType.INVENTORY, "updateItem" , item.serializeToString());
     }
 
     public static String deleteItem(int productID) {

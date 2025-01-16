@@ -12,10 +12,10 @@ import java.util.Map;
 
 public class ChatSession {
     private static int sessionCounter = 0;
-    private final int sessionID;
-    private final Map<SocketData, User> allListeners;
-    private final User creator;
-    private final User receiver;
+    private int sessionID;
+    private Map<SocketData, User> allListeners;
+    private User creator;
+    private User receiver;
 
     public ChatSession(Employee creator, User receiver) {
         this.allListeners = new HashMap<SocketData, User>();

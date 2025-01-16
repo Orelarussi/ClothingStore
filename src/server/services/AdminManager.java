@@ -1,11 +1,14 @@
 package server.services;
+import server.services.BranchManager;
 
 import server.models.Admin;
-import server.models.Branch;
 import server.models.Employee;
+import server.models.User;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AdminManager {
     private Map<Integer, Employee> employees = new HashMap<>();
@@ -13,7 +16,6 @@ public class AdminManager {
 
     //singleton
     private static AdminManager instance;
-
     public static synchronized AdminManager getInstance() {
         if (instance == null) {
             instance = new AdminManager();
@@ -21,8 +23,7 @@ public class AdminManager {
         return instance;
     }
 
-    private AdminManager() {
-    }
+    private AdminManager(){}
 
 
     public LoginResult login(int id, String pass) {
@@ -47,6 +48,12 @@ public class AdminManager {
         return onlyEmployees; // Return a copy to prevent external modifications
     }
 
+    public void listEmployees() {
+        for (Employee employee : employees.values()) {
+            System.out.println(employee);
+        }
+    }
+
     public List<Employee> getEmployeesByBranch(int branchID) {
         List<Employee> employees = getAllEmployees();
         List<Employee> filtered = employees.stream()
@@ -57,8 +64,7 @@ public class AdminManager {
 
     public void addEmployee(Employee employee) {
         employees.put(employee.getId(), employee);
-        Branch branch = BranchManager.getInstance().getBranchById(employee.getBranchID());
-        branch.increaseEmployeeNumberBy1();
+        BranchManager.getInstance().getBranchById(employee.getBranchID()).increaseEmployeNumberBy1();
 
         System.out.println("Employee " + employee.getFullName() + " added successfully.");
     }
@@ -126,11 +132,5 @@ public class AdminManager {
             return passwordHash.equals(employee.getPassword());
         }
         return false;
-    }
-
-    public void setEmployees(List<Employee> employees) {
-        this.employees = employees.stream()
-                .map(emp -> new AbstractMap.SimpleEntry<>(emp.getId(), emp))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

@@ -5,10 +5,10 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
 public class SocketData {
-    private final Socket socket;
+    private Socket socket;
     private BufferedReader inputStream;
     private PrintWriter outputStream;
-    private final String clientAddress;
+    private String clientAddress;
 
     public SocketData(Socket socket) {
         this.socket = socket;

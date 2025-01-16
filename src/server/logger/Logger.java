@@ -55,15 +55,14 @@ public class Logger {
      * @param purchase The purchase instance.
      */
     public static void logPurchase(Purchase purchase) {
-        log("Customer " + purchase.getCustomerID() + " purchased " + purchase.getPurchaseID());
+        log("Customer " + purchase.getCustomerID()+ " purchased " + purchase.getPurchaseID());
     }
 
-    //TODO: handle chat
-
+     //TODO: handle chat
     /**
      * Handles the saving of chat conversations.
      *
-     * @param fileName     The file name for storing the conversation.
+     * @param fileName The file name for storing the conversation.
      * @param conversation The conversation content.
      */
     public static void saveChat(String fileName, String conversation) {
@@ -79,7 +78,7 @@ public class Logger {
      * Logs the initiation of a chat.
      */
     public static void logChatStarted(Employee sender, User receiver) {
-        log("Chat started from: " + sender.getId() + " To -> " + receiver.getId());
+        log("Chat started from: " + sender.getId() + " To -> "+ receiver.getId());
     }
 
     /**

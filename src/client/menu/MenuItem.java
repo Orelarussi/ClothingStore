@@ -5,12 +5,12 @@ public class MenuItem {
     private final String title;
     private final MenuAction action;
 
-    public MenuItem(String title, MenuAction action) {
+    public MenuItem(String title, MenuAction action){
         this.title = title;
         this.action = action;
     }
 
-    public void run() {
+    public void run(){
         action.run();
     }
 

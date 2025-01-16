@@ -1,28 +1,26 @@
 package server.models;
 
 
-import server.utils.JsonSerializable;
-
 import java.util.HashMap;
 import java.util.Map;
 
-public class Branch extends JsonSerializable {
-    private int id;
+public class Branch {
+    private int branchID;
     private int employeeAmount;
     private String address;
-    private final Map<Integer, Integer> inventory; // Map<ProductID, Quantity>
-    private final Map<Integer, Integer> sales; // Map<ProductID, Sales Amount>
+    private Map<Integer, Integer> inventory; // Map<ProductID, Quantity>
+    private Map<Integer, Integer> sales; // Map<ProductID, Sales Amount>
 
-    public Branch(int id, String address) {
-        this.id = id;
-        this.employeeAmount = 0;
+    public Branch(int branchID, int employeeAmount, String address) {
+        this.branchID = branchID;
+        this.employeeAmount = employeeAmount;
         this.address = address;
         this.inventory = new HashMap<>();
         this.sales = new HashMap<>();
     }
 
-    public int getId() {
-        return id;
+    public int getBranchID() {
+        return branchID;
     }
 
     public int getEmployeeAmount() {
@@ -58,23 +56,14 @@ public class Branch extends JsonSerializable {
     }
 
     public void showInventory() {
-        System.out.println("Inventory for Branch ID: " + id);
+        System.out.println("Inventory for Branch ID: " + branchID);
         inventory.forEach((productId, quantity) -> System.out.println("Product ID: " + productId + ", Quantity: " + quantity));
     }
 
-    public void increaseEmployeeNumberBy1() {
+    public void increaseEmployeNumberBy1() {
         this.employeeAmount++;
     }
-
-    public void decreaseEmployeeNumberBy1() {
+    public void ReduceEmployeNumberBy1() {
         this.employeeAmount--;
-    }
-
-    @Override
-    protected void populateFromJson(String json) {
-        Branch branch = gson.fromJson(json, Branch.class);
-        this.id = branch.id;
-        this.employeeAmount = branch.employeeAmount;
-        this.address = branch.address;
     }
 }

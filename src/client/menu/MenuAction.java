@@ -1,5 +1,5 @@
 package client.menu;
 
 public interface MenuAction {
-    void run();
+    public void run();
 }

@@ -34,7 +34,7 @@ public class DecodeExecuteCommandEmployee {
             case "getEmployeeByID":
                 id = Integer.parseInt(Format.getFirstParam(command));
                 emp = manager.findEmployeeById(id);
-                if (emp == null)
+                if(emp == null)
                     response = Format.encodeEmpty("");
                 else
                     response = emp.serializeToString();
@@ -42,7 +42,7 @@ public class DecodeExecuteCommandEmployee {
             case "getEmployees":
                 //public List<Employee> getEmployees() {
                 List<Employee> employees = manager.getAllEmployees();
-                if (employees.isEmpty())
+                if(employees.isEmpty())
                     response = Format.encodeEmpty("");
                 else
                     response = Format.encodeEmployees(employees);
@@ -52,7 +52,7 @@ public class DecodeExecuteCommandEmployee {
 //                String branch = Format.getFirstParam(command);
                 List<Employee> empList = new ArrayList<>();
 //                        manager.getEmployeesByBranch(branch);
-                if (empList.isEmpty())
+                if(empList.isEmpty())
                     response = Format.encodeEmpty("");
                 else
                     response = Format.encodeEmployees(empList);

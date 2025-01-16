@@ -34,4 +34,6 @@ public class AdminHandler extends HandlerBase {
         data.addProperty("id", id);
         return super.encodeRequest(MethodType.REMOVE_EMP,data);
     }
+
+
 }

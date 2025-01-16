@@ -3,7 +3,7 @@ package server.models;
 import client.serverCommunication.Format;
 import server.utils.JsonSerializable;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,12 +21,13 @@ public class Purchase extends JsonSerializable {
     private List<Product> purchasedItems;
 
 
+
     /**
      * Creates a new purchase instance with the given customer ID, date, branch, and purchased items.
      *
-     * @param customerID     The ID of the customer.
-     * @param date           Date and time of the purchase.
-     * @param branch         Branch where the purchase was made.
+     * @param customerID The ID of the customer.
+     * @param date Date and time of the purchase.
+     * @param branch Branch where the purchase was made.
      * @param purchasedItems List of items that were purchased.
      */
     //New purchase
@@ -42,8 +43,8 @@ public class Purchase extends JsonSerializable {
      *
      * @param purchaseID Unique identifier for the purchase.
      * @param customerID The ID of the customer.
-     * @param date       Date and time of the purchase.
-     * @param branch     Branch where the purchase was made.
+     * @param date Date and time of the purchase.
+     * @param branch Branch where the purchase was made.
      */
     //Creating a purchase object from the server.database
     public Purchase(int purchaseID, int customerID, LocalDateTime date, String branch) {
@@ -59,7 +60,7 @@ public class Purchase extends JsonSerializable {
 
     @Override
     protected void populateFromJson(String json) {
-        Purchase tmp = gson.fromJson(json, Purchase.class);
+        Purchase tmp = gson.fromJson(json,Purchase.class);
         this.purchaseID = tmp.purchaseID;
         this.customerID = tmp.customerID;
         this.date = tmp.date;
@@ -121,13 +122,13 @@ public class Purchase extends JsonSerializable {
     }
 
     /**
-     * Returns a string representation of the purchase.
-     *
-     * @return The string representation of the purchase.
-     */
+    * Returns a string representation of the purchase.
+    *
+    * @return The string representation of the purchase.
+    */
     @Override
     public String toString() {
-        return purchaseID + Format.fieldSeparator +
+        return  purchaseID + Format.fieldSeparator +
                 customerID + Format.fieldSeparator +
                 date + Format.fieldSeparator +
                 branch;

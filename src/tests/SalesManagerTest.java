@@ -1,13 +1,13 @@
 package tests;
 
+import server.models.SaleReport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import server.models.SaleReport;
 import server.services.SalesManager;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SalesManagerTest {
     private SalesManager salesManager;

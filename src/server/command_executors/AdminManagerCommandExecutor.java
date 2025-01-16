@@ -4,27 +4,26 @@ import com.google.gson.JsonObject;
 import server.services.AdminManager;
 import server.services.LoginResult;
 
-public class AdminManagerCommandExecutor implements IExecute {
+public class AdminManagerCommandExecutor implements IExecute{
     private AdminManager adminManager;
 
     @Override
-    public String execute(Integer userId, LoginResult loginResult, String request) {
+    public String execute(Integer userId,LoginResult loginResult, String request) {
         this.adminManager = AdminManager.getInstance();
         MethodType method = ServerDecoder.getMethodType(request);
         JsonObject data = ServerDecoder.getData(request);
-        switch (method) {
+        switch (method){
             case LOGIN:
                 JsonObject response = new JsonObject();
                 int id = data.get("id").getAsInt();
                 String password = data.get("password").getAsString();
-                LoginResult result = adminManager.login(id, password);
-                response.addProperty("id", id);
+                LoginResult result = adminManager.login(id,password);
+                response.addProperty ("id", id);
                 response.addProperty("result", result.toString());
                 return response.toString();
             case ADD_EMP:
                 return null;
-            default:
-                return "";
+            default: return "";
         }
     }
 }

@@ -15,7 +15,10 @@ import server.models.purchaseHistory.PurchasedItem;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 // [TYPE] | [METHOD_NAME] | [PARAMETERS]
 public class Format {
@@ -26,8 +29,8 @@ public class Format {
     public static String objectSeparator = "~~~";
     public static String fieldSeparator = "!!!";
 
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-    private static final DateTimeFormatter formatter_get = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+    private static DateTimeFormatter formatter_get = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static String encode(ClassType type, String methodName) {
         return type + typeSeparator + methodName + methodSeparator;
@@ -79,7 +82,7 @@ public class Format {
 
     public static List<Customer> decodeCustomers(String jsonString) {
         Gson gson = new Gson();
-        JsonArray jarr = gson.fromJson(jsonString, JsonArray.class);
+        JsonArray jarr = gson.fromJson(jsonString,JsonArray.class);
 
         List<Customer> arr = new ArrayList<>();
 
@@ -112,8 +115,7 @@ public class Format {
     }
 
     public static List<Employee> decodeEmployees(String jsonString) {
-        Type listType = new TypeToken<List<Employee>>() {
-        }.getType();
+        Type listType = new TypeToken<List<Employee>>(){}.getType();
         List<Employee> employees = new Gson().fromJson(jsonString, listType);
         return employees;
     }
@@ -128,8 +130,7 @@ public class Format {
     }
 
     public static List<Product> decodeProducts(String jsonString) {
-        Type listType = new TypeToken<List<Product>>() {
-        }.getType();
+        Type listType = new TypeToken<List<Product>>(){}.getType();
         List<Product> products = new Gson().fromJson(jsonString, listType);
         return products;
     }
@@ -167,7 +168,9 @@ public class Format {
         String[] objects = str.split(objectSeparator);
         Set<String> branches = new HashSet<>();
 
-        Collections.addAll(branches, objects);
+        for (String objectString : objects) {
+            branches.add(objectString);
+        }
         return branches;
     }
 
