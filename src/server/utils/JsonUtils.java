@@ -36,7 +36,7 @@ public class JsonUtils {
         }
     }
 
-    private static final String dirPath = "files";
+    private static final String dirPath = "src"+File.separator+"files";
 
     // Generic method to read a JSON file and convert it to a list of objects
     public static <T> List<T> readJsonListFromFile(
