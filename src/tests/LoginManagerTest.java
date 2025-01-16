@@ -1,12 +1,13 @@
 package tests;
 
-import server.models.Employee;
-import server.models.Employee.Position;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import server.models.Employee;
+import server.models.Employee.Position;
 import server.services.LoginManager;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class LoginManagerTest {
 

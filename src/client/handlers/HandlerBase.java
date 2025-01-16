@@ -11,15 +11,15 @@ public abstract class HandlerBase {
     private final ServiceType serviceType;
 
     public HandlerBase(ServiceType serviceType) {
-        this.serviceType= serviceType;
+        this.serviceType = serviceType;
     }
 
     protected String encodeRequest(MethodType methodType, JsonObject data) {
-            // Build the request string
+        // Build the request string
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty(SERVICE_KEY,serviceType.toString());
-        jsonObject.addProperty(METHOD_KEY,methodType.toString());
-        jsonObject.add(DATA_KEY,data);
+        jsonObject.addProperty(SERVICE_KEY, serviceType.toString());
+        jsonObject.addProperty(METHOD_KEY, methodType.toString());
+        jsonObject.add(DATA_KEY, data);
         return jsonObject.toString();
     }
 }
