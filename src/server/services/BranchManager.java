@@ -2,8 +2,11 @@ package server.services;
 
 import server.models.Branch;
 
+import java.util.AbstractMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BranchManager {
     // singleton
@@ -16,14 +19,14 @@ public class BranchManager {
         return instance;
     }
 
-    private final Map<Integer, Branch> branches;
+    private Map<Integer, Branch> branches;
 
-    public BranchManager() {
+    private BranchManager() {
         this.branches = new HashMap<>();
     }
 
     public void addBranch(Branch branch) {
-        branches.put(branch.getBranchID(), branch);
+        branches.put(branch.getId(), branch);
     }
 
 
@@ -76,4 +79,13 @@ public class BranchManager {
         return branches.get(branchID);
     }
 
+    public Map<Integer, Branch> getBranches() {
+        return branches;
+    }
+
+    public void setBranches(List<Branch> branches) {
+        this.branches = branches.stream()
+                .map(branch -> new AbstractMap.SimpleEntry<>(branch.getId(), branch))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
 }

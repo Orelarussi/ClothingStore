@@ -8,6 +8,7 @@ import server.command_executors.ServerDecoder;
 import server.models.Employee;
 import server.models.Employee.Position;
 import server.services.LoginResult;
+import server.utils.JsonUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -56,6 +57,7 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        JsonUtils.save();
     }
 
     private static void startAdminMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {

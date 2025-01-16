@@ -25,7 +25,11 @@ public class ClientHandler extends Thread {
     public void run() {
         try {
             String request;
-            while ((request = socketData.getInputStream().readLine()) != null) {
+            while (true) {
+                request = socketData.getInputStream().readLine();
+                if (request == null)
+                    break;
+
                 // generic handler for all cases
                 ServiceType serviceType = ServerDecoder.getServiceType(request);
                 MethodType methodType = ServerDecoder.getMethodType(request);
@@ -40,7 +44,6 @@ public class ClientHandler extends Thread {
             }
         } catch (IOException e) {
             e.printStackTrace();
-
         } finally {
             try {
                 socketData.getOutputStream().close();
