@@ -10,6 +10,7 @@ import java.util.Map;
 public class LoginManager {
     // singleton
     private static LoginManager instance;
+
     public static LoginManager getInstance() {
         return instance != null ? instance : (instance = new LoginManager());
     }
@@ -18,7 +19,7 @@ public class LoginManager {
 
     private LoginManager() {
         this.users = new HashMap<>();
-        users.put(1,new Admin(1, "Eran", "", "000", "1234"));//TODO remove after testing
+        users.put(1, new Admin(1, "Eran", "", "000", "1234"));//TODO remove after testing
     }
 
 

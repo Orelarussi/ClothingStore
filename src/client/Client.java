@@ -16,13 +16,12 @@ import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.net.Socket;
 import java.util.Arrays;
-import java.util.List;
 
 public class Client {
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 12345;
     private static final Gson gson = new Gson();
-    private static AdminHandler adminHandler = new AdminHandler();
+    private static final AdminHandler adminHandler = new AdminHandler();
     private static LoginResult loginResult = LoginResult.FAILURE;
     private static Integer id;
 
@@ -141,22 +140,22 @@ public class Client {
 
             for (int i = 0; i < fields.length; i++) {
                 String fName = fields[i];
-                System.out.println((i+1) + ". " + fName);
+                System.out.println((i + 1) + ". " + fName);
             }
             try {
                 int selectedFieldNum = Integer.parseInt(consoleInput.readLine());
                 String selectedField = fields[selectedFieldNum - 1];
-                System.out.println("Choose the new value for "+selectedField);
+                System.out.println("Choose the new value for " + selectedField);
                 String val = consoleInput.readLine();
                 JsonObject req = new JsonObject();
-                req.addProperty(selectedField,val);
+                req.addProperty(selectedField, val);
                 //{selectedField : val } - example { firstName : "Orel" }
 
                 break;
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input");
             } catch (IndexOutOfBoundsException e) {
-                System.out.println("Please enter a value between 1 to "+fields.length);
+                System.out.println("Please enter a value between 1 to " + fields.length);
             }
 
         }

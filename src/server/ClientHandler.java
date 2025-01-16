@@ -15,7 +15,8 @@ public class ClientHandler extends Thread {
     private static final Map<Integer, SocketData> connections = new HashMap<>();
     private Integer userId;
     private LoginResult loginResult = LoginResult.FAILURE;
-    private SocketData socketData;
+    private final SocketData socketData;
+
     public ClientHandler(Socket socket) {
         this.socketData = new SocketData(socket);
     }
@@ -30,14 +31,14 @@ public class ClientHandler extends Thread {
                 MethodType methodType = ServerDecoder.getMethodType(request);
 
                 IExecute commandExecutor = CommandExecutorFactory.getCommandExecutor(serviceType);
-                String response = commandExecutor.execute(userId,loginResult,request);
-                if(methodType == MethodType.LOGIN){
+                String response = commandExecutor.execute(userId, loginResult, request);
+                if (methodType == MethodType.LOGIN) {
                     handleLoginResponse(response);
                 }
 
                 socketData.getOutputStream().println(response);
             }
-          } catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
 
         } finally {
@@ -48,7 +49,7 @@ public class ClientHandler extends Thread {
                 e.printStackTrace();
             }
             synchronized (connections) {
-                if(userId != null){
+                if (userId != null) {
                     connections.remove(connections.get(userId));
                 }
             }
@@ -65,14 +66,15 @@ public class ClientHandler extends Thread {
 //            }
         }
     }
-    private void handleLoginResponse(String response){
+
+    private void handleLoginResponse(String response) {
         JsonObject responseJsonObject = ServerDecoder.convertToJsonObject(response);
         int id = responseJsonObject.get("id").getAsInt();
         LoginResult result = LoginResult.valueOf(responseJsonObject.get("result").getAsString());
-        if (result!= LoginResult.FAILURE){
-            synchronized(connections){
+        if (result != LoginResult.FAILURE) {
+            synchronized (connections) {
                 SocketData previousConnectionSocketData = connections.get(id);
-                if(previousConnectionSocketData != null){
+                if (previousConnectionSocketData != null) {
                     // disconnect user previous connection
                     try {
                         previousConnectionSocketData.getOutputStream().close();
@@ -83,7 +85,7 @@ public class ClientHandler extends Thread {
                 }
                 userId = id;
                 loginResult = result;
-                connections.put(id,socketData);
+                connections.put(id, socketData);
             }
         }
     }

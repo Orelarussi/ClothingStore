@@ -5,7 +5,8 @@ import server.utils.JsonSerializable;
 public abstract class PurchasePlan extends JsonSerializable {
     protected int discountPercent;
 
-    public PurchasePlan(){}
+    public PurchasePlan() {
+    }
 
     public int getDiscountPercent() {
         return discountPercent;

@@ -16,7 +16,7 @@ public class BranchManager {
         return instance;
     }
 
-    private Map<Integer, Branch> branches;
+    private final Map<Integer, Branch> branches;
 
     public BranchManager() {
         this.branches = new HashMap<>();

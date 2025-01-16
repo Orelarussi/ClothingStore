@@ -7,10 +7,12 @@ public abstract class JsonSerializable {
     protected static final Gson gson = new Gson();
 
     // No-arg constructor for Gson compatibility
-    protected JsonSerializable() {}
-
-    public JsonSerializable(String string){
+    protected JsonSerializable() {
     }
+
+    public JsonSerializable(String string) {
+    }
+
     // Serialize the object to a JSON string
     public String serializeToString() {
         return gson.toJson(this);

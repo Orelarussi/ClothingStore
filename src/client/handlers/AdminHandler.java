@@ -11,21 +11,21 @@ public class AdminHandler extends HandlerBase {
         super(ServiceType.ADMIN);
     }
 
-    public String login(int id, String password){
-        JsonObject data = new JsonObject();
-        data.addProperty("id",id);
-        data.addProperty("password",password);
-        return super.encodeRequest(MethodType.LOGIN,data);
-    }
-
-    public String createEmployee(Employee employee){
-        JsonObject data = new Gson().fromJson(employee.serializeToString(), JsonObject.class);
-        return super.encodeRequest(MethodType.ADD_EMP,data);
-    }
-
-    public String removeEmployee(int id){
+    public String login(int id, String password) {
         JsonObject data = new JsonObject();
         data.addProperty("id", id);
-        return super.encodeRequest(MethodType.REMOVE_EMP,data);
+        data.addProperty("password", password);
+        return super.encodeRequest(MethodType.LOGIN, data);
+    }
+
+    public String createEmployee(Employee employee) {
+        JsonObject data = new Gson().fromJson(employee.serializeToString(), JsonObject.class);
+        return super.encodeRequest(MethodType.ADD_EMP, data);
+    }
+
+    public String removeEmployee(int id) {
+        JsonObject data = new JsonObject();
+        data.addProperty("id", id);
+        return super.encodeRequest(MethodType.REMOVE_EMP, data);
     }
 }

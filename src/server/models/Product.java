@@ -1,12 +1,8 @@
 package server.models;
 
-import server.exceptions.InvalidQuantityException;
 import server.utils.JsonSerializable;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class Product extends JsonSerializable{
+public class Product extends JsonSerializable {
     private int id;
     private String name;
     private String category;
@@ -22,7 +18,7 @@ public class Product extends JsonSerializable{
 
     @Override
     protected void populateFromJson(String json) {
-        Product temp = gson.fromJson(json,Product.class);
+        Product temp = gson.fromJson(json, Product.class);
         this.id = temp.id;
         this.name = temp.name;
         this.category = temp.category;

@@ -1,7 +1,7 @@
 package server.services;
-import server.models.Branch;
 
 import server.models.Admin;
+import server.models.Branch;
 import server.models.Employee;
 
 import java.util.*;
@@ -13,6 +13,7 @@ public class AdminManager {
 
     //singleton
     private static AdminManager instance;
+
     public static synchronized AdminManager getInstance() {
         if (instance == null) {
             instance = new AdminManager();
@@ -20,7 +21,8 @@ public class AdminManager {
         return instance;
     }
 
-    private AdminManager(){}
+    private AdminManager() {
+    }
 
 
     public LoginResult login(int id, String pass) {
@@ -128,7 +130,7 @@ public class AdminManager {
 
     public void setEmployees(List<Employee> employees) {
         this.employees = employees.stream()
-                .map(emp-> new AbstractMap.SimpleEntry<>(emp.getId(), emp))
+                .map(emp -> new AbstractMap.SimpleEntry<>(emp.getId(), emp))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

@@ -3,12 +3,14 @@ package server.command_executors;
 import java.util.HashMap;
 
 public class CommandExecutorFactory {
-    private static final HashMap<ServiceType,IExecute> commandExecutorDictionary = new HashMap<>();
+    private static final HashMap<ServiceType, IExecute> commandExecutorDictionary = new HashMap<>();
+
     static {
-        commandExecutorDictionary.put(ServiceType.ADMIN,new AdminManagerCommandExecutor());
+        commandExecutorDictionary.put(ServiceType.ADMIN, new AdminManagerCommandExecutor());
 //        commandExecutorDictionary.put(ServiceType.___,new AdminManagerCommandExecutor());
     }
-    public static IExecute getCommandExecutor(ServiceType serviceType){
+
+    public static IExecute getCommandExecutor(ServiceType serviceType) {
         return commandExecutorDictionary.get(serviceType);
     }
 }
