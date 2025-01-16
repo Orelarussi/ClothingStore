@@ -97,11 +97,3 @@ public class PurchasedItem extends JsonSerializable {
 //        return new Gson().fromJson(serializedString, PurchasedItem.class);
 //    }
 }
-
-
-/*
-CREATE TABLE PurchaseHistoryItems (
-	purchaseID int NOT NULL,
-	productID int NOT NULL
-);
- */
