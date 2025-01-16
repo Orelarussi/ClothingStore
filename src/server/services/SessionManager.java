@@ -1,11 +1,12 @@
 package server.services;
 
 import server.models.Person;
+
 import java.util.HashSet;
 import java.util.Set;
 
 public class SessionManager {
-    private Set<Person> loggedInPeople;
+    private final Set<Person> loggedInPeople;
 
     public SessionManager() {
         this.loggedInPeople = new HashSet<>();
