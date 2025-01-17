@@ -8,13 +8,11 @@ public class SocketData implements Closeable {
     private Socket socket;
     private BufferedReader inputStream;
     private PrintWriter outputStream;
-    private String clientAddress;
 
     public SocketData(Socket socket) throws IOException {
         this.socket = socket;
         this.inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
         this.outputStream = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
-        this.clientAddress = socket.getInetAddress() + ":" + socket.getPort();
     }
 
     public Socket getSocket() {
@@ -27,10 +25,6 @@ public class SocketData implements Closeable {
 
     public PrintWriter getOutputStream() {
         return outputStream;
-    }
-
-    public String getClientAddress() {
-        return clientAddress;
     }
 
     /**
