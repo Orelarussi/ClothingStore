@@ -5,6 +5,7 @@ import client.menu.MenuItem;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import server.command_executors.ServerDecoder;
+import server.database.SocketData;
 import server.models.Employee;
 import server.models.Employee.Position;
 import server.services.LoginResult;
@@ -22,23 +23,39 @@ public class Client {
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 12345;
     private static final Gson gson = new Gson();
+    public static final String LOG_OUT = "Log out";
     private static AdminHandler adminHandler = new AdminHandler();
     private static Integer id;
 
     public static void main(String[] args) {
-        connectToServer();
+        BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in));
+
+        MenuItem[] generalMenu = new MenuItem[]{
+                new MenuItem("Login", () -> connectToServer(consoleInput)),
+                new MenuItem("Exit", () -> exitClient(consoleInput))
+        };
+
+        while (true) {
+            System.out.println("\nWelcome to Clothing Store\n");
+            try {
+                displayAndRunMenu(generalMenu, consoleInput, "main menu", false);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    private static void connectToServer() {
-        try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT)) {
+    private static void connectToServer(BufferedReader consoleInput) {
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in));
+        //try with resources will close the socket when done
+        try (SocketData socketData = new SocketData(new Socket(SERVER_HOST, SERVER_PORT))) {
+
             System.out.println("Connected to server at " + SERVER_HOST + ":" + SERVER_PORT);
             //start logic
+            PrintWriter out = socketData.getOutputStream();
+            BufferedReader in = socketData.getInputStream();
             LoginResult loginResult = login(consoleInput, out, in);
-            showAdminOrEmployeeMenu(loginResult,consoleInput, out, in);
+            showAdminOrEmployeeMenu(loginResult, consoleInput, out, in);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -49,6 +66,8 @@ public class Client {
             throws IOException {
 
         LoginResult loginResult = LoginResult.FAILURE;
+
+        System.out.println("\n=== Login ===");
 
         while (!(loginResult == LoginResult.ADMIN || loginResult == LoginResult.EMPLOYEE)) {
             // id
@@ -86,18 +105,17 @@ public class Client {
     }
     //display And Run Menu : to use in the start ... menu
 
-    private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String menuTitle) throws IOException {
-        menuItems = Arrays.copyOf(menuItems, menuItems.length + 2);
-        menuItems[menuItems.length - 2] = new MenuItem("Back", null);
-        menuItems[menuItems.length - 1] = new MenuItem("Exit", () -> {
-            System.out.println("Exiting the client. Goodbye!");
-            try {
-                consoleInput.close(); // Close console input
-            } catch (IOException e) {
-                System.out.println("Error closing console input: " + e.getMessage());
-            }
-            System.exit(0); // Terminate the client process
-        });
+    private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String title) throws IOException {
+        displayAndRunMenu(menuItems,consoleInput,title,true);
+    }
+
+    private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String menuTitle,
+                                          boolean addBack_ExitOpt) throws IOException {
+        if (addBack_ExitOpt) {
+            menuItems = Arrays.copyOf(menuItems, menuItems.length + 2);
+            menuItems[menuItems.length - 2] = new MenuItem("Back", null);
+            menuItems[menuItems.length - 1] = new MenuItem("Exit", () -> exitClient(consoleInput));
+        }
 
         int choice;
         while (true) {
@@ -116,7 +134,8 @@ public class Client {
             }
 
             if (choice > 0 && choice <= menuItems.length) {
-                if (menuItems[choice - 1].getTitle().equals("Back")) {
+                String title = menuItems[choice - 1].getTitle();
+                if (title.equals("Back") || title.equals(LOG_OUT)) {
                     return;
                 } else {
                     menuItems[choice - 1].run();
@@ -125,6 +144,16 @@ public class Client {
                 System.out.println("Invalid choice. Please try again.");
             }
         }
+    }
+
+    private static void exitClient(BufferedReader consoleInput) {
+        System.out.println("Exiting the client. Goodbye!");
+        try {
+            consoleInput.close(); // Close console input
+        } catch (IOException e) {
+            System.out.println("Error closing console input: " + e.getMessage());
+        }
+        System.exit(0); // Terminate the client process
     }
 
     //all menus functions:
@@ -151,9 +180,11 @@ public class Client {
                 new MenuItem("View all employees", () -> {
                     System.out.println("Displaying all employees...");
                     // You can implement additional logic for this option here.
+                }),
+                new MenuItem(LOG_OUT, () -> {
                 })
         };
-        displayAndRunMenu(adminMenu, consoleInput, "Admin Menu");
+        displayAndRunMenu(adminMenu, consoleInput, "Admin Menu" );
     }
 
     private static void startEmployeeMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
@@ -186,6 +217,8 @@ public class Client {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
+                }),
+                new MenuItem(LOG_OUT, () -> {
                 })
         };
         displayAndRunMenu(employeeMenu, consoleInput, "Employee Menu");
@@ -330,7 +363,7 @@ public class Client {
     }
 
 
-    //input halp functions:
+    //input help functions:
     private static int getInt(String msg, String errMsg, BufferedReader consoleInput) {
         while (true) {
             System.out.print(msg);
