@@ -1,5 +1,6 @@
 package server.command_executors;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -22,7 +23,8 @@ public class ServerDecoder {
     }
 
     public static JsonObject convertToJsonObject(String jsonString){
-        return JsonParser.parseString(jsonString).getAsJsonObject();
+        JsonElement jsonElement = JsonParser.parseString(jsonString);
+        return jsonElement.getAsJsonObject();
     }
     public static String unAuthResponse(ServiceType serviceType,MethodType methodType){
         JsonObject jsonObject = new JsonObject();

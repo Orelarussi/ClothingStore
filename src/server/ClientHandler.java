@@ -16,7 +16,7 @@ public class ClientHandler extends Thread {
     private Integer userId;
     private LoginResult loginResult = LoginResult.FAILURE;
     private SocketData socketData;
-    public ClientHandler(Socket socket) {
+    public ClientHandler(Socket socket) throws IOException {
         this.socketData = new SocketData(socket);
     }
 
@@ -42,15 +42,15 @@ public class ClientHandler extends Thread {
 
         } finally {
             try {
-                socketData.getOutputStream().close();
-                socketData.getSocket().close();
+                socketData.close();// closes socket, inputStream and outputStream
+                synchronized (connections) {
+                    if(userId != null){
+                        SocketData removed = connections.remove(userId);
+                        removed.close();
+                    }
+                }
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-            synchronized (connections) {
-                if(userId != null){
-                    connections.remove(connections.get(userId));
-                }
             }
 //            final ChatManager chatManager = ChatManager.getInstance();
 //            if (chatManager.getChattingEmployees().containsKey(socketData)) {

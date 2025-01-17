@@ -16,7 +16,6 @@ import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.net.Socket;
 import java.util.Arrays;
-import java.util.function.Predicate;
 
 
 public class Client {
@@ -24,10 +23,13 @@ public class Client {
     private static final int SERVER_PORT = 12345;
     private static final Gson gson = new Gson();
     private static AdminHandler adminHandler = new AdminHandler();
-    private static LoginResult loginResult = LoginResult.FAILURE;
     private static Integer id;
 
     public static void main(String[] args) {
+        connectToServer();
+    }
+
+    private static void connectToServer() {
         try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT)) {
 
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -35,39 +37,46 @@ public class Client {
             BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Connected to server at " + SERVER_HOST + ":" + SERVER_PORT);
             //start logic
-            loginAndShowAdminOrEmployeeMenu(consoleInput, out, in);
+            LoginResult loginResult = login(consoleInput, out, in);
+            showAdminOrEmployeeMenu(loginResult,consoleInput, out, in);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static void loginAndShowAdminOrEmployeeMenu(BufferedReader consoleInput, PrintWriter out, BufferedReader in)
-    throws IOException {
-        while (true) {
-            while (loginResult == LoginResult.FAILURE) {
-                // id
-                id = getInt("Username id: ", "Invalid id. Please enter a numeric value.", consoleInput);
-                // password
-                System.out.print("Password: ");
-                String password = consoleInput.readLine();
-                String request = adminHandler.login(id, password);
-                //send the request to the server
-                out.println(request);
-                JsonObject loginResponse = ServerDecoder.convertToJsonObject(in.readLine());
-                loginResult = LoginResult.valueOf(loginResponse.get("result").getAsString());
-                if (loginResult == LoginResult.FAILURE) {
-                    System.out.println("User id or password are incorrect, please try again");
-                }
-            }
-            if (loginResult == LoginResult.ADMIN) {
-                startAdminMenu(in, out, consoleInput);
+    private static LoginResult login(BufferedReader consoleInput, PrintWriter out, BufferedReader in)
+            throws IOException {
 
-                loginResult = LoginResult.FAILURE;
-            } else {
+        LoginResult loginResult = LoginResult.FAILURE;
+
+        while (!(loginResult == LoginResult.ADMIN || loginResult == LoginResult.EMPLOYEE)) {
+            // id
+            id = getInt("Username id: ", "Invalid id. Please enter a numeric value.", consoleInput);
+            // password
+            System.out.print("Password: ");
+            String password = consoleInput.readLine();
+            String request = adminHandler.login(id, password);
+            //send the request to the server
+            out.println(request);
+            String serverResponse = in.readLine();
+            JsonObject loginResponse = ServerDecoder.convertToJsonObject(serverResponse);
+            loginResult = LoginResult.valueOf(loginResponse.get("result").getAsString());
+        }
+        return loginResult;
+    }
+
+    private static void showAdminOrEmployeeMenu(LoginResult loginResult, BufferedReader consoleInput, PrintWriter out, BufferedReader in) throws IOException {
+        switch (loginResult) {
+            case ADMIN:
+                startAdminMenu(in, out, consoleInput);
+                break;
+            case EMPLOYEE:
                 startEmployeeMenu(in, out, consoleInput);
-                loginResult = LoginResult.FAILURE;
-            }
+                break;
+            case FAILURE:
+                System.out.println("User id or password are incorrect, please try again");
+                break;
         }
     }
 
@@ -77,7 +86,7 @@ public class Client {
     }
     //display And Run Menu : to use in the start ... menu
 
-    private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput,String menuTitle) throws IOException {
+    private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String menuTitle) throws IOException {
         menuItems = Arrays.copyOf(menuItems, menuItems.length + 2);
         menuItems[menuItems.length - 2] = new MenuItem("Back", null);
         menuItems[menuItems.length - 1] = new MenuItem("Exit", () -> {
@@ -93,7 +102,7 @@ public class Client {
         int choice;
         while (true) {
             // display the menu
-            System.out.println("\n=== "+menuTitle+" ===");
+            System.out.println("\n=== " + menuTitle + " ===");
             for (int i = 0; i < menuItems.length; i++) {
                 System.out.println((i + 1) + ". " + menuItems[i].getTitle());
             }
@@ -108,8 +117,8 @@ public class Client {
 
             if (choice > 0 && choice <= menuItems.length) {
                 if (menuItems[choice - 1].getTitle().equals("Back")) {
-                    break;
-                }else {
+                    return;
+                } else {
                     menuItems[choice - 1].run();
                 }
             } else {
@@ -123,7 +132,8 @@ public class Client {
     private static void startAdminMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         MenuItem[] adminMenu = {
                 new MenuItem("Add employee", () -> {
-                    createAndAddEmployee(in, out, consoleInput);}),
+                    createAndAddEmployee(in, out, consoleInput);
+                }),
                 new MenuItem("Remove employee", () -> {
                     try {
                         removeEmployee(in, out, consoleInput);
@@ -143,7 +153,7 @@ public class Client {
                     // You can implement additional logic for this option here.
                 })
         };
-        displayAndRunMenu(adminMenu, consoleInput,"Admin Menu");
+        displayAndRunMenu(adminMenu, consoleInput, "Admin Menu");
     }
 
     private static void startEmployeeMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
@@ -240,7 +250,7 @@ public class Client {
                 System.out.println("Choose the new value for " + selectedField);
                 String val = consoleInput.readLine();
                 JsonObject req = new JsonObject();
-                req.addProperty(selectedField,val);
+                req.addProperty(selectedField, val);
                 //{selectedField : val } - example { firstName : "Orel" }
 
                 break;
@@ -298,7 +308,7 @@ public class Client {
 
             int positionChoice;
             Position position;
-            positionChoice = getInt( "Enter the number corresponding to the position:", "Invalid choice. Please select a valid number.", consoleInput );
+            positionChoice = getInt("Enter the number corresponding to the position:", "Invalid choice. Please select a valid number.", consoleInput);
             if (positionChoice < 1 || positionChoice > positions.length) {
                 System.out.println("Invalid choice. Please select a valid number.");
                 return;
@@ -333,6 +343,7 @@ public class Client {
             }
         }
     }
+
     private static long getLong(String msg, String errMsg, BufferedReader consoleInput) {
         while (true) {
             System.out.print(msg);
