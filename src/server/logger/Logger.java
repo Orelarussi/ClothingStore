@@ -77,8 +77,8 @@ public class Logger {
     /**
      * Logs the initiation of a chat.
      */
-    public static void logChatStarted(Employee sender, User receiver) {
-        log("Chat started from: " + sender.getId() + " To -> "+ receiver.getId());
+    public static void logChatStarted(int sender, int receiver) {
+        log("Chat started from: " + sender + " To -> "+ receiver);
     }
 
     /**

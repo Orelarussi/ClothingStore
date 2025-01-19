@@ -1,13 +1,10 @@
 package server.services;
 
 import server.ClientHandler;
-import server.database.ChatSession;
+import server.database.Chat;
 import server.database.SocketData;
-import server.models.Chat;
 import server.models.Employee;
 import server.models.Message;
-import server.Server;
-import server.models.User;
 
 import java.util.*;
 
@@ -20,14 +17,14 @@ public class ChatManager {
         return instance;
     }
 
-    private Map<SocketData, ChatSession> chattingEmployees;
+    private Map<SocketData, Chat> chattingEmployees;
     private Map<String, List<Employee>> waitingEmployees;
     private Map<SocketData, Employee> availableEmployees;
     private List<Chat> activeChats;
 
     private ChatManager() {
-        this.availableEmployees = new HashMap<>();
-        this.activeChats = new ArrayList<>();
+        availableEmployees = new HashMap<>();
+        activeChats = new ArrayList<>();
         chattingEmployees = new HashMap<>();
         waitingEmployees = new HashMap<>();
     }
@@ -76,7 +73,7 @@ public class ChatManager {
     // Employee sends a message in an active chat
     public void sendMessage(Employee employee, String messageContent) {
         for (Chat chat : activeChats) {
-            if (chat.getEmployee1ID() == employee.getId() || chat.getEmployee2ID() == employee.getId()) {
+            if (chat.getCreatorID() == employee.getId() || chat.getReceiverID() == employee.getId()) {
                 chat.addMessage(employee, messageContent);
                 chat.displayChat();
                 return;
@@ -88,7 +85,7 @@ public class ChatManager {
     // When an employee is done with a chat, make them available again
     public void endChat(Employee employee) {
         for (Chat chat : activeChats) {
-            if (chat.getEmployee1ID() == employee.getId()|| chat.getEmployee2ID() == employee.getId()) {
+            if (chat.getCreatorID() == employee.getId()|| chat.getReceiverID() == employee.getId()) {
                 activeChats.remove(chat);
 //                availableEmployees.add(employee);
                 System.out.println(employee.getFirstName() + " is now available for a new chat.");
@@ -103,8 +100,8 @@ public class ChatManager {
         System.out.println("Message added: " + message);
     }
 
-    public Set<ChatSession> getAvailableChats(int branch) {
-        Set<ChatSession> chats = new HashSet<>();
+    public Set<Chat> getAvailableChats(int branch) {
+        Set<Chat> chats = new HashSet<>();
 //        for (Map.Entry<SocketData, ChatSession> entry : chattingEmployees.entrySet()) {
 //            //ChatSession chat = entry.getValue();
 //            //Employee emp = chat.getCreatorEmployee();
@@ -122,11 +119,11 @@ public class ChatManager {
         return chats;
     }
 
-    public Map<SocketData, ChatSession> getChattingEmployees() {
+    public Map<SocketData, Chat> getChattingEmployees() {
         return chattingEmployees;
     }
 
-    public ChatSession getChatSessionBySocketData(SocketData socketData) {
+    public Chat getChatSessionBySocketData(SocketData socketData) {
         return chattingEmployees.get(socketData);
     }
 
@@ -160,9 +157,9 @@ public class ChatManager {
         }
     }
 
-    public void validateChatSession(ChatSession chat) {
+    public void validateChatSession(Chat chat) {
         int chattingCount = 0;
-        for (Map.Entry<SocketData, ChatSession> entry : chattingEmployees.entrySet()) {
+        for (Map.Entry<SocketData, Chat> entry : chattingEmployees.entrySet()) {
             int tempSessionID = entry.getValue().getSessionID();
             int sessionID = chat.getSessionID();
 
@@ -175,11 +172,11 @@ public class ChatManager {
         }
     }
 
-    public void endChatSession(ChatSession chat) {
-        for (Map.Entry<SocketData, ChatSession> entry : chattingEmployees.entrySet()) {
+    public void endChatSession(Chat chat) {
+        for (Map.Entry<SocketData, Chat> entry : chattingEmployees.entrySet()) {
             if (entry.getValue() == chat) {
                 SocketData socketData = entry.getKey();
-                chat.removeListener(socketData);
+//                chat.removeListener(socketData);
                 chattingEmployees.remove(socketData);
 
                 String command = "CHAT@@@abortCurrentChat###";
@@ -188,9 +185,9 @@ public class ChatManager {
         }
     }
 
-    public ChatSession getChatSessionByID(int sessionID) {
-        for (Map.Entry<SocketData, ChatSession> entry : chattingEmployees.entrySet()) {
-            ChatSession chat = entry.getValue();
+    public Chat getChatSessionByID(int sessionID) {
+        for (Map.Entry<SocketData, Chat> entry : chattingEmployees.entrySet()) {
+            Chat chat = entry.getValue();
 
             if (chat.getSessionID() == sessionID)
                 return chat;
