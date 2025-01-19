@@ -30,13 +30,13 @@ public abstract class Customer extends Person {
         //According to CustomerType enum
         switch (type) {
             case "NEW" -> {
-                return gson.fromJson(objString, NewCustomer.class);
+                return new NewCustomer(json.get("id").getAsInt(), json.get("firstName").getAsString(), json.get("lastName").getAsString() ,json.get("phoneNumber").getAsString());
             }
             case "RETURNING" -> {
-                return gson.fromJson(objString, ReturningCustomer.class);
+                return new ReturningCustomer(json.get("id").getAsInt(), json.get("firstName").getAsString(), json.get("lastName").getAsString() ,json.get("phoneNumber").getAsString());
             }
             case "VIP" -> {
-                return gson.fromJson(objString, VIPCustomer.class);
+                return new VIPCustomer(json.get("id").getAsInt(), json.get("firstName").getAsString(), json.get("lastName").getAsString() ,json.get("phoneNumber").getAsString());
             }
             default -> throw new IllegalArgumentException("Unknown class type: " + type);
         }
@@ -67,7 +67,7 @@ public abstract class Customer extends Person {
     protected void populateFromJson(String json) {
         super.populateFromJson(json);
         Customer temp = gson.fromJson(json,Customer.class);
-        this.purchasePlan = temp.purchasePlan;
         this.type = temp.type;
+        this.purchasePlan = temp.purchasePlan;
     }
 }

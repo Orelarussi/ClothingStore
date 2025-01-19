@@ -1,1 +1,1 @@
-[{"branchID":1,"employeeAmount":51,"address":"test","inventory":{"1":5},"sales":{"1":20}},{"branchID":2,"employeeAmount":51,"address":"test","inventory":{"2":5},"sales":{"2":20}}]
+[{"branchID":1,"employeeAmount":51,"address":"test","inventory":{"1":5, "3": 213},"sales":{}},{"branchID":2,"employeeAmount":51,"address":"test","inventory":{"2":5},"sales":{}}]

@@ -113,6 +113,31 @@ public class Client {
         }
     }
 
+    private void saleProduct(PrintWriter out, BufferedReader in, BufferedReader consoleInput) throws IOException {
+        System.out.print("Enter the Customer ID to purchase: ");
+        int customerID = Integer.parseInt(consoleInput.readLine());
+
+        System.out.print("Enter the Product Id: ");
+        int productId = Integer.parseInt(consoleInput.readLine());
+
+        System.out.print("Enter the Amount: ");
+        int amount = Integer.parseInt(consoleInput.readLine());
+
+        String request = EmployeeHandler.getInstance().saleProduct(customerID, productId, amount);
+
+        // Send the request to the server
+        out.println(request);
+
+        // Wait for the server's response
+        String response = in.readLine();
+        if (response != null) {
+            System.out.println("Sale added Successfully");
+            System.out.println(response);
+        } else {
+            System.out.println("No response received from the server.");
+        }
+    }
+
     private void startInventoryMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         MenuItem[] inventoryMenu = {
                 new MenuItem("Show branch inventory", () -> {
@@ -122,7 +147,16 @@ public class Client {
                         System.out.println("An error occurred while displaying the inventory: " + e.getMessage());
                     }
                 }),
-                new MenuItem("Sale product to customer", () -> System.out.println("Processing sale to customer..."))
+                new MenuItem("Sale product to customer", () -> {
+                    try {
+                        saleProduct(out, in, consoleInput);
+                    } catch (IOException e) {
+                        System.out.println("An error occurred while displaying the inventory: " + e.getMessage());
+                    }
+
+
+                    System.out.println("Processing sale to customer...");
+                })
         };
         displayAndRunMenu(inventoryMenu, consoleInput, "Inventory Menu");
     }

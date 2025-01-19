@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 public class AdminManager {
     private Map<Integer, Employee> employees = new HashMap<>();
     private static final Admin admin = new Admin(1, "Eran", "", "000", "1234");
+    public static int currentUserId = admin.getId();
 
     //singleton
     private static AdminManager instance;
@@ -26,12 +27,14 @@ public class AdminManager {
     public LoginResult login(int id, String pass) {
         // Check if the login is for the admin
         if (admin.getId() == id && admin.getPassword().equals(pass)) {
+            currentUserId = id;
             return LoginResult.ADMIN;
         }
 
         // Check if the login is for an employee
         Employee emp = employees.get(id);
         if (emp != null && emp.getPassword().equals(pass)) {
+            currentUserId = id;
             return LoginResult.EMPLOYEE;
         }
 

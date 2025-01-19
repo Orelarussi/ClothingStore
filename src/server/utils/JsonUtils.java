@@ -7,6 +7,7 @@ import server.models.Employee;
 import server.models.Product;
 import server.models.customer.Customer;
 import server.models.customer.CustomerType;
+import server.models.customer.NewCustomer;
 import server.services.AdminManager;
 import server.services.BranchManager;
 import server.services.EmployeeManager;
@@ -66,7 +67,6 @@ public class JsonUtils {
         return dirPath + File.separator + filePath;
     }
 
-    //    TODO call asynchronously
     public static void save() {
         System.out.println("Saving JSON files...");
         System.out.println("Saving employees...");
@@ -80,7 +80,6 @@ public class JsonUtils {
         System.out.println("JSON files saved successfully.");
     }
 
-//    //    TODO call asynchronously
     public static void load() {
         System.out.println("Loading JSON files...");
         System.out.println("Loading employees...");

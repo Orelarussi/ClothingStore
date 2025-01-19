@@ -21,4 +21,12 @@ public class EmployeeHandler extends BaseHandler{
         data.addProperty("branchId",branchId);
         return super.encodeRequest(MethodType.GET_INVENTORY_BY_BRANCH, data);
     }
+
+    public String saleProduct(int customerId, int productId, int amount) {
+        JsonObject data = new JsonObject();
+        data.addProperty("customerId", customerId);
+        data.addProperty("productId", productId);
+        data.addProperty("amount", amount);
+        return super.encodeRequest(MethodType.SALE_PRODUCT, data);
+    }
 }
