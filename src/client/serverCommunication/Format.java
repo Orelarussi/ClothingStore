@@ -5,12 +5,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import server.database.ChatSession;
+import server.database.Chat;
 import server.models.Employee;
 import server.models.Product;
-import server.models.User;
 import server.models.customer.Customer;
 import server.models.purchaseHistory.PurchasedItem;
+import server.services.AdminManager;
 
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
@@ -197,21 +197,26 @@ public class Format {
         return tableLines;
     }
 
-    public static String encodeAvailableChats(Set<ChatSession> chats) {
+    public static String encodeAvailableChats(Set<Chat> chats) {
         JsonArray result = new JsonArray(chats.size());
-
         JsonObject object;
-        for (ChatSession chat : chats) {
+        AdminManager manager = AdminManager.getInstance();
+
+        for (Chat chat : chats) {
             object = new JsonObject();
             object.addProperty("sessionID", chat.getSessionID());
 
-            User employee = chat.getReceiverEmployee();
-//            object.addProperty("branchID", employee.getBranchID()); TODO fix
+            int employeeID = chat.getReceiverID();
+            Employee employee = manager.findEmployeeById(employeeID);
+
+            object.addProperty("branchID", employee.getBranchID());
             object.addProperty("fullName", employee.getFullName());
 
-            employee = chat.getCreatorEmployee();
+            employeeID = chat.getCreatorID();
+            employee = manager.findEmployeeById(employeeID);
             object.addProperty("fullName", employee.getFullName());
 
+            result.add(object);
         }
         return result.getAsString();
     }
