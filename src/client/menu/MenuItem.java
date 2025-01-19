@@ -1,5 +1,7 @@
 package client.menu;
 
+import java.io.IOException;
+
 public class MenuItem {
 
     private final String title;

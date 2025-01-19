@@ -7,13 +7,11 @@ import server.models.purchase_plan.PurchasePlan;
 
 public abstract class Customer extends Person {
 
-    private String branchID;
     protected PurchasePlan purchasePlan;
     protected CustomerType type;
 
-    public Customer(int id, String firstName, String lastName, String phoneNumber, String branchID, CustomerType type) {
+    public Customer(int id, String firstName, String lastName, String phoneNumber, CustomerType type) {
         super(id, firstName, lastName, phoneNumber);
-        this.branchID = branchID;
         this.purchasePlan = createPurchasePlan();
         this.type = type;
     }
@@ -46,14 +44,6 @@ public abstract class Customer extends Person {
 
     protected abstract PurchasePlan createPurchasePlan();
 
-    public String getBranchID() {
-        return branchID;
-    }
-
-    public void setBranchID(String branchID) {
-        this.branchID = branchID;
-    }
-
     public PurchasePlan getPurchasePlan() {
         return purchasePlan;
     }
@@ -65,7 +55,6 @@ public abstract class Customer extends Person {
     @Override
     public String toString() {
         return super.toString() + "Customer{" +
-                ", branchID='" + branchID + '\'' +
                 ", plan='" + purchasePlan +'\'' +
                 '}';
     }
@@ -78,7 +67,6 @@ public abstract class Customer extends Person {
     protected void populateFromJson(String json) {
         super.populateFromJson(json);
         Customer temp = gson.fromJson(json,Customer.class);
-        this.branchID = temp.branchID;
         this.purchasePlan = temp.purchasePlan;
         this.type = temp.type;
     }
