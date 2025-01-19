@@ -1,9 +1,13 @@
 package server.services;
 
 import server.models.Product;
+import server.utils.JsonUtils;
 
+import java.util.AbstractMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ProductManager {
     private static ProductManager instance;
@@ -19,10 +23,6 @@ public class ProductManager {
 
     public ProductManager() {
         this.products = new HashMap<>();
-        products.put(1, new Product(1, "Skinny Jeans", "Jeans", 39.99));
-        products.put(2, new Product(2, "Relaxed Jeans", "Jeans", 49.99));
-        products.put(3, new Product(3, "Leather Jacket", "Jackets", 89.99));
-        products.put(4, new Product(4, "Denim Jacket", "Jackets", 79.99));
     }
 
     public void addProduct(Product product) {
@@ -31,6 +31,16 @@ public class ProductManager {
 
     public Product getProduct(int productId) {
         return products.get(productId);
+    }
+
+    public Map<Integer, Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products.stream()
+                .map(product -> new AbstractMap.SimpleEntry<>(product.getId(), product))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public void displayProducts() {

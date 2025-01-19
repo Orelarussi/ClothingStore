@@ -1,15 +1,9 @@
 package server.command_executors;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import server.models.customer.Customer;
-import server.services.AdminManager;
+import server.services.BranchManager;
 import server.services.EmployeeManager;
 import server.services.LoginResult;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class EmployeeManagerCommandExecutor implements IExecute{
 
@@ -21,25 +15,18 @@ public class EmployeeManagerCommandExecutor implements IExecute{
         JsonObject response = new JsonObject();
 
         switch (method){
-            case ADD_CUSTOMER:
-                Customer customer = Customer.deserializeFromString(data.getAsString());
-                boolean added = manager.addCustomer(customer);
-                response.addProperty("success", added);
-                break;
-            case DELETE_CUSTOMER:
-                int id = data.get("id").getAsInt();
-                boolean wasDeleted = manager.deleteCustomer(id);
-                response.addProperty("success", wasDeleted);
-                break;
-            case GET_ALL_CUSTOMERS:
-                Map<Integer, Customer> customers = manager.getCustomers();
-                JsonArray jsonArray = new JsonArray(customers.size());
-                customers.forEach((_, value) -> {
-                    jsonArray.add(value.serializeToJson());
-                });
-                response.add("customers", jsonArray);
-                response.addProperty("success", true);
-                break;
+            case GET_INVENTORY_BY_BRANCH:
+                int branchId = data.get("branchId").getAsInt();
+                StringBuilder result = new StringBuilder();
+
+                BranchManager.getInstance().getBranchById(branchId).getInventory().forEach((productId, value) ->
+                        result.append(String.format("ProductId %s : amount %s, ", productId, value)));
+
+                if (!result.isEmpty()) {
+                    result.setLength(result.length() - 2);
+                }
+
+                return result.toString();
             default:
                 response.addProperty("success", false);
                 break;

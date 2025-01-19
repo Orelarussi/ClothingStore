@@ -2,6 +2,7 @@ package client;
 
 import client.handlers.AdminHandler;
 import client.handlers.CustomerHandler;
+import client.handlers.EmployeeHandler;
 import client.menu.MenuItem;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -97,13 +98,10 @@ public class Client {
         System.out.print("Enter the branch ID to display its inventory: ");
         int branchID = Integer.parseInt(consoleInput.readLine());
 
-        // Create a JSON request
-        JsonObject request = new JsonObject();
-        request.addProperty("action", "showInventory");
-        request.addProperty("branchID", branchID);
+        String request = EmployeeHandler.getInstance().showInventory(branchID);
 
         // Send the request to the server
-        out.println(request.toString());
+        out.println(request);
 
         // Wait for the server's response
         String response = in.readLine();

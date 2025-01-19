@@ -2,12 +2,16 @@ package server.services;
 
 import server.models.Branch;
 
+import java.util.AbstractMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BranchManager {
     // singleton
     private static BranchManager instance;
+
     public static synchronized BranchManager getInstance() {
         if (instance == null) {
             instance = new BranchManager();
@@ -72,6 +76,16 @@ public void showInventory(int branchID) {
 }
 public  Branch getBranchById(int branchID) {
     return branches.get(branchID);
+    }
+
+    public Map<Integer, Branch> getBranches() {
+        return branches;
+    }
+
+    public void setBranches(List<Branch> branches) {
+        this.branches = branches.stream()
+                .map(branch -> new AbstractMap.SimpleEntry<>(branch.getBranchID(), branch))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
 }

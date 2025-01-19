@@ -7,7 +7,8 @@ public class CommandExecutorFactory {
 
     static {
         commandExecutorDictionary.put(ServiceType.ADMIN, new AdminManagerCommandExecutor());
-        commandExecutorDictionary.put(ServiceType.CUSTOMER, new EmployeeManagerCommandExecutor());
+        commandExecutorDictionary.put(ServiceType.CUSTOMER, new CustomerManagerCommandExecutor());
+        commandExecutorDictionary.put(ServiceType.EMPLOYEE, new EmployeeManagerCommandExecutor());
     }
 
     public static IExecute getCommandExecutor(ServiceType serviceType) {

@@ -8,7 +8,7 @@ import server.models.Employee;
 
 public class AdminHandler extends BaseHandler {
 
-    private static AdminHandler instance = new AdminHandler();
+    private static final AdminHandler instance = new AdminHandler();
 
     public static AdminHandler getInstance() {
         return instance;
@@ -41,6 +41,4 @@ public class AdminHandler extends BaseHandler {
         data.addProperty("id", id);
         return super.encodeRequest(MethodType.REMOVE_EMP,data);
     }
-
-
 }

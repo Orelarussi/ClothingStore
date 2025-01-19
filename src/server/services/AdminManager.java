@@ -1,14 +1,10 @@
 package server.services;
-import server.services.BranchManager;
 
 import server.models.Admin;
 import server.models.Employee;
-import server.models.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class AdminManager {
     private Map<Integer, Employee> employees = new HashMap<>();
@@ -20,6 +16,7 @@ public class AdminManager {
         if (instance == null) {
             instance = new AdminManager();
         }
+
         return instance;
     }
 
@@ -132,5 +129,11 @@ public class AdminManager {
             return passwordHash.equals(employee.getPassword());
         }
         return false;
+    }
+
+    public void setEmployees(List<Employee> employees) {
+        this.employees = employees.stream()
+                .map(employee -> new AbstractMap.SimpleEntry<>(employee.getBranchID(), employee))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }
