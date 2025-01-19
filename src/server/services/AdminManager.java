@@ -1,4 +1,5 @@
 package server.services;
+import server.models.Branch;
 import server.services.BranchManager;
 
 import server.models.Admin;
@@ -63,8 +64,10 @@ public class AdminManager {
     }
 
     public void addEmployee(Employee employee) {
+
         employees.put(employee.getId(), employee);
-        BranchManager.getInstance().getBranchById(employee.getBranchID()).increaseEmployeNumberBy1();
+        Branch branch =BranchManager.getInstance().getBranchById(employee.getBranchID());
+        branch.increaseEmployeeNumberBy1();
 
         System.out.println("Employee " + employee.getFullName() + " added successfully.");
     }

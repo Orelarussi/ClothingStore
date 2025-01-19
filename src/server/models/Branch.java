@@ -60,10 +60,10 @@ public class Branch {
         inventory.forEach((productId, quantity) -> System.out.println("Product ID: " + productId + ", Quantity: " + quantity));
     }
 
-    public void increaseEmployeNumberBy1() {
+    public void increaseEmployeeNumberBy1() {
         this.employeeAmount++;
     }
-    public void ReduceEmployeNumberBy1() {
+    public void ReduceEmployeeNumberBy1() {
         this.employeeAmount--;
     }
 }

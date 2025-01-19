@@ -16,8 +16,23 @@ public class BranchManager {
     }
     private  Map<Integer, Branch> branches;
 
-    public BranchManager() {
+    // אתחול סניפים סטטיים
+    private void initializeBranches() {
+        Branch branch1 = new Branch(1, 0, "Tel Aviv");
+        Branch branch2 = new Branch(2, 0, "Jerusalem");
+        Branch branch3 = new Branch(3, 0, "Haifa");
+        Branch branch4 = new Branch(4, 0, "Beersheba");
+
+        branches.put(branch1.getBranchID(), branch1);
+        branches.put(branch2.getBranchID(), branch2);
+        branches.put(branch3.getBranchID(), branch3);
+        branches.put(branch4.getBranchID(), branch4);
+    }
+
+
+    private BranchManager() {
         this.branches = new HashMap<>();
+        initializeBranches();
     }
 
 public void addBranch(Branch branch) {
