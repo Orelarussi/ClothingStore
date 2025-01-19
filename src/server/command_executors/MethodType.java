@@ -5,5 +5,8 @@ public enum MethodType {
     LOGOUT,
     ADD_EMP,
     REMOVE_EMP,
+
+    //CHAT:
+    OPEN_CHAT
     //TODO: add others methods
 }

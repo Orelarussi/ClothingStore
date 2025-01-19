@@ -1,6 +1,7 @@
 package client;
 
 import client.handlers.AdminHandler;
+import client.handlers.ChatHandler;
 import client.menu.MenuItem;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -17,6 +18,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 
 public class Client {
@@ -25,6 +27,7 @@ public class Client {
     private static final Gson gson = new Gson();
     public static final String LOG_OUT = "Log out";
     private static AdminHandler adminHandler = new AdminHandler();
+    private static ChatHandler chatHandler= new ChatHandler();
     private static Integer id;
 
     public static void main(String[] args) {
@@ -106,7 +109,7 @@ public class Client {
     //display And Run Menu : to use in the start ... menu
 
     private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String title) throws IOException {
-        displayAndRunMenu(menuItems,consoleInput,title,true);
+        displayAndRunMenu(menuItems, consoleInput, title, true);
     }
 
     private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String menuTitle,
@@ -179,12 +182,11 @@ public class Client {
                 }),
                 new MenuItem("View all employees", () -> {
                     System.out.println("Displaying all employees...");
-                    // You can implement additional logic for this option here.
                 }),
                 new MenuItem(LOG_OUT, () -> {
                 })
         };
-        displayAndRunMenu(adminMenu, consoleInput, "Admin Menu" );
+        displayAndRunMenu(adminMenu, consoleInput, "Admin Menu");
     }
 
     private static void startEmployeeMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
@@ -263,7 +265,8 @@ public class Client {
 //all the functions that inside of the menu
 
     //admin menu functions:
-    private static void editEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    private static void editEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput)
+            throws IOException {
         int employeeId = getInt("Enter the employee ID you would like to edit:", "Invalid ID. Please enter a numeric value.", consoleInput);
         while (true) {
 
@@ -297,7 +300,8 @@ public class Client {
 
     }
 
-    private static void removeEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    private static void removeEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput)
+            throws IOException {
         System.out.println("Enter the employee ID you would like to remove:");
         int employeeId;
         try {
@@ -314,7 +318,8 @@ public class Client {
     private static void createAndAddEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
         System.out.println("Enter employee details:");
         try {
-            int employeeId = getInt("Employee ID: ", "Invalid ID. Please enter a numeric value.", consoleInput);
+            int employeeId = getInt("Employee ID: ", "Invalid ID. Please enter a numeric value.",
+                    consoleInput);
 
             System.out.print("Employee First Name: ");
             String firstName = consoleInput.readLine();
@@ -328,7 +333,8 @@ public class Client {
             System.out.print("Employee Password Number: ");
             String password = consoleInput.readLine();
 
-            int branchId = getInt("Employee Branch Id: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
+            int branchId = getInt("Employee Branch Id: ", "Invalid Branch ID. Please enter a numeric value.",
+                    consoleInput);
 
             long accountNumber = getLong("Employee account number: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
 
@@ -341,7 +347,8 @@ public class Client {
 
             int positionChoice;
             Position position;
-            positionChoice = getInt("Enter the number corresponding to the position:", "Invalid choice. Please select a valid number.", consoleInput);
+            positionChoice = getInt("Enter the number corresponding to the position:",
+                    "Invalid choice. Please select a valid number.", consoleInput);
             if (positionChoice < 1 || positionChoice > positions.length) {
                 System.out.println("Invalid choice. Please select a valid number.");
                 return;
@@ -358,17 +365,52 @@ public class Client {
         }
     }
 
-    private static void viewAllEmployees(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    private static void viewAllEmployees(BufferedReader in, PrintWriter out, BufferedReader consoleInput)
+            throws IOException {
+
+    }
+
+    //chat functions:
+
+    public void openChat(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        int myBranchID = 1;//need to use get brunch id by em id
+        String[] branches = {"Tel Aviv", "Jerusalem", "Haifa", "Beersheba"};
+
+        System.out.println("Branches:");
+        for (int i = 0; i < branches.length; i++) {
+            if (i + 1 != myBranchID) {
+                System.out.println("Branch ID: " + (i + 1) + ", Address: " + branches[i]);
+            }
+        }
+        int selectedBranchID = getInt("Enter branch ID : ",
+                "Invalid input. Please enter a valid branch number.", consoleInput,
+                    branch -> branch < 1 || branch > branches.length || branch == myBranchID);
+        // build the request
+        String request = chatHandler.openChat(selectedBranchID,myBranchID);
+        //send the request to the server
+        out.println(request);
+        //get chat from server
+
 
     }
 
 
     //input help functions:
     private static int getInt(String msg, String errMsg, BufferedReader consoleInput) {
+        return getInt(msg,errMsg,consoleInput, null);
+    }
+
+    private static int getInt(String msg, String errMsg, BufferedReader consoleInput, Predicate<Integer> test) {
         while (true) {
             System.out.print(msg);
             try {
-                return Integer.parseInt(consoleInput.readLine());
+                int number = Integer.parseInt(consoleInput.readLine());
+                if (test != null)
+                    if (test.test(number)) {
+                        return number;
+                    } else {
+                        return number;
+                    }
             } catch (NumberFormatException e) {
                 System.out.println(errMsg);
             } catch (IOException e) {
