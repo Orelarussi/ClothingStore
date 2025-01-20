@@ -1,6 +1,7 @@
 package server.command_executors;
 
 import com.google.gson.JsonObject;
+import server.models.Employee;
 import server.services.AdminManager;
 import server.services.LoginResult;
 
@@ -12,18 +13,22 @@ public class AdminManagerCommandExecutor implements IExecute{
         this.adminManager = AdminManager.getInstance();
         MethodType method = ServerDecoder.getMethodType(request);
         JsonObject data = ServerDecoder.getData(request);
+        JsonObject response = new JsonObject();
         switch (method){
             case LOGIN:
-                JsonObject response = new JsonObject();
                 int id = data.get("id").getAsInt();
                 String password = data.get("password").getAsString();
                 LoginResult result = adminManager.login(id,password);
                 response.addProperty ("id", id);
                 response.addProperty("result", result.toString());
-                return response.toString();
+                break;
             case ADD_EMP:
-                return null;
-            default: return "";
+                Employee emp= new Employee(data.getAsString());
+                adminManager.addEmployee(emp);
+                response.addProperty("result","success");
+                break;
         }
+        return response.toString();
+
     }
 }

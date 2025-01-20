@@ -13,7 +13,7 @@ public class Employee extends User {
 
     public Employee(String json){
         this();
-        employeesNum++;
+        employeesNum++; //TODO check if needed?
         populateFromJson(json);
     }
 

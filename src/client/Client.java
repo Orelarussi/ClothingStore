@@ -15,7 +15,6 @@ import server.models.Employee.Position;
 import server.models.customer.Customer;
 import server.models.customer.NewCustomer;
 import server.services.LoginResult;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

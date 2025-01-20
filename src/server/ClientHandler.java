@@ -3,8 +3,8 @@ package server;
 import com.google.gson.JsonObject;
 import server.command_executors.*;
 import server.database.SocketData;
+import server.models.Employee;
 import server.services.LoginResult;
-import server.utils.JsonUtils;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -40,9 +40,14 @@ public class ClientHandler extends Thread {
             }
           } catch (IOException e) {
             e.printStackTrace();
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("error", e.getMessage());
+            socketData.getOutputStream().println(jsonObject.toString());
+
 
         } finally {
             try {
+                socketData.getOutputStream().println("{}");
                 socketData.close();// closes socket, inputStream and outputStream
                 synchronized (connections) {
                     if(userId != null){
