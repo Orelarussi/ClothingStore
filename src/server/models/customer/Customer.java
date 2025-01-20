@@ -62,12 +62,4 @@ public abstract class Customer extends Person {
     public CustomerType getType() {
         return type;
     }
-
-    @Override
-    protected void populateFromJson(String json) {
-        super.populateFromJson(json);
-        Customer temp = gson.fromJson(json,Customer.class);
-        this.type = temp.type;
-        this.purchasePlan = temp.purchasePlan;
-    }
 }

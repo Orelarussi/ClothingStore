@@ -1,7 +1,7 @@
 package server.models;
 
 public abstract class User extends Person {
-    private String password;
+    protected String password;
 
     public User(int id, String firstName, String lastName, String phoneNumber, String password) {
         super(id, firstName, lastName, phoneNumber);
@@ -29,12 +29,5 @@ public abstract class User extends Person {
                 ", lastName='" + lastName + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 '}';
-    }
-
-    @Override
-    protected void populateFromJson(String json) {
-        super.populateFromJson(json);
-        User temp = gson.fromJson(json,User.class);
-        this.password = temp.password;
     }
 }

@@ -1,13 +1,20 @@
 package server.services;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.binding.MapBinding;
+import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
 import server.models.Admin;
 import server.models.Employee;
+import server.utils.JsonUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class AdminManager {
-    private Map<Integer, Employee> employees = new HashMap<>();
+public class AdminManager implements MapChangeListener {
+    private ObservableMap<Integer, Employee> employees = FXCollections.observableHashMap();
     private static final Admin admin = new Admin(1, "Eran", "", "000", "1234");
     public static int currentUserId = admin.getId();
 
@@ -21,7 +28,9 @@ public class AdminManager {
         return instance;
     }
 
-    private AdminManager(){}
+    private AdminManager(){
+        employees.addListener(this);
+    }
 
 
     public LoginResult login(int id, String pass) {
@@ -135,8 +144,17 @@ public class AdminManager {
     }
 
     public void setEmployees(List<Employee> employees) {
-        this.employees = employees.stream()
-                .map(employee -> new AbstractMap.SimpleEntry<>(employee.getBranchID(), employee))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        ObservableMap<Integer,Employee> map = FXCollections.observableHashMap();
+        for (Employee employee : employees) {
+            map.put(employee.getBranchID(), employee);
+        }
+        this.employees.removeListener(this);
+        this.employees = map;
+    }
+
+    @Override
+    public void onChanged(Change change) {
+        System.out.println(change);
+        JsonUtils.saveEmployees();
     }
 }

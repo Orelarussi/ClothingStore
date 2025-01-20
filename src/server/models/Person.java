@@ -51,13 +51,4 @@ public abstract class Person extends JsonSerializable {
     public String getFullName() {
         return getFirstName() + " " + getLastName();
     }
-
-    @Override
-    protected void populateFromJson(String json) {
-        User temp = gson.fromJson(json,User.class);
-        this.id = temp.id;
-        this.firstName = temp.firstName;
-        this.lastName = temp.lastName;
-        this.phoneNumber = temp.phoneNumber;
-    }
 }

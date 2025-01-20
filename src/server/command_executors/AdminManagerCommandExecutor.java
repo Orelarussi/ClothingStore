@@ -23,7 +23,7 @@ public class AdminManagerCommandExecutor implements IExecute{
                 response.addProperty("result", result.toString());
                 break;
             case ADD_EMP:
-                Employee emp= new Employee(data.getAsString());
+                Employee emp= new Employee(data.toString());
                 adminManager.addEmployee(emp);
                 response.addProperty("result","success");
                 break;

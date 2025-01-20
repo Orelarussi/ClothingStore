@@ -1,13 +1,12 @@
 package server.utils;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import server.models.Branch;
 import server.models.Employee;
 import server.models.Product;
 import server.models.customer.Customer;
-import server.models.customer.CustomerType;
-import server.models.customer.NewCustomer;
 import server.services.AdminManager;
 import server.services.BranchManager;
 import server.services.EmployeeManager;
@@ -39,7 +38,7 @@ public class JsonUtils {
         }
     }
 
-    private static final Gson gson = new Gson();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static final String dirPath = "src" + File.separator + "files";
 
     // Generic method to read a JSON file and convert it to a list of objects
@@ -108,26 +107,26 @@ public class JsonUtils {
         writeJsonFile(Files.Customers.getFileName(), customers);
     }
 
-    private static void saveEmployees() {
+    public static void saveEmployees() {
         List<Employee> employees = AdminManager.getInstance().getAllEmployees();
         writeJsonFile(Files.Employees.getFileName(), employees);
     }
 
-    private static void loadBranches() {
+    public static void loadBranches() {
         List<Branch> branches = basicLoad(Files.Branches, Branch.class);
         if (branches != null) {
             BranchManager.getInstance().setBranches(branches);
         }
     }
 
-    private static void loadProducts() {
+    public static void loadProducts() {
         List<Product> products = basicLoad(Files.Products, Product.class);
         if (products != null) {
             ProductManager.getInstance().setProducts(products);
         }
     }
 
-    private static void loadCustomers() {
+    public static void loadCustomers() {
         List<JsonObject> employeesJsonList = basicLoad(Files.Customers, JsonObject.class);
 
         if (employeesJsonList != null) {
@@ -142,13 +141,13 @@ public class JsonUtils {
         }
     }
 
-    private static void loadEmployees() {
+    public static void loadEmployees() {
         List<Employee> employees = basicLoad(Files.Employees, Employee.class);
         if (employees != null)
             AdminManager.getInstance().setEmployees(employees);
     }
 
-    private static <T> List<T> basicLoad(Files fileName, Class<T> objClass) {
+    public static <T> List<T> basicLoad(Files fileName, Class<T> objClass) {
         String jsonFileName = fileName.getFileName();
         if (new File(jsonFileName).exists()) {
             return readJsonFile(jsonFileName, objClass);

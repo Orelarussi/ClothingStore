@@ -17,4 +17,17 @@ public class VIPCustomer extends Customer{
     public String serializeToString() {
         return new Gson().toJson(this);
     }
+
+    @Override
+    protected void populateFromJson(String json) {
+        VIPCustomer temp = new Gson().fromJson(json, VIPCustomer.class);
+        // Customer
+        this.purchasePlan = temp.purchasePlan;
+        this.type = temp.type;
+        // Person
+        this.id = temp.id;
+        this.firstName = temp.firstName;
+        this.lastName = temp.lastName;
+        this.phoneNumber = temp.phoneNumber;
+    }
 }
