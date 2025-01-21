@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import server.command_executors.MethodType;
 import server.command_executors.ServiceType;
 
-public class ChatHandler extends HandlerBase{
+public class ChatHandler extends BaseHandler{
     public ChatHandler() {
         super(ServiceType.CHAT);
     }

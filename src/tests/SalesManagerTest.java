@@ -19,7 +19,7 @@ public class SalesManagerTest {
 
     @Test
     public void testAddSaleReport() {
-        SaleReport sale = new SaleReport("Branch01", "T-Shirt", "Clothing", 10, 199.9, LocalDate.now());
+        SaleReport sale = new SaleReport(1, 3, 10, 199.9, LocalDate.now());
         salesManager.addSaleReport(sale);
 
         assertEquals(1, salesManager.getAllSaleReports().size());

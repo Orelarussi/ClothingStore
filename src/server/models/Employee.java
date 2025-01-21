@@ -13,7 +13,7 @@ public class Employee extends User {
 
     public Employee(String json){
         this();
-        employeesNum++;
+        employeesNum++; //TODO check if needed?
         populateFromJson(json);
     }
 
@@ -35,9 +35,16 @@ public class Employee extends User {
     // Getters and Setters
     @Override
     protected void populateFromJson(String json) {
-        super.populateFromJson(json);
         Employee temp = gson.fromJson(json,Employee.class);
 
+    //Person
+        this.id = id;
+        this.firstName = temp.firstName;
+        this.lastName = temp.lastName;
+        this.phoneNumber = temp.phoneNumber;
+    //User
+        this.password = temp.password;
+     //employee
         this.branchID = temp.branchID;
         this.accountNumber = temp.accountNumber;
         this.employeeNumber = temp.employeeNumber;

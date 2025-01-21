@@ -2,13 +2,16 @@ package client;
 
 import client.handlers.AdminHandler;
 import client.handlers.ChatHandler;
+import client.handlers.CustomerHandler;
+import client.handlers.EmployeeHandler;
 import client.menu.MenuItem;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import server.command_executors.ServerDecoder;
 import server.database.SocketData;
 import server.models.Employee;
 import server.models.Employee.Position;
+import server.models.customer.Customer;
+import server.models.customer.NewCustomer;
 import server.services.LoginResult;
 
 import java.io.BufferedReader;
@@ -17,16 +20,16 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Predicate;
 
 
 public class Client {
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 12345;
-    private static final Gson gson = new Gson();
     public static final String LOG_OUT = "Log out";
-    private static AdminHandler adminHandler = new AdminHandler();
     private static ChatHandler chatHandler= new ChatHandler();
     private static Integer id;
 
@@ -78,7 +81,7 @@ public class Client {
             // password
             System.out.print("Password: ");
             String password = consoleInput.readLine();
-            String request = adminHandler.login(id, password);
+            String request = AdminHandler.getInstance().login(id, password);
             //send the request to the server
             out.println(request);
             String serverResponse = in.readLine();
@@ -87,6 +90,74 @@ public class Client {
         }
         return loginResult;
     }
+
+    private static void showBranchInventory(PrintWriter out, BufferedReader in, BufferedReader consoleInput) throws IOException {
+        System.out.print("Enter the branch ID to display its inventory: ");
+        int branchID = Integer.parseInt(consoleInput.readLine());
+
+        String request = EmployeeHandler.getInstance().showInventory(branchID);
+
+        // Send the request to the server
+        out.println(request);
+
+        // Wait for the server's response
+        String response = in.readLine();
+        if (response != null) {
+            System.out.println("Inventory for Branch ID " + branchID + ":");
+            System.out.println(response);
+        } else {
+            System.out.println("No response received from the server.");
+        }
+    }
+
+    private static void saleProduct(PrintWriter out, BufferedReader in, BufferedReader consoleInput) throws IOException {
+        System.out.print("Enter the Customer ID to purchase: ");
+        int customerID = Integer.parseInt(consoleInput.readLine());
+
+        System.out.print("Enter the Product Id: ");
+        int productId = Integer.parseInt(consoleInput.readLine());
+
+        System.out.print("Enter the Amount: ");
+        int amount = Integer.parseInt(consoleInput.readLine());
+
+        String request = EmployeeHandler.getInstance().saleProduct(customerID, productId, amount);
+
+        // Send the request to the server
+        out.println(request);
+
+        // Wait for the server's response
+        String response = in.readLine();
+        if (response != null) {
+            System.out.println("Sale added Successfully");
+            System.out.println(response);
+        } else {
+            System.out.println("No response received from the server.");
+        }
+    }
+
+    private static void startInventoryMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+        MenuItem[] inventoryMenu = {
+                new MenuItem("Show branch inventory", () -> {
+                    try {
+                        showBranchInventory(out, in, consoleInput);
+                    } catch (IOException e) {
+                        System.out.println("An error occurred while displaying the inventory: " + e.getMessage());
+                    }
+                }),
+                new MenuItem("Sale product to customer", () -> {
+                    try {
+                        saleProduct(out, in, consoleInput);
+                    } catch (IOException e) {
+                        System.out.println("An error occurred while displaying the inventory: " + e.getMessage());
+                    }
+
+
+                    System.out.println("Processing sale to customer...");
+                })
+        };
+        displayAndRunMenu(inventoryMenu, consoleInput, "Inventory Menu");
+    }
+
 
     private static void showAdminOrEmployeeMenu(LoginResult loginResult, BufferedReader consoleInput, PrintWriter out, BufferedReader in) throws IOException {
         switch (loginResult) {
@@ -103,7 +174,7 @@ public class Client {
     }
 
     private static void logout(PrintWriter out) {
-        String request = adminHandler.logout(id);
+        String request = AdminHandler.getInstance().logout(id);
         out.println(request);
     }
     //display And Run Menu : to use in the start ... menu
@@ -182,6 +253,7 @@ public class Client {
                 }),
                 new MenuItem("View all employees", () -> {
                     System.out.println("Displaying all employees...");
+                    // You can implement additional logic for this option here.
                 }),
                 new MenuItem(LOG_OUT, () -> {
                 })
@@ -226,22 +298,77 @@ public class Client {
         displayAndRunMenu(employeeMenu, consoleInput, "Employee Menu");
     }
 
-    private static void startInventoryMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
-        MenuItem[] inventoryMenu = {
-                new MenuItem("Show branch inventory", () -> System.out.println("Displaying branch inventory...")),
-                new MenuItem("Sale product to customer", () -> System.out.println("Processing sale to customer...")),
-        };
-        displayAndRunMenu(inventoryMenu, consoleInput, "Inventory Menu");
-    }
-
     private static void startCustomerMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         MenuItem[] customerMenu = {
-                new MenuItem("Add customer", () -> System.out.println("Adding customer...")),
-                new MenuItem("Delete customer", () -> System.out.println("Deleting customer...")),
-                new MenuItem("Show all customers in chain", () -> System.out.println("Displaying all customers in the chain...")),
+                new MenuItem("Add customer", () -> addCustomer(in, out, consoleInput)),
+                new MenuItem("Delete customer", () -> deleteCustomer(in,out,consoleInput)),
+                new MenuItem("Show all customers in chain", () -> showCustomers(in,out)),
         };
         displayAndRunMenu(customerMenu, consoleInput, "Customer Menu");
     }
+
+    private static  void showCustomers(BufferedReader in, PrintWriter out) {
+        String request = CustomerHandler.getInstance().getAllCustomers();
+        out.println(request);
+
+        List<Customer> customers = new ArrayList<>();
+        try {
+            String response = in.readLine();
+            JsonArray jsonArray = JsonParser.parseString(response).getAsJsonArray();
+            for (JsonElement jsonElement : jsonArray) {
+                Customer customer = Customer.deserializeFromString(jsonElement.toString());
+                customers.add(customer);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        customers.forEach(System.out::println);
+    }
+
+    private static void deleteCustomer(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        int cid = getInt("Enter customer id to delete:","Invalid id",consoleInput);
+        String request = CustomerHandler.getInstance().deleteCustomer(cid);
+        out.println(request);
+
+        try {
+            String response = in.readLine();
+            System.out.println(response);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void addCustomer(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        NewCustomer customer = null;
+        try {
+            customer = getNewCustomer(consoleInput);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        String request = CustomerHandler.getInstance().addCustomer(customer);
+        out.println(request);
+
+        try {
+            String response = in.readLine();
+            System.out.println(response);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static NewCustomer getNewCustomer(BufferedReader consoleInput) throws IOException {
+        int cid = getInt("Enter customer id: ","Invalid id",consoleInput);
+        System.out.println("Enter first customer name: ");
+        String first = consoleInput.readLine();
+        System.out.println("Enter last customer name: ");
+        String last= consoleInput.readLine();
+        System.out.println("Enter phone number: ");
+        String phone = consoleInput.readLine();
+
+        return new NewCustomer(cid,first,last,phone);
+    }
+
 
     private static void startSalesReportMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         MenuItem[] salesReportMenu = {
@@ -265,8 +392,7 @@ public class Client {
 //all the functions that inside of the menu
 
     //admin menu functions:
-    private static void editEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput)
-            throws IOException {
+    private static void editEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         int employeeId = getInt("Enter the employee ID you would like to edit:", "Invalid ID. Please enter a numeric value.", consoleInput);
         while (true) {
 
@@ -300,8 +426,7 @@ public class Client {
 
     }
 
-    private static void removeEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput)
-            throws IOException {
+    private static void removeEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         System.out.println("Enter the employee ID you would like to remove:");
         int employeeId;
         try {
@@ -310,7 +435,7 @@ public class Client {
             System.out.println("Invalid ID. Please enter a numeric value.");
             return;
         }
-        final String removeEmployeeJsonReq = adminHandler.removeEmployee(employeeId);
+        final String removeEmployeeJsonReq = AdminHandler.getInstance().removeEmployee(employeeId);
         out.println(removeEmployeeJsonReq);
 
     }
@@ -318,8 +443,7 @@ public class Client {
     private static void createAndAddEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
         System.out.println("Enter employee details:");
         try {
-            int employeeId = getInt("Employee ID: ", "Invalid ID. Please enter a numeric value.",
-                    consoleInput);
+            int employeeId = getInt("Employee ID: ", "Invalid ID. Please enter a numeric value.", consoleInput);
 
             System.out.print("Employee First Name: ");
             String firstName = consoleInput.readLine();
@@ -333,8 +457,7 @@ public class Client {
             System.out.print("Employee Password Number: ");
             String password = consoleInput.readLine();
 
-            int branchId = getInt("Employee Branch Id: ", "Invalid Branch ID. Please enter a numeric value.",
-                    consoleInput);
+            int branchId = getInt("Employee Branch Id: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
 
             long accountNumber = getLong("Employee account number: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
 
@@ -347,8 +470,7 @@ public class Client {
 
             int positionChoice;
             Position position;
-            positionChoice = getInt("Enter the number corresponding to the position:",
-                    "Invalid choice. Please select a valid number.", consoleInput);
+            positionChoice = getInt("Enter the number corresponding to the position:", "Invalid choice. Please select a valid number.", consoleInput);
             if (positionChoice < 1 || positionChoice > positions.length) {
                 System.out.println("Invalid choice. Please select a valid number.");
                 return;
@@ -358,15 +480,14 @@ public class Client {
             Employee employee = new Employee(employeeId, branchId, firstName,
                     lastName, phoneNumber, password, accountNumber, position);
 
-            final String newEmployeeJsonReq = adminHandler.createEmployee(employee);
+            final String newEmployeeJsonReq = AdminHandler.getInstance().createEmployee(employee);
             out.println(newEmployeeJsonReq);
         } catch (IOException e) {
             System.out.println(e.getLocalizedMessage());
         }
     }
 
-    private static void viewAllEmployees(BufferedReader in, PrintWriter out, BufferedReader consoleInput)
-            throws IOException {
+    private static void viewAllEmployees(BufferedReader in, PrintWriter out, BufferedReader consoleInput)  throws IOException {
 
     }
 
@@ -405,12 +526,13 @@ public class Client {
             System.out.print(msg);
             try {
                 int number = Integer.parseInt(consoleInput.readLine());
-                if (test != null)
+                if (test != null){
                     if (test.test(number)) {
                         return number;
-                    } else {
-                        return number;
                     }
+                }else {
+                    return number;
+                }
             } catch (NumberFormatException e) {
                 System.out.println(errMsg);
             } catch (IOException e) {

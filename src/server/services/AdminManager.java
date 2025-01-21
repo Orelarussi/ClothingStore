@@ -2,18 +2,23 @@ package server.services;
 import server.models.Branch;
 import server.services.BranchManager;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.binding.MapBinding;
+import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
 import server.models.Admin;
 import server.models.Employee;
-import server.models.User;
+import server.utils.JsonUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class AdminManager {
-    private Map<Integer, Employee> employees = new HashMap<>();
+public class AdminManager implements MapChangeListener {
+    private ObservableMap<Integer, Employee> employees = FXCollections.observableHashMap();
     private static final Admin admin = new Admin(1, "Eran", "", "000", "1234");
+    public static int currentUserId = admin.getId();
 
     //singleton
     private static AdminManager instance;
@@ -24,18 +29,22 @@ public class AdminManager {
         return instance;
     }
 
-    private AdminManager(){}
+    private AdminManager(){
+        employees.addListener(this);
+    }
 
 
     public LoginResult login(int id, String pass) {
         // Check if the login is for the admin
         if (admin.getId() == id && admin.getPassword().equals(pass)) {
+            currentUserId = id;
             return LoginResult.ADMIN;
         }
 
         // Check if the login is for an employee
         Employee emp = employees.get(id);
         if (emp != null && emp.getPassword().equals(pass)) {
+            currentUserId = id;
             return LoginResult.EMPLOYEE;
         }
 
@@ -64,7 +73,6 @@ public class AdminManager {
     }
 
     public void addEmployee(Employee employee) {
-
         employees.put(employee.getId(), employee);
         Branch branch =BranchManager.getInstance().getBranchById(employee.getBranchID());
         branch.increaseEmployeeNumberBy1();
@@ -135,5 +143,20 @@ public class AdminManager {
             return passwordHash.equals(employee.getPassword());
         }
         return false;
+    }
+
+    public void setEmployees(List<Employee> employees) {
+        ObservableMap<Integer,Employee> map = FXCollections.observableHashMap();
+        for (Employee employee : employees) {
+            map.put(employee.getBranchID(), employee);
+        }
+        this.employees.removeListener(this);
+        this.employees = map;
+    }
+
+    @Override
+    public void onChanged(Change change) {
+        System.out.println(change);
+        JsonUtils.saveEmployees();
     }
 }

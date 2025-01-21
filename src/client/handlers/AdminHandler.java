@@ -6,8 +6,15 @@ import server.command_executors.MethodType;
 import server.command_executors.ServiceType;
 import server.models.Employee;
 
-public class AdminHandler extends HandlerBase {
-    public AdminHandler() {
+public class AdminHandler extends BaseHandler {
+
+    private static final AdminHandler instance = new AdminHandler();
+
+    public static AdminHandler getInstance() {
+        return instance;
+    }
+
+    private AdminHandler() {
         super(ServiceType.ADMIN);
     }
 
@@ -34,6 +41,4 @@ public class AdminHandler extends HandlerBase {
         data.addProperty("id", id);
         return super.encodeRequest(MethodType.REMOVE_EMP,data);
     }
-
-
 }

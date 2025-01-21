@@ -1,10 +1,12 @@
 package server.models;
 
 
+import server.utils.JsonSerializable;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class Branch {
+public class Branch extends JsonSerializable {
     private int branchID;
     private int employeeAmount;
     private String address;
@@ -65,5 +67,16 @@ public class Branch {
     }
     public void ReduceEmployeeNumberBy1() {
         this.employeeAmount--;
+    }
+
+    @Override
+    protected void populateFromJson(String json) {
+        Branch temp = gson.fromJson(json, Branch.class);
+
+        this.branchID = temp.getBranchID();
+        this.employeeAmount = temp.getEmployeeAmount();
+        this.address = temp.getAddress();
+        this.inventory = temp.getInventory();
+        this.sales = temp.getSales();
     }
 }

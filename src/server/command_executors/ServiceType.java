@@ -4,5 +4,6 @@ public enum ServiceType {
     ADMIN,
     EMPLOYEE,
     CHAT,
-    BRANCH
+    BRANCH,
+    CUSTOMER
 }

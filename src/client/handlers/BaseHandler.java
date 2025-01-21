@@ -4,14 +4,14 @@ import com.google.gson.JsonObject;
 import server.command_executors.MethodType;
 import server.command_executors.ServiceType;
 
-public abstract class HandlerBase {
+public abstract class BaseHandler {
     private static final String SERVICE_KEY = "service";
     private static final String METHOD_KEY = "method";
     private static final String DATA_KEY = "data";
-    private final ServiceType serviceType;
+    private static ServiceType serviceType;
 
-    public HandlerBase(ServiceType serviceType) {
-        this.serviceType= serviceType;
+    public BaseHandler(ServiceType serviceType) {
+        BaseHandler.serviceType = serviceType;
     }
 
     protected String encodeRequest(MethodType methodType, JsonObject data) {

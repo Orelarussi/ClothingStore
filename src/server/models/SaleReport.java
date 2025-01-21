@@ -3,45 +3,35 @@ package server.models;
 import java.time.LocalDate;
 
 public class SaleReport {
-    private String branchID;
-    private String productName;
-    private String productCategory;
+    private int branchID;
+    private int productId;
     private int quantitySold;
     private double totalSales;
     private LocalDate date;
 
-    public SaleReport(String branchID, String productName, String productCategory, int quantitySold, double totalSales, LocalDate date) {
+    public SaleReport(int branchID, int productId, int quantitySold, double totalSales, LocalDate date) {
         this.branchID = branchID;
-        this.productName = productName;
-        this.productCategory = productCategory;
+        this.productId = productId;
         this.quantitySold = quantitySold;
         this.totalSales = totalSales;
         this.date = date;
     }
 
     // Getters and Setters
-    public String getBranchID() {
+    public int getBranchID() {
         return branchID;
     }
 
-    public void setBranchID(String branchID) {
+    public void setBranchID(int branchID) {
         this.branchID = branchID;
     }
 
-    public String getProductName() {
-        return productName;
+    public int getProductId() {
+        return productId;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
-    public String getProductCategory() {
-        return productCategory;
-    }
-
-    public void setProductCategory(String productCategory) {
-        this.productCategory = productCategory;
+    public void setProductId(int productId) {
+        this.productId = productId;
     }
 
     public int getQuantitySold() {
@@ -72,8 +62,7 @@ public class SaleReport {
     public String toString() {
         return "SaleReport{" +
                 "branchID='" + branchID + '\'' +
-                ", productName='" + productName + '\'' +
-                ", productCategory='" + productCategory + '\'' +
+                ", productId='" + productId + '\'' +
                 ", quantitySold=" + quantitySold +
                 ", totalSales=" + totalSales +
                 ", date=" + date +
