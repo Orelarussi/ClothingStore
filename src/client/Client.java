@@ -30,7 +30,6 @@ public class Client {
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 12345;
     public static final String LOG_OUT = "Log out";
-    private static ChatHandler chatHandler= new ChatHandler();
     private static Integer id;
 
     public static void main(String[] args) {
@@ -507,7 +506,7 @@ public class Client {
                 "Invalid input. Please enter a valid branch number.", consoleInput,
                     branch -> branch < 1 || branch > branches.length || branch == myBranchID);
         // build the request
-        String request = chatHandler.openChat(selectedBranchID,myBranchID);
+        String request = ChatHandler.getInstance().openChat(selectedBranchID,myBranchID);
         //send the request to the server
         out.println(request);
         //get chat from server

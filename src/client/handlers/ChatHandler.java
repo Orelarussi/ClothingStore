@@ -5,8 +5,12 @@ import server.command_executors.MethodType;
 import server.command_executors.ServiceType;
 
 public class ChatHandler extends BaseHandler{
-    public ChatHandler() {
+    private ChatHandler() {
         super(ServiceType.CHAT);
+    }
+    private static ChatHandler instance = new ChatHandler();
+    public static ChatHandler getInstance() {
+        return instance;
     }
 
     public String openChat(int selectedBranchID,int myBranchID){
