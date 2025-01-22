@@ -5,8 +5,8 @@ import server.models.purchase_plan.PurchasePlan;
 import server.models.purchase_plan.VIPCustomerPurchasePlan;
 
 public class VIPCustomer extends Customer{
-    public VIPCustomer(int id, String first, String last, String phone) {
-        super(id, first, last, phone, CustomerType.VIP);
+    public VIPCustomer(int id, String first, String last, String phone, int totalPurchases) {
+        super(id, first, last, phone, CustomerType.VIP, totalPurchases);
     }
     @Override
     protected PurchasePlan createPurchasePlan() {

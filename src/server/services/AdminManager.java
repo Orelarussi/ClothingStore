@@ -148,7 +148,7 @@ public class AdminManager implements MapChangeListener {
     public void setEmployees(List<Employee> employees) {
         ObservableMap<Integer,Employee> map = FXCollections.observableHashMap();
         for (Employee employee : employees) {
-            map.put(employee.getBranchID(), employee);
+            map.put(employee.getId(), employee);
         }
         this.employees.removeListener(this);
         this.employees = map;

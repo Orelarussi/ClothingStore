@@ -54,10 +54,9 @@ public class SalesManager {
         }
         else {
             branch.getInventory().put(productId, stock - amount);
-            return String.format("purchased success, only %s remain", branch.getInventory().get(productId));
+            customer.setTotalPurchases(customer.getTotalPurchases() + amount);
+
+            return String.format("purchased success, only %s remain, customer spend total of %s products", branch.getInventory().get(productId), customer.getTotalPurchases());
         }
-
-
-        //return "hello";
     }
 }

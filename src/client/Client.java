@@ -365,7 +365,7 @@ public class Client {
         System.out.println("Enter phone number: ");
         String phone = consoleInput.readLine();
 
-        return new NewCustomer(cid,first,last,phone);
+        return new NewCustomer(cid,first,last,phone, 0);
     }
 
 

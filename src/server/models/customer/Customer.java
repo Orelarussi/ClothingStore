@@ -4,16 +4,23 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import server.models.Person;
 import server.models.purchase_plan.PurchasePlan;
+import server.models.purchase_plan.ReturningCustomerPurchasePlan;
+import server.models.purchase_plan.VIPCustomerPurchasePlan;
 
 public abstract class Customer extends Person {
 
     protected PurchasePlan purchasePlan;
     protected CustomerType type;
+    private int totalPurchases;
+    private final int RETURNING_CUSTOMER_PURCHASES = 5;
+    private final int VIP_CUSTOMER_PURCHASES = 10;
 
-    public Customer(int id, String firstName, String lastName, String phoneNumber, CustomerType type) {
+
+    public Customer(int id, String firstName, String lastName, String phoneNumber, CustomerType type, int totalPurchases) {
         super(id, firstName, lastName, phoneNumber);
         this.purchasePlan = createPurchasePlan();
         this.type = type;
+        this.totalPurchases = 0;
     }
 
     /**
@@ -30,13 +37,13 @@ public abstract class Customer extends Person {
         //According to CustomerType enum
         switch (type) {
             case "NEW" -> {
-                return new NewCustomer(json.get("id").getAsInt(), json.get("firstName").getAsString(), json.get("lastName").getAsString() ,json.get("phoneNumber").getAsString());
+                return new NewCustomer(json.get("id").getAsInt(), json.get("firstName").getAsString(), json.get("lastName").getAsString() ,json.get("phoneNumber").getAsString(), json.get("totalPurchases").getAsInt());
             }
             case "RETURNING" -> {
-                return new ReturningCustomer(json.get("id").getAsInt(), json.get("firstName").getAsString(), json.get("lastName").getAsString() ,json.get("phoneNumber").getAsString());
+                return new ReturningCustomer(json.get("id").getAsInt(), json.get("firstName").getAsString(), json.get("lastName").getAsString() ,json.get("phoneNumber").getAsString(), json.get("int totalPurchases").getAsInt());
             }
             case "VIP" -> {
-                return new VIPCustomer(json.get("id").getAsInt(), json.get("firstName").getAsString(), json.get("lastName").getAsString() ,json.get("phoneNumber").getAsString());
+                return new VIPCustomer(json.get("id").getAsInt(), json.get("firstName").getAsString(), json.get("lastName").getAsString() ,json.get("phoneNumber").getAsString(), json.get("int totalPurchases").getAsInt());
             }
             default -> throw new IllegalArgumentException("Unknown class type: " + type);
         }
@@ -50,6 +57,22 @@ public abstract class Customer extends Person {
 
     public void setPurchasePlan(PurchasePlan purchasePlan) {
         this.purchasePlan = purchasePlan;
+    }
+
+    public int getTotalPurchases() {
+        return totalPurchases;
+    }
+
+    public void setTotalPurchases(int totalPurchases) {
+        this.totalPurchases = totalPurchases;
+
+        if(this.type != CustomerType.VIP && this.totalPurchases > VIP_CUSTOMER_PURCHASES) {
+            this.type = CustomerType.VIP;
+            this.purchasePlan = new VIPCustomerPurchasePlan();
+        } else if (this.type != CustomerType.RETURNING &&  this.totalPurchases > RETURNING_CUSTOMER_PURCHASES) {
+            this.type = CustomerType.RETURNING;
+            this.purchasePlan = new ReturningCustomerPurchasePlan();
+        }
     }
 
     @Override
