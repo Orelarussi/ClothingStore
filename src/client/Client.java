@@ -456,7 +456,7 @@ public class Client {
             System.out.print("Employee Phone Number: ");
             String phoneNumber = consoleInput.readLine();
 
-            System.out.print("Employee Password Number: ");
+            System.out.print("Employee Password : ");
             String password = consoleInput.readLine();
 
             int branchId = getInt("Employee Branch Id: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);

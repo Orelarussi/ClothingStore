@@ -1,0 +1,13 @@
+[
+  {
+    "branchID": 4,
+    "accountNumber": 123,
+    "employeeNumber": 1,
+    "position": "SHIFTMGR",
+    "password": "1234",
+    "id": 2,
+    "firstName": "orel",
+    "lastName": "arussi",
+    "phoneNumber": "0503308010"
+  }
+]

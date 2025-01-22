@@ -24,8 +24,12 @@ public class AdminManagerCommandExecutor implements IExecute{
                 break;
             case ADD_EMP:
                 Employee emp= new Employee(data.toString());
-                adminManager.addEmployee(emp);
-                response.addProperty("result","success");
+                try {
+                    adminManager.addEmployee(emp);
+                    response.addProperty("result","success");
+                }catch (IllegalArgumentException e){
+                    response.addProperty("error",e.getMessage());
+                }
                 break;
         }
         return response.toString();

@@ -38,7 +38,7 @@ public class Employee extends User {
         Employee temp = gson.fromJson(json,Employee.class);
 
     //Person
-        this.id = id;
+        this.id = temp.id;
         this.firstName = temp.firstName;
         this.lastName = temp.lastName;
         this.phoneNumber = temp.phoneNumber;

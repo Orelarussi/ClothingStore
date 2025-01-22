@@ -54,6 +54,10 @@ public class JsonUtils {
 
     // Generic method to write a list of objects to a JSON file
     public static <T> void writeJsonFile(String filePath, List<T> objects) {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();//create folder
+        }
         try (FileWriter writer = new FileWriter(filePath)) {
             gson.toJson(objects, writer);
             System.out.println("JSON file updated successfully.");
@@ -92,17 +96,17 @@ public class JsonUtils {
         System.out.println("JSON files loaded successfully.");
     }
 
-    private static void saveBranches() {
+    public static void saveBranches() {
         List<Branch> branches = BranchManager.getInstance().getBranches().values().stream().toList();
         writeJsonFile(Files.Branches.getFileName(), branches);
     }
 
-    private static void saveProducts() {
+    public static void saveProducts() {
         List<Product> products = ProductManager.getInstance().getProducts().values().stream().toList();
         writeJsonFile(Files.Products.getFileName(), products);
     }
 
-    private static void saveCustomers() {
+    public static void saveCustomers() {
         List<Customer> customers = EmployeeManager.getInstance().getCustomers().values().stream().toList();
         writeJsonFile(Files.Customers.getFileName(), customers);
     }

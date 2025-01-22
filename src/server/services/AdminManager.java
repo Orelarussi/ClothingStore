@@ -29,7 +29,7 @@ public class AdminManager implements MapChangeListener {
     }
 
     private AdminManager(){
-        employees.addListener(this);
+        setEmployees(new ArrayList<>());
     }
 
 
@@ -72,6 +72,9 @@ public class AdminManager implements MapChangeListener {
     }
 
     public void addEmployee(Employee employee) {
+        if (employees.containsKey(employee.getId())) {
+            throw new IllegalArgumentException("Employee with id " + employee.getId() + " already exists");
+        }
         employees.put(employee.getId(), employee);
         BranchManager.getInstance().getBranchById(employee.getBranchID()).increaseEmployeNumberBy1();
 
@@ -150,6 +153,7 @@ public class AdminManager implements MapChangeListener {
         }
         this.employees.removeListener(this);
         this.employees = map;
+        this.employees.addListener(this);
     }
 
     @Override
