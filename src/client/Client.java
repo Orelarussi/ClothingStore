@@ -4,10 +4,8 @@ import client.handlers.AdminHandler;
 import client.handlers.CustomerHandler;
 import client.handlers.EmployeeHandler;
 import client.menu.MenuItem;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import server.command_executors.ServerDecoder;
 import server.database.SocketData;
 import server.models.Employee;
@@ -15,11 +13,13 @@ import server.models.Employee.Position;
 import server.models.customer.Customer;
 import server.models.customer.NewCustomer;
 import server.services.LoginResult;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -182,11 +182,11 @@ public class Client {
     //display And Run Menu : to use in the start ... menu
 
     private void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String title) throws IOException {
-        displayAndRunMenu(menuItems,consoleInput,title,true);
+        displayAndRunMenu(menuItems, consoleInput, title, true);
     }
 
     private void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String menuTitle,
-                                          boolean addBack_ExitOpt) throws IOException {
+                                   boolean addBack_ExitOpt) throws IOException {
         if (addBack_ExitOpt) {
             menuItems = Arrays.copyOf(menuItems, menuItems.length + 2);
             menuItems[menuItems.length - 2] = new MenuItem("Back", null);
@@ -236,9 +236,7 @@ public class Client {
 
     private void startAdminMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         MenuItem[] adminMenu = {
-                new MenuItem("Add employee", () -> {
-                    createAndAddEmployee(in, out, consoleInput);
-                }),
+                new MenuItem("Add employee", () -> createAndAddEmployee(in, out, consoleInput)),
                 new MenuItem("Remove employee", () -> {
                     try {
                         removeEmployee(in, out, consoleInput);
@@ -254,13 +252,15 @@ public class Client {
                     }
                 }),
                 new MenuItem("View all employees", () -> {
-                    System.out.println("Displaying all employees...");
-                    // You can implement additional logic for this option here.
+                    try {
+                        viewAllEmployees(in, out);
+                    } catch (IOException e) {
+                        System.out.println("An error occurred while viewing all employees.");
+                    }
                 }),
-                new MenuItem(LOG_OUT, () -> {
-                })
+                new MenuItem(LOG_OUT, () -> {})
         };
-        displayAndRunMenu(adminMenu, consoleInput, "Admin Menu" );
+        displayAndRunMenu(adminMenu, consoleInput, "Admin Menu");
     }
 
     private void startEmployeeMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
@@ -303,8 +303,8 @@ public class Client {
     private void startCustomerMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         MenuItem[] customerMenu = {
                 new MenuItem("Add customer", () -> addCustomer(in, out, consoleInput)),
-                new MenuItem("Delete customer", () -> deleteCustomer(in,out,consoleInput)),
-                new MenuItem("Show all customers in chain", () -> showCustomers(in,out)),
+                new MenuItem("Delete customer", () -> deleteCustomer(in, out, consoleInput)),
+                new MenuItem("Show all customers in chain", () -> showCustomers(in, out)),
         };
         displayAndRunMenu(customerMenu, consoleInput, "Customer Menu");
     }
@@ -328,7 +328,7 @@ public class Client {
     }
 
     private void deleteCustomer(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
-        int cid = getInt("Enter customer id to delete:","Invalid id",consoleInput);
+        int cid = getInt("Enter customer id to delete:", "Invalid id", consoleInput);
         String request = CustomerHandler.getInstance().deleteCustomer(cid);
         out.println(request);
 
@@ -360,15 +360,15 @@ public class Client {
     }
 
     private NewCustomer getNewCustomer(BufferedReader consoleInput) throws IOException {
-        int cid = getInt("Enter customer id: ","Invalid id",consoleInput);
+        int cid = getInt("Enter customer id: ", "Invalid id", consoleInput);
         System.out.println("Enter first customer name: ");
         String first = consoleInput.readLine();
         System.out.println("Enter last customer name: ");
-        String last= consoleInput.readLine();
+        String last = consoleInput.readLine();
         System.out.println("Enter phone number: ");
         String phone = consoleInput.readLine();
 
-        return new NewCustomer(cid,first,last,phone);
+        return new NewCustomer(cid, first, last, phone);
     }
 
 
@@ -459,9 +459,13 @@ public class Client {
             System.out.print("Employee Password : ");
             String password = consoleInput.readLine();
 
-            int branchId = getInt("Employee Branch Id: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
+            int branchId = getInt("Employee Branch Id: ",
+                    "Invalid Branch ID. Please enter a numeric value.",
+                    consoleInput);
 
-            long accountNumber = getLong("Employee account number: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
+            long accountNumber = getLong("Employee account number: ",
+                    "Invalid Branch ID. Please enter a numeric value.",
+                    consoleInput);
 
             // Position selection
             System.out.println("Select Employee Position:");
@@ -479,18 +483,45 @@ public class Client {
             }
             position = positions[positionChoice - 1];
 
-            Employee employee = new Employee(employeeId, branchId, firstName,
-                    lastName, phoneNumber, password, accountNumber, position);
+            Employee employee = new Employee(employeeId, branchId, firstName, lastName,
+                    phoneNumber, password, accountNumber, position);
 
             final String newEmployeeJsonReq = AdminHandler.getInstance().createEmployee(employee);
             out.println(newEmployeeJsonReq);
+
+            String result = in.readLine();
+            if (result != null){
+                JsonObject res = new JsonObject();
+                if (res.has("error")) {
+                    System.out.println("Employee " + employee.getFullName() + " failed to add.");
+                    System.out.println(res.get("error"));
+                }
+                if (res.has("result")) {
+                    System.out.println("Employee " + employee.getFullName() + " successfully added.");
+                }
+            }
+
         } catch (IOException e) {
             System.out.println(e.getLocalizedMessage());
         }
     }
 
-    private void viewAllEmployees(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    private void viewAllEmployees(BufferedReader in, PrintWriter out) throws IOException {
+        String request = AdminHandler.getInstance().getAllEmployees();
+        out.println(request);//send request to server
 
+        String result = in.readLine();
+
+        if (result != null) {
+            JsonObject res = JsonParser.parseString(result).getAsJsonObject();
+            JsonElement element = res.get("employees");
+            if (element != null) {
+                //Convert to list of employees
+                Type type = new TypeToken<List<Employee>>() {}.getType();
+                List<Employee> employees = new Gson().fromJson(element.getAsString(), type);
+                employees.forEach(System.out::println);
+            }
+        }
     }
 
 

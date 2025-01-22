@@ -1,9 +1,12 @@
 package server.command_executors;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import server.models.Employee;
 import server.services.AdminManager;
 import server.services.LoginResult;
+
+import java.util.List;
 
 public class AdminManagerCommandExecutor implements IExecute{
     private AdminManager adminManager;
@@ -29,7 +32,15 @@ public class AdminManagerCommandExecutor implements IExecute{
                     response.addProperty("result","success");
                 }catch (IllegalArgumentException e){
                     response.addProperty("error",e.getMessage());
+                }catch (Exception e){
+                    response.addProperty("error",e.getMessage());
                 }
+                break;
+            case GET_ALL_EMP:
+                List<Employee> employees = adminManager.getAllEmployees();
+                String json = new Gson().toJson(employees);
+                response.addProperty("employees",json);
+                response.addProperty("result","success");
                 break;
         }
         return response.toString();

@@ -41,4 +41,9 @@ public class AdminHandler extends BaseHandler {
         data.addProperty("id", id);
         return super.encodeRequest(MethodType.REMOVE_EMP,data);
     }
+
+    public String getAllEmployees(){
+        JsonObject data = new JsonObject();
+        return super.encodeRequest(MethodType.GET_ALL_EMP,data);
+    }
 }
