@@ -5,7 +5,7 @@
     "employeeNumber": 1,
     "position": "SHIFTMGR",
     "password": "1111",
-    "id": 1,
+    "id": 4,
     "firstName": "eran",
     "lastName": "kar",
     "phoneNumber": "3466457"
@@ -16,7 +16,7 @@
     "employeeNumber": 2,
     "position": "SELLER",
     "password": "1111",
-    "id": 3,
+    "id": 5,
     "firstName": "rtykj",
     "lastName": "asftj",
     "phoneNumber": "5467684"
