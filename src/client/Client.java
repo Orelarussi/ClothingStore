@@ -31,6 +31,7 @@ public class Client {
     private static final int SERVER_PORT = 12345;
     public static final String LOG_OUT = "Log out";
     private static Integer id;
+    private static boolean up = true;
 
     public static void main(String[] args) {
         BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in));
@@ -313,15 +314,23 @@ public class Client {
         List<Customer> customers = new ArrayList<>();
         try {
             String response = in.readLine();
-            JsonArray jsonArray = JsonParser.parseString(response).getAsJsonArray();
-            for (JsonElement jsonElement : jsonArray) {
-                Customer customer = Customer.deserializeFromString(jsonElement.toString());
-                customers.add(customer);
+            JsonObject object = JsonParser.parseString(response).getAsJsonObject();
+
+            if (object.get("success").getAsBoolean()) {
+                JsonArray jsonArray = object.get("customers").getAsJsonArray();
+                for (JsonElement jsonElement : jsonArray) {
+                    Customer customer = Customer.deserializeFromString(jsonElement.toString());
+                    customers.add(customer);
+                }
+
+                System.out.println(String.join("\n",customers.stream().map(Customer::toString).toList()));
+            }
+            else {
+                System.out.println("failed to fetched customers");
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        customers.forEach(System.out::println);
     }
 
     private static void deleteCustomer(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {

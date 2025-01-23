@@ -20,7 +20,6 @@ public class Server {
             while (true) {
                 //TODO: Getting Employee When Client-Login Here
                 new ClientHandler(serverSocket.accept()).start();
-
             }
         } catch (IOException e) {
             e.printStackTrace();

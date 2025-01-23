@@ -12,8 +12,6 @@ public abstract class Customer extends Person {
     protected PurchasePlan purchasePlan;
     protected CustomerType type;
     private int totalPurchases;
-    private final int RETURNING_CUSTOMER_PURCHASES = 5;
-    private final int VIP_CUSTOMER_PURCHASES = 10;
 
 
     public Customer(int id, String firstName, String lastName, String phoneNumber, CustomerType type, int totalPurchases) {
@@ -66,10 +64,10 @@ public abstract class Customer extends Person {
     public void setTotalPurchases(int totalPurchases) {
         this.totalPurchases = totalPurchases;
 
-        if(this.type != CustomerType.VIP && this.totalPurchases > VIP_CUSTOMER_PURCHASES) {
+        if(this.type != CustomerType.VIP && this.totalPurchases > 10) {
             this.type = CustomerType.VIP;
             this.purchasePlan = new VIPCustomerPurchasePlan();
-        } else if (this.type != CustomerType.RETURNING &&  this.totalPurchases > RETURNING_CUSTOMER_PURCHASES) {
+        } else if (this.type != CustomerType.RETURNING &&  this.totalPurchases > 5) {
             this.type = CustomerType.RETURNING;
             this.purchasePlan = new ReturningCustomerPurchasePlan();
         }
@@ -77,9 +75,10 @@ public abstract class Customer extends Person {
 
     @Override
     public String toString() {
-        return super.toString() + "Customer{" +
-                ", plan='" + purchasePlan +'\'' +
-                '}';
+        return "Customer \n {" +
+                "id =" + getId() +", " +
+                "full name =" + getFullName() +", " +
+                "type =" + getType() + '}';
     }
 
     public CustomerType getType() {

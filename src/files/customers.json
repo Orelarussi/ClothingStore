@@ -1,1 +1,15 @@
-[{"purchasePlan":{"planDetails":"New customer: 10% off on first purchase.","customerID":0,"purchaseID":0},"type":"NEW","id":1,"firstName":"test","lastName":"Test","phoneNumber":"035534056", "totalPurchases": 0}]
+[
+  {
+    "purchasePlan": {
+      "planDetails": "New customer: 10% off on first purchase.",
+      "customerID": 0,
+      "purchaseID": 0
+    },
+    "type": "NEW",
+    "totalPurchases": 0,
+    "id": 1,
+    "firstName": "test",
+    "lastName": "Test",
+    "phoneNumber": "035534056"
+  }
+]

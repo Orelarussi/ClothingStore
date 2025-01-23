@@ -20,7 +20,7 @@ public class CustomerManagerCommandExecutor implements IExecute{
 
         switch (method){
             case ADD_CUSTOMER:
-                Customer customer = Customer.deserializeFromString(data.getAsString());
+                Customer customer = Customer.deserializeFromString(data.toString());
                 boolean added = manager.addCustomer(customer);
                 response.addProperty("success", added);
                 break;

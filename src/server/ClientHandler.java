@@ -3,11 +3,11 @@ package server;
 import com.google.gson.JsonObject;
 import server.command_executors.*;
 import server.database.SocketData;
-import server.models.Employee;
 import server.services.LoginResult;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,9 +42,7 @@ public class ClientHandler extends Thread {
             e.printStackTrace();
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("error", e.getMessage());
-            socketData.getOutputStream().println(jsonObject.toString());
-
-
+            socketData.getOutputStream().println(jsonObject);
         } finally {
             try {
                 socketData.getOutputStream().println("{}");
