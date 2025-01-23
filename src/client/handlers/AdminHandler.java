@@ -41,4 +41,16 @@ public class AdminHandler extends BaseHandler {
         data.addProperty("id", id);
         return super.encodeRequest(MethodType.REMOVE_EMP,data);
     }
+
+    public String isShiftManger(Integer employeeId) {
+        JsonObject data = new JsonObject();
+        data.addProperty("employeeId", employeeId);
+        return super.encodeRequest(MethodType.IS_SHIFT_MANAGER, data);
+    }
+
+    public String getBranchId(Integer employeeId) {
+        JsonObject data = new JsonObject();
+        data.addProperty("employeeId", employeeId);
+        return super.encodeRequest(MethodType.GET_BRANCH_ID, data);
+    }
 }

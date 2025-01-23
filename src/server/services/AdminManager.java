@@ -72,6 +72,14 @@ public class AdminManager implements MapChangeListener {
         return filtered;
     }
 
+    public String getEmployeeNameById(int employeeId) {
+        Employee employee = findEmployeeById(employeeId);
+        if (employee != null) {
+            return employee.getFirstName() + " " + employee.getLastName();
+        }
+        return "Unknown Employee";
+    }
+
     public void addEmployee(Employee employee) {
         employees.put(employee.getId(), employee);
         Branch branch =BranchManager.getInstance().getBranchById(employee.getBranchID());

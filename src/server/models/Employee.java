@@ -78,4 +78,6 @@ public class Employee extends User {
             throw new IllegalArgumentException("Employee number must be positive.");
         }
     }
+
+    public Position getPosition(){return position;}
 }

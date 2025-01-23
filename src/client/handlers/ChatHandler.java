@@ -13,10 +13,26 @@ public class ChatHandler extends BaseHandler{
         return instance;
     }
 
-    public String openChat(int selectedBranchID,int myBranchID){
+    public String waitingForChatRequest(int selectedBranchId, int employeeId){
         JsonObject data = new JsonObject();
-        data.addProperty("selectedBranchID",selectedBranchID);
-        data.addProperty("myBranchID",myBranchID);
-        return super.encodeRequest(MethodType.OPEN_CHAT,data);
+        data.addProperty("selectedBranchId",selectedBranchId);
+        data.addProperty("employeeId",employeeId);
+        return super.encodeRequest(MethodType.WAITING_FOR_CHAT_REQUEST,data);
+    }
+
+    public String removeFromWaitingList(Integer id, int branchId) {
+        JsonObject data = new JsonObject();
+        data.addProperty("BranchId",branchId);
+        data.addProperty("myID",id);
+        return super.encodeRequest(MethodType.REMOVE_FROM_WAITING_LIST,data);
+    }
+    public String removeFromAvailableList(int employeeId) {
+        JsonObject data = new JsonObject();
+        data.addProperty("employeeId", employeeId);
+        return super.encodeRequest(MethodType.REMOVE_FROM_AVAILABLE_LIST, data);
+    }
+
+    public String availableForChat(Integer id) {
+        return "";
     }
 }

@@ -1,210 +1,130 @@
 package server.services;
 
-import server.ClientHandler;
-import server.database.Chat;
-import server.database.SocketData;
 import server.models.Employee;
-import server.models.Message;
+import server.models.chat.ChatSession;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ChatManager {
+    private final Map<Integer, Queue<Integer>> availableEmployeesByBranch; // Available employees by branch
+    private final Map<Integer, Queue<Integer>> waitingEmployeesByBranch; // Waiting employees by branch
+    private final Map<Integer, Object> branchLocks; // <branch,Object>Locks for branches
+    private final Map<Integer, ChatSession> activeChatSessions;
+    private static int nextChatSessionId = 1;
     private static ChatManager instance;
+
+    private ChatManager() {
+        availableEmployeesByBranch = new ConcurrentHashMap<Integer, Queue<Integer>>();
+        waitingEmployeesByBranch = new ConcurrentHashMap<>();
+        branchLocks = new ConcurrentHashMap<>();
+        activeChatSessions = new ConcurrentHashMap<>();
+
+        for (int branchId = 1; branchId <= 4; branchId++) {
+            availableEmployeesByBranch.put(branchId, new ConcurrentLinkedQueue<>());
+            waitingEmployeesByBranch.put(branchId, new ConcurrentLinkedQueue<>());
+            branchLocks.put(branchId, new Object());
+        }
+    }
     public static synchronized ChatManager getInstance() {
         if (instance == null) {
             instance = new ChatManager();
         }
         return instance;
     }
-
-    private Map<SocketData, Chat> chattingEmployees;
-    private Map<String, List<Employee>> waitingEmployees;
-    private Map<SocketData, Employee> availableEmployees;
-    private List<Chat> activeChats;
-
-    private ChatManager() {
-        availableEmployees = new HashMap<>();
-        activeChats = new ArrayList<>();
-        chattingEmployees = new HashMap<>();
-        waitingEmployees = new HashMap<>();
+    private synchronized Object getBranchLock(int branchId) {
+        return branchLocks.get(branchId);
     }
 
-
-
-    public static Set<Integer> getAvailableBranches(int branch) {
-        Set<Integer> branches = new HashSet<>();
-        for (Map.Entry<Integer, SocketData> entry : ClientHandler.getConnections().entrySet()) {
-            Employee emp = AdminManager.getInstance().findEmployeeById(entry.getKey());
-            if (emp.getBranchID() != branch)
-                branches.add(emp.getBranchID());
+    public Boolean joinChatAsManager(int managerId, int targetChatId) {
+        ChatSession chatSession = activeChatSessions.get(targetChatId);
+        int shiftManagerBranchId = getBranchIdByEmployeeId(managerId);
+        if (chatSession.isRelevantForShiftManager(shiftManagerBranchId)){
+            chatSession.setShiftManagerID(managerId);
+            return true;
         }
-        return branches;
-    }
-
-
-    // Add an available employee
-    public void addAvailableEmployee(Employee employee) {
-//        TODO put employee with socket
-//        availableEmployees.add(employee);
-        System.out.println(employee.getFirstName() + " is now available for chat.");
-    }
-
-    // Start a chat between two employees
-    public void startChat(Employee employee1, Employee employee2) {
-        if (!availableEmployees.containsKey(employee1) || !availableEmployees.containsKey(employee2)) {
-            System.out.println("One or both employees are not available for chat.");
-            return;
-        }
-
-        Chat chat = new Chat(employee1.getId(), employee2.getId());
-        activeChats.add(chat);
-
-        // Remove employees from available list
-        availableEmployees.remove(employee1);
-        availableEmployees.remove(employee2);
-
-        System.out.println("Chat started between " + employee1.getFirstName() + " and " + employee2.getFirstName());
-    }
-
-    public Map<SocketData, Employee> getAvailableEmployees() {
-        return availableEmployees;
-    }
-
-    // Employee sends a message in an active chat
-    public void sendMessage(Employee employee, String messageContent) {
-        for (Chat chat : activeChats) {
-            if (chat.getCreatorID() == employee.getId() || chat.getReceiverID() == employee.getId()) {
-                chat.addMessage(employee, messageContent);
-                chat.displayChat();
-                return;
-            }
-        }
-        System.out.println("No active chat found for " + employee.getFirstName());
-    }
-
-    // When an employee is done with a chat, make them available again
-    public void endChat(Employee employee) {
-        for (Chat chat : activeChats) {
-            if (chat.getCreatorID() == employee.getId()|| chat.getReceiverID() == employee.getId()) {
-                activeChats.remove(chat);
-//                availableEmployees.add(employee);
-                System.out.println(employee.getFirstName() + " is now available for a new chat.");
-                return;
-            }
-        }
-        System.out.println("No active chat found for " + employee.getFirstName());
-    }
-
-    public void addMessage(Employee sender, Employee receiver, String content) {
-        Message message = new Message(sender, content);
-        System.out.println("Message added: " + message);
-    }
-
-    public Set<Chat> getAvailableChats(int branch) {
-        Set<Chat> chats = new HashSet<>();
-//        for (Map.Entry<SocketData, ChatSession> entry : chattingEmployees.entrySet()) {
-//            //ChatSession chat = entry.getValue();
-//            //Employee emp = chat.getCreatorEmployee();
-//
-//            User user = ClientHandler.getUserBySocketData(entry.getKey());
-//            if (user instanceof Employee) {
-//                Employee emp = (Employee) user;
-//
-//
-//                if (emp.getBranchID() == branch){
-//                    chats.add(entry.getValue());
-//                }
-//            }
-//        }
-        return chats;
-    }
-
-    public Map<SocketData, Chat> getChattingEmployees() {
-        return chattingEmployees;
-    }
-
-    public Chat getChatSessionBySocketData(SocketData socketData) {
-        return chattingEmployees.get(socketData);
-    }
-
-    public boolean isAvailableEmployeesForChat(int branch) {
-        for (Map.Entry<SocketData, Employee> entry : availableEmployees.entrySet()) {
-            Employee emp = entry.getValue();
-            if (emp.getBranchID() == branch)
-                return true;
-        }
-
         return false;
     }
 
-    public void addEmployeeToWaitingList(Employee emp, String branch) {
-        boolean foundBranch = false;
-        for (Map.Entry<String, List<Employee>> entry : waitingEmployees.entrySet()) {
-            List<Employee> waitingForChat = entry.getValue();
+    public List<ChatSession> getOptionalChatToJoin(int managerId) {
+        int shiftManagerBranchId = getBranchIdByEmployeeId(managerId);
+        return activeChatSessions.values().stream()
+                .filter( chatSession->chatSession.isRelevantForShiftManager(shiftManagerBranchId)).toList();
+    }
 
-            if (entry.getKey().equals(branch)) {
-                List<Employee> employees = entry.getValue();
-                employees.add(emp);
-                waitingEmployees.put(branch, employees);
-                foundBranch = true;
+    public Integer waitingForChatRequest(int selectedBranchId, int employeeId) {
+        synchronized (getBranchLock(selectedBranchId)) {
+            Queue<Integer> availableQueue = availableEmployeesByBranch.get(selectedBranchId);
+            if (availableQueue.isEmpty()) {
+                addWaitingEmployee(selectedBranchId, employeeId);
+                return null;
             }
+            int availableEmployeeID = availableQueue.poll();
+            return createChat(employeeId,availableEmployeeID);
         }
 
-        if (!foundBranch) {
-            List<Employee> employees = new ArrayList<Employee>();
-            employees.add(emp);
-            waitingEmployees.put(branch, employees);
-        }
     }
 
-    public void validateChatSession(Chat chat) {
-        int chattingCount = 0;
-        for (Map.Entry<SocketData, Chat> entry : chattingEmployees.entrySet()) {
-            int tempSessionID = entry.getValue().getSessionID();
-            int sessionID = chat.getSessionID();
-
-            if (tempSessionID == sessionID)
-                chattingCount++;
-        }
-
-        if (chattingCount < 2) { // Close chat because not enough employees for chat
-            endChatSession(chat);
-        }
-    }
-
-    public void endChatSession(Chat chat) {
-        for (Map.Entry<SocketData, Chat> entry : chattingEmployees.entrySet()) {
-            if (entry.getValue() == chat) {
-                SocketData socketData = entry.getKey();
-//                chat.removeListener(socketData);
-                chattingEmployees.remove(socketData);
-
-                String command = "CHAT@@@abortCurrentChat###";
-                socketData.getOutputStream().println(command);
+    public Integer availableForChatRequest( int employeeId) {
+        int branchId = getBranchIdByEmployeeId(employeeId);
+        synchronized (getBranchLock(branchId)) {
+            Queue<Integer> waitingQueue = waitingEmployeesByBranch.get(branchId);
+            if (waitingQueue.isEmpty()) {
+                addAvailableEmployee(branchId, employeeId);
+                return null;
             }
+            int waitingEmployeeID = waitingQueue.poll();
+            return createChat(waitingEmployeeID,employeeId);
         }
     }
 
-    public Chat getChatSessionByID(int sessionID) {
-        for (Map.Entry<SocketData, Chat> entry : chattingEmployees.entrySet()) {
-            Chat chat = entry.getValue();
-
-            if (chat.getSessionID() == sessionID)
-                return chat;
-        }
-
-        return null;
+    public int createChat(int employee1Id, int employee2Id) {
+        int chatSessionId = getNewChatSessionId();
+        ChatSession chatSession = new ChatSession(employee1Id,employee2Id,chatSessionId);
+        activeChatSessions.put(chatSessionId,chatSession);
+        return chatSessionId;
     }
 
-    public SocketData getFirstAvailableEmployeeByBranch(int branch) {
-        for (Map.Entry<SocketData, Employee> entry : availableEmployees.entrySet()) {
-            Employee emp = entry.getValue();
+    public void closeChat(int chatSessionId) {
+        activeChatSessions.remove(chatSessionId);//The chat object will be eligible for garbage collection if no other references exist
+    }
 
-            if (emp.getBranchID() == branch)
-                return entry.getKey();
 
+    //the synchronized is not! inside the add func ,need to surround.
+    public void addWaitingEmployee(int branchId, int employeeId) {
+            Queue<Integer> waitingQueue = waitingEmployeesByBranch.get(branchId);
+            waitingQueue.add(employeeId);
+
+    }
+    public void addAvailableEmployee(int branchId,int employeeId) {
+        Queue<Integer> availableQueue = availableEmployeesByBranch.get(branchId);
+        availableQueue.add(employeeId);
+    }
+
+    //the synchronized is inside the remove fuc
+    public void removeFromWaitingList(int branchId, int employeeId) {
+        synchronized (getBranchLock(branchId)) {
+            Queue<Integer> waitingQueue = waitingEmployeesByBranch.get(branchId);
+            waitingQueue.remove(employeeId);
         }
+    }
+    public void removeFromAvailableList(int employeeId) {
+        int branchId = getBranchIdByEmployeeId(employeeId);
+        synchronized (getBranchLock(branchId)) {
+            Queue<Integer> availableQueue = availableEmployeesByBranch.get(branchId);
+            availableQueue.remove(employeeId);
+        }
+    }
 
-        return null;
+    //help functions:
+    private int getBranchIdByEmployeeId(int employeeId) {
+        AdminManager adminManager = AdminManager.getInstance();
+        Employee employee = adminManager.findEmployeeById(employeeId);
+        return employee.getBranchID();
+    }
+
+    private synchronized int getNewChatSessionId() {
+        return nextChatSessionId++;
     }
 }
