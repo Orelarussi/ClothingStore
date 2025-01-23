@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+import com.google.gson.JsonObject;
 import server.models.customer.Customer;
 
 public class EmployeeManager {
@@ -49,5 +49,15 @@ public class EmployeeManager {
 
     public Map<Integer, Customer> getCustomers() {
         return customers;
+    }
+
+    public void setCustomersFromJson(List<JsonObject> employeesJsonList) {
+        List<Customer> customers = employeesJsonList.stream()
+                .map(json -> {
+                    String asString = json.toString();
+                    Customer customer = Customer.deserializeFromString(asString);
+                    return customer;
+                }).toList();
+        this.setCustomers(customers);
     }
 }

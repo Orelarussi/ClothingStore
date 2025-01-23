@@ -42,6 +42,17 @@ public class AdminHandler extends BaseHandler {
         return super.encodeRequest(MethodType.REMOVE_EMP,data);
     }
 
+    public String getAllEmployees(){
+        JsonObject data = new JsonObject();
+        return super.encodeRequest(MethodType.GET_ALL_EMP,data);
+    }
+
+    public String isEmployeeExist(int id) {
+        JsonObject data = new JsonObject();
+        data.addProperty("id", id);
+        return super.encodeRequest(MethodType.IS_EMPLOYEE_EXISTS,data);
+    }
+
     public String isShiftManger(Integer employeeId) {
         JsonObject data = new JsonObject();
         data.addProperty("employeeId", employeeId);

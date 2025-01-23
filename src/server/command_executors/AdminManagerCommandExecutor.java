@@ -1,9 +1,12 @@
 package server.command_executors;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import server.models.Employee;
 import server.services.AdminManager;
 import server.services.LoginResult;
+
+import java.util.List;
 
 public class AdminManagerCommandExecutor implements IExecute{
     private AdminManager adminManager;
@@ -27,8 +30,30 @@ public class AdminManagerCommandExecutor implements IExecute{
                 break;
             case ADD_EMP:
                 Employee emp= new Employee(data.toString());
-                adminManager.addEmployee(emp);
+                try {
+                    adminManager.addEmployee(emp);
+                    response.addProperty("result","success");
+                } catch (Exception e){
+                    response.addProperty("error",e.getMessage());
+                }
+                break;
+            case REMOVE_EMP:
+                try {
+                    adminManager.deleteEmployee(data.get("id").getAsInt());
+                    response.addProperty("result","success");
+                } catch (ClassCastException | IllegalStateException e){
+                    response.addProperty("error",e.getMessage());
+                }
+                break;
+            case GET_ALL_EMP:
+                List<Employee> employees = adminManager.getAllEmployees();
+                String json = new Gson().toJson(employees);
+                response.addProperty("employees",json);
                 response.addProperty("result","success");
+                break;
+            case IS_EMPLOYEE_EXISTS:
+                employee = adminManager.findEmployeeById(data.get("id").getAsInt());
+                response.addProperty("exists",employee != null);
                 break;
             case IS_SHIFT_MANAGER: // New case for checking role
                 employeeId = data.get("employeeId").getAsInt();

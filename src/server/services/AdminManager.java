@@ -1,10 +1,5 @@
 package server.services;
-import server.models.Branch;
-import server.services.BranchManager;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.binding.MapBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
@@ -13,7 +8,6 @@ import server.models.Employee;
 import server.utils.JsonUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class AdminManager implements MapChangeListener {
     private ObservableMap<Integer, Employee> employees = FXCollections.observableHashMap();
@@ -26,6 +20,7 @@ public class AdminManager implements MapChangeListener {
         if (instance == null) {
             instance = new AdminManager();
         }
+
         return instance;
     }
 
@@ -82,8 +77,7 @@ public class AdminManager implements MapChangeListener {
 
     public void addEmployee(Employee employee) {
         employees.put(employee.getId(), employee);
-        Branch branch =BranchManager.getInstance().getBranchById(employee.getBranchID());
-        branch.increaseEmployeeNumberBy1();
+        BranchManager.getInstance().getBranchById(employee.getBranchID()).increaseEmployeeNumberBy1();
 
         System.out.println("Employee " + employee.getFullName() + " added successfully.");
     }
