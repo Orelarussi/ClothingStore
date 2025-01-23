@@ -458,21 +458,9 @@ public class Client {
     }
 
     private void createAndAddEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
-        System.out.println("Enter employee details:");
-        boolean doesEmployeeExist = false;
         try {
-            int employeeId = 0;
-            while (!doesEmployeeExist) {
-                employeeId = getInt("Employee ID: ", "Invalid ID. Please enter a numeric value.", consoleInput);
-                String req = admin_handler.isEmployeeExist(employeeId);
-                out.println(req);
-
-                String result = in.readLine();
-                if (result != null) {
-                    JsonObject obj = JsonParser.parseString(result).getAsJsonObject();
-                    doesEmployeeExist = Boolean.valueOf(obj.get("exists").getAsString());
-                }
-            }
+            System.out.println("Enter employee details:");
+            int employeeId = getEmployeeId(in, out, consoleInput);
 
             System.out.print("Employee First Name: ");
             String firstName = consoleInput.readLine();
@@ -485,8 +473,11 @@ public class Client {
 
             System.out.print("Employee Password : ");
             String password = consoleInput.readLine();
-           //Map<Integer, Branch> branches = BranchManager.getInstance().getBranches();
-          //  branches.values().forEach(System.out::println);
+//            Map<Integer, Branch> branches = BranchManager.getInstance().getBranches();
+//            for (Branch branch : branches.values()) {
+//                System.out.println(branch);
+//            }
+
             int branchId = getInt("Employee Branch Id: ",
                     "Invalid Branch ID. Please enter a numeric value.",
                     consoleInput);
@@ -533,6 +524,29 @@ public class Client {
         } catch (IOException e) {
             System.out.println(e.getLocalizedMessage());
         }
+    }
+
+    private int getEmployeeId(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+        boolean doesEmployeeExist = true;
+        int employeeId = -1;
+        while (doesEmployeeExist) {
+            employeeId = getInt("Employee ID: ", "Invalid ID. Please enter a numeric value.", consoleInput);
+            if (employeeId <= 0) {
+                System.out.println("ID must be a positive number!");
+                continue;
+            }
+            String req = admin_handler.isEmployeeExist(employeeId);
+            out.println(req);
+
+            String result = in.readLine();
+            if (result != null) {
+                JsonObject obj = JsonParser.parseString(result).getAsJsonObject();
+                doesEmployeeExist = obj.get("exists").getAsBoolean();
+                if(doesEmployeeExist)
+                    System.out.println("Employee with id "+ employeeId + " already exists!");
+            }
+        }
+        return employeeId;
     }
 
     private void viewAllEmployees(BufferedReader in, PrintWriter out) throws IOException {

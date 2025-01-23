@@ -20,5 +20,16 @@
     "firstName": "orel",
     "lastName": "arussi",
     "phoneNumber": "0503308151"
+  },
+  {
+    "branchID": 1,
+    "accountNumber": 123,
+    "employeeNumber": 1,
+    "position": "SHIFTMGR",
+    "password": "1234",
+    "id": 3,
+    "firstName": "eran",
+    "lastName": "kar ",
+    "phoneNumber": "050515151"
   }
 ]

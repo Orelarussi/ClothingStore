@@ -1,7 +1,7 @@
 [
   {
     "branchID": 1,
-    "employeeAmount": 2,
+    "employeeAmount": 3,
     "address": "Tel Aviv",
     "inventory": {},
     "sales": {}
