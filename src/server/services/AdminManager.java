@@ -1,8 +1,5 @@
 package server.services;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.binding.MapBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
@@ -11,11 +8,10 @@ import server.models.Employee;
 import server.utils.JsonUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class AdminManager implements MapChangeListener {
     private ObservableMap<Integer, Employee> employees = FXCollections.observableHashMap();
-    private static final Admin admin = new Admin(1, "Eran", "", "000", "1234");
+    private static final Admin admin = new Admin(1, "Eran", "karaso", "000", "1234");
     public static int currentUserId = admin.getId();
 
     //singleton
@@ -76,8 +72,7 @@ public class AdminManager implements MapChangeListener {
             throw new IllegalArgumentException("Employee with id " + employee.getId() + " already exists");
         }
         employees.put(employee.getId(), employee);
-        BranchManager.getInstance().getBranchById(employee.getBranchID()).increaseEmployeNumberBy1();
-
+        BranchManager.getInstance().addEmployeeToBranch(employee.getBranchID());
         System.out.println("Employee " + employee.getFullName() + " added successfully.");
     }
 
@@ -85,6 +80,7 @@ public class AdminManager implements MapChangeListener {
         Employee employee = employees.remove(id);
         if (employee != null) {
             System.out.println("Employee " + employee.getFirstName() + " removed successfully.");
+            BranchManager.getInstance().removeEmployeeFromBranch(employee.getBranchID());
         } else {
             System.out.println("Employee not found.");
         }
@@ -151,7 +147,8 @@ public class AdminManager implements MapChangeListener {
         for (Employee employee : employees) {
             map.put(employee.getId(), employee);
         }
-        this.employees.removeListener(this);
+        if (this.employees != null)
+            this.employees.removeListener(this);
         this.employees = map;
         this.employees.addListener(this);
     }

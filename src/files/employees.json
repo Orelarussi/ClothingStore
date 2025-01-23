@@ -1,46 +1,24 @@
 [
   {
     "branchID": 1,
-    "accountNumber": 6413,
-    "employeeNumber": 1,
-    "position": "SHIFTMGR",
-    "password": "1111",
-    "id": 4,
-    "firstName": "eran",
-    "lastName": "kar",
-    "phoneNumber": "3466457"
-  },
-  {
-    "branchID": 2,
-    "accountNumber": 3547,
-    "employeeNumber": 2,
-    "position": "SELLER",
-    "password": "1111",
-    "id": 5,
-    "firstName": "rtykj",
-    "lastName": "asftj",
-    "phoneNumber": "5467684"
-  },
-  {
-    "branchID": 1,
-    "accountNumber": 8,
-    "employeeNumber": 2,
-    "position": "CASHIER",
-    "password": "23",
-    "id": 3,
-    "firstName": "dfbdfgb",
-    "lastName": "dsgwsa",
-    "phoneNumber": "32323"
-  },
-  {
-    "branchID": 4,
     "accountNumber": 123,
-    "employeeNumber": 1,
+    "employeeNumber": 2,
     "position": "SHIFTMGR",
     "password": "1234",
-    "id": 2,
+    "id": 323859629,
     "firstName": "orel",
     "lastName": "arussi",
     "phoneNumber": "0503308010"
+  },
+  {
+    "branchID": 1,
+    "accountNumber": 1,
+    "employeeNumber": 1,
+    "position": "SHIFTMGR",
+    "password": "1234",
+    "id": 1,
+    "firstName": "orel",
+    "lastName": "arussi",
+    "phoneNumber": "0503308151"
   }
 ]

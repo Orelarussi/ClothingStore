@@ -62,11 +62,13 @@ public class Branch extends JsonSerializable {
         inventory.forEach((productId, quantity) -> System.out.println("Product ID: " + productId + ", Quantity: " + quantity));
     }
 
-    public void increaseEmployeNumberBy1() {
+    public void increaseEmployeeNumberBy1() {
         this.employeeAmount++;
     }
-    public void ReduceEmployeNumberBy1() {
+
+    public void reduceEmployeeNumberBy1() {
         this.employeeAmount--;
+        if (this.employeeAmount < 0) this.employeeAmount = 0;
     }
 
     @Override

@@ -36,7 +36,7 @@ public class ClientHandler extends Thread {
                     handleLoginResponse(response);
                 }
 
-                socketData.getOutputStream().println(response);
+                socketData.getOutputStream().println(response);//send response to client
             }
           } catch (IOException e) {
             e.printStackTrace();
@@ -75,22 +75,24 @@ public class ClientHandler extends Thread {
         JsonObject responseJsonObject = ServerDecoder.convertToJsonObject(response);
         int id = responseJsonObject.get("id").getAsInt();
         LoginResult result = LoginResult.valueOf(responseJsonObject.get("result").getAsString());
-        if (result!= LoginResult.FAILURE){
-            synchronized(connections){
-                SocketData previousConnectionSocketData = connections.get(id);
-                if(previousConnectionSocketData != null){
-                    // disconnect user previous connection
-                    try {
-                        previousConnectionSocketData.getOutputStream().close();
-                        previousConnectionSocketData.getSocket().close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+        if (result == LoginResult.FAILURE) {
+            System.out.println("login failed ID or PASSWORD is incorrect ");
+            return;
+        }
+        synchronized(connections){
+            SocketData previousConnectionSocketData = connections.get(id);
+            if(previousConnectionSocketData != null){
+                // disconnect user previous connection
+                try {
+                    previousConnectionSocketData.getOutputStream().close();
+                    previousConnectionSocketData.getSocket().close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                userId = id;
-                loginResult = result;
-                connections.put(id,socketData);
             }
+            userId = id;
+            loginResult = result;
+            connections.put(id,socketData);
         }
     }
 

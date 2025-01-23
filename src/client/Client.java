@@ -8,10 +8,13 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import server.command_executors.ServerDecoder;
 import server.database.SocketData;
+import server.models.Branch;
 import server.models.Employee;
 import server.models.Employee.Position;
 import server.models.customer.Customer;
 import server.models.customer.NewCustomer;
+import server.services.AdminManager;
+import server.services.BranchManager;
 import server.services.LoginResult;
 
 import java.io.BufferedReader;
@@ -24,12 +27,14 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 
 public class Client {
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 12345;
     public static final String LOG_OUT = "Log out";
+    public static final AdminHandler admin_handler = AdminHandler.getInstance();
 
     private Integer id;
 
@@ -83,7 +88,7 @@ public class Client {
             // password
             System.out.print("Password: ");
             String password = consoleInput.readLine();
-            String request = AdminHandler.getInstance().login(id, password);
+            String request = admin_handler.login(id, password);
             //send the request to the server
             out.println(request);
             String serverResponse = in.readLine();
@@ -176,7 +181,7 @@ public class Client {
     }
 
     private void logout(PrintWriter out) {
-        String request = AdminHandler.getInstance().logout(id);
+        String request = admin_handler.logout(id);
         out.println(request);
     }
     //display And Run Menu : to use in the start ... menu
@@ -437,15 +442,37 @@ public class Client {
             System.out.println("Invalid ID. Please enter a numeric value.");
             return;
         }
-        final String removeEmployeeJsonReq = AdminHandler.getInstance().removeEmployee(employeeId);
+        final String removeEmployeeJsonReq = admin_handler.removeEmployee(employeeId);
         out.println(removeEmployeeJsonReq);
-
+        String response = in.readLine();
+        if (response != null){
+            JsonObject res = new JsonObject();
+            if (res.has("error")) {
+                System.out.println("Employee " + employeeId + " failed to remove.");
+                System.out.println(res.get("error"));
+            }
+            if (res.has("result")) {
+                System.out.println("Employee " + employeeId + " was successfully removed.");
+            }
+        }
     }
 
     private void createAndAddEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
         System.out.println("Enter employee details:");
+        boolean doesEmployeeExist = false;
         try {
-            int employeeId = getInt("Employee ID: ", "Invalid ID. Please enter a numeric value.", consoleInput);
+            int employeeId = 0;
+            while (!doesEmployeeExist) {
+                employeeId = getInt("Employee ID: ", "Invalid ID. Please enter a numeric value.", consoleInput);
+                String req = admin_handler.isEmployeeExist(employeeId);
+                out.println(req);
+
+                String result = in.readLine();
+                if (result != null) {
+                    JsonObject obj = JsonParser.parseString(result).getAsJsonObject();
+                    doesEmployeeExist = Boolean.valueOf(obj.get("exists").getAsString());
+                }
+            }
 
             System.out.print("Employee First Name: ");
             String firstName = consoleInput.readLine();
@@ -458,7 +485,8 @@ public class Client {
 
             System.out.print("Employee Password : ");
             String password = consoleInput.readLine();
-
+           //Map<Integer, Branch> branches = BranchManager.getInstance().getBranches();
+          //  branches.values().forEach(System.out::println);
             int branchId = getInt("Employee Branch Id: ",
                     "Invalid Branch ID. Please enter a numeric value.",
                     consoleInput);
@@ -486,15 +514,16 @@ public class Client {
             Employee employee = new Employee(employeeId, branchId, firstName, lastName,
                     phoneNumber, password, accountNumber, position);
 
-            final String newEmployeeJsonReq = AdminHandler.getInstance().createEmployee(employee);
+            final String newEmployeeJsonReq = admin_handler.createEmployee(employee);
             out.println(newEmployeeJsonReq);
 
             String result = in.readLine();
             if (result != null){
-                JsonObject res = new JsonObject();
+                JsonObject res = JsonParser.parseString(result).getAsJsonObject();
                 if (res.has("error")) {
                     System.out.println("Employee " + employee.getFullName() + " failed to add.");
-                    System.out.println(res.get("error"));
+                    String error = res.get("error").toString();
+                    System.out.println(error);
                 }
                 if (res.has("result")) {
                     System.out.println("Employee " + employee.getFullName() + " successfully added.");
@@ -507,7 +536,7 @@ public class Client {
     }
 
     private void viewAllEmployees(BufferedReader in, PrintWriter out) throws IOException {
-        String request = AdminHandler.getInstance().getAllEmployees();
+        String request = admin_handler.getAllEmployees();
         out.println(request);//send request to server
 
         String result = in.readLine();

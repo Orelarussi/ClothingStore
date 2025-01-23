@@ -17,6 +17,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 public class JsonUtils {
@@ -118,37 +119,22 @@ public class JsonUtils {
 
     public static void loadBranches() {
         List<Branch> branches = basicLoad(Files.Branches, Branch.class);
-        if (branches != null) {
-            BranchManager.getInstance().setBranches(branches);
-        }
+        BranchManager.getInstance().setBranches(branches);
     }
 
     public static void loadProducts() {
         List<Product> products = basicLoad(Files.Products, Product.class);
-        if (products != null) {
-            ProductManager.getInstance().setProducts(products);
-        }
+        ProductManager.getInstance().setProducts(products);
     }
 
     public static void loadCustomers() {
         List<JsonObject> employeesJsonList = basicLoad(Files.Customers, JsonObject.class);
-
-        if (employeesJsonList != null) {
-            List<Customer> customers = employeesJsonList.stream()
-                    .map(json -> {
-                        String asString = json.toString();
-                        Customer customer = Customer.deserializeFromString(asString);
-                        return customer;
-                    }).toList();
-
-            EmployeeManager.getInstance().setCustomers(customers);
-        }
+        EmployeeManager.getInstance().setCustomersFromJson(employeesJsonList);
     }
 
     public static void loadEmployees() {
         List<Employee> employees = basicLoad(Files.Employees, Employee.class);
-        if (employees != null)
-            AdminManager.getInstance().setEmployees(employees);
+        AdminManager.getInstance().setEmployees(employees);
     }
 
     public static <T> List<T> basicLoad(Files fileName, Class<T> objClass) {
@@ -157,6 +143,6 @@ public class JsonUtils {
             return readJsonFile(jsonFileName, objClass);
         }
         System.out.println("File " + jsonFileName + " does not exist.");
-        return null;
+        return new ArrayList<>();
     }
 }

@@ -46,4 +46,10 @@ public class AdminHandler extends BaseHandler {
         JsonObject data = new JsonObject();
         return super.encodeRequest(MethodType.GET_ALL_EMP,data);
     }
+
+    public String isEmployeeExist(int id) {
+        JsonObject data = new JsonObject();
+        data.addProperty("id", id);
+        return super.encodeRequest(MethodType.IS_EMPLOYEE_EXISTS,data);
+    }
 }

@@ -30,9 +30,15 @@ public class AdminManagerCommandExecutor implements IExecute{
                 try {
                     adminManager.addEmployee(emp);
                     response.addProperty("result","success");
-                }catch (IllegalArgumentException e){
+                } catch (Exception e){
                     response.addProperty("error",e.getMessage());
-                }catch (Exception e){
+                }
+                break;
+            case REMOVE_EMP:
+                try {
+                    adminManager.deleteEmployee(data.get("id").getAsInt());
+                    response.addProperty("result","success");
+                } catch (ClassCastException | IllegalStateException e){
                     response.addProperty("error",e.getMessage());
                 }
                 break;
@@ -41,6 +47,10 @@ public class AdminManagerCommandExecutor implements IExecute{
                 String json = new Gson().toJson(employees);
                 response.addProperty("employees",json);
                 response.addProperty("result","success");
+                break;
+            case IS_EMPLOYEE_EXISTS:
+                Employee employee = adminManager.findEmployeeById(data.get("id").getAsInt());
+                response.addProperty("exists",employee != null);
                 break;
         }
         return response.toString();
