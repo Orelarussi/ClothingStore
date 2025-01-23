@@ -9,7 +9,7 @@ import server.utils.JsonUtils;
 
 import java.util.*;
 
-public class AdminManager implements MapChangeListener {
+public class AdminManager implements MapChangeListener<Integer,Employee> {
     private ObservableMap<Integer, Employee> employees = FXCollections.observableHashMap();
     private static final Admin admin = new Admin(1, "Eran", "karaso", "000", "1234");
     public static int currentUserId = admin.getId();
@@ -154,7 +154,7 @@ public class AdminManager implements MapChangeListener {
     }
 
     @Override
-    public void onChanged(Change change) {
+    public void onChanged(Change<? extends Integer, ? extends Employee> change) {
         System.out.println(change);
         JsonUtils.saveEmployees();
     }
