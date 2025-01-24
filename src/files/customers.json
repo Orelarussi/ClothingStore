@@ -19,7 +19,7 @@
       "purchaseID": 0
     },
     "type": "VIP",
-    "totalPurchases": 100,
+    "totalPurchases": 0,
     "id": 2,
     "firstName": "Dani",
     "lastName": "dan",
@@ -32,7 +32,7 @@
       "purchaseID": 0
     },
     "type": "RETURNING",
-    "totalPurchases": 7,
+    "totalPurchases": 0,
     "id": 3,
     "firstName": "eran",
     "lastName": "banani",

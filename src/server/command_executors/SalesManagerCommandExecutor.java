@@ -1,6 +1,7 @@
 package server.command_executors;
 
 import com.google.gson.JsonObject;
+import server.models.SaleReport;
 import server.services.LoginResult;
 import server.services.SalesManager;
 
@@ -21,16 +22,16 @@ public class SalesManagerCommandExecutor implements IExecute{
             case SHOW_SALES_BY_BRANCH:
                 int branchId = data.get("branchId").getAsInt();
 
-                salesManager.getAllSaleReports().stream()
-                        .filter(saleReport -> saleReport.getBranchID() == branchId)
-                        .forEach(saleReport -> result.append(String.format("sale -> %s, ", saleReport)));
-
-                if (result.isEmpty()) {
-                    return "Not Found Sales";
+                for (SaleReport report : salesManager.getAllSaleReports()) {
+                    if (report.getBranchID() == branchId) {
+                        String str = report + "\n";
+                        result.append(str);
+                    }
                 }
 
-                result.setLength(result.length() - 2);
-                return result.toString();
+                response.addProperty("sales",result.toString());
+
+                return response.toString();
             case SHOW_SALES_BY_PRODUCT:
                 int productId = data.get("productId").getAsInt();
 

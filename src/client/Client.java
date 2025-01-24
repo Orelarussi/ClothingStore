@@ -398,7 +398,9 @@ public class Client {
 
         try {
             String response = in.readLine();
-            System.out.println(response);
+            JsonObject obj = JsonParser.parseString(response).getAsJsonObject();
+            String sales = obj.get("sales").getAsString();
+            System.out.println(sales);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
