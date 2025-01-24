@@ -1,4 +1,6 @@
 package server.services;
+import server.models.Branch;
+import server.services.BranchManager;
 
 import com.sun.javafx.collections.MapAdapterChange;
 import javafx.collections.FXCollections;
@@ -25,7 +27,6 @@ public class AdminManager implements MapChangeListener<Integer, Employee> {
         if (instance == null) {
             instance = new AdminManager();
         }
-
         return instance;
     }
 

@@ -1,6 +1,7 @@
 package client;
 
 import client.handlers.AdminHandler;
+import client.handlers.ChatHandler;
 import client.handlers.CustomerHandler;
 import client.handlers.EmployeeHandler;
 import client.menu.MenuItem;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 
 
 public class Client {
@@ -36,26 +38,24 @@ public class Client {
     private Integer id;
 
     public static void main(String[] args) {
-        Client client = new Client();
-
         BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in));
 
         MenuItem[] generalMenu = new MenuItem[]{
-                new MenuItem("Login", () -> client.connectToServer(consoleInput)),
-                new MenuItem("Exit", () -> client.exitClient(consoleInput))
+                new MenuItem("Login", () -> connectToServer(consoleInput)),
+                new MenuItem("Exit", () -> exitClient(consoleInput))
         };
 
         while (true) {
             System.out.println("\nWelcome to Clothing Store\n");
             try {
-                client.displayAndRunMenu(generalMenu, consoleInput, "main menu", false);
+                displayAndRunMenu(generalMenu, consoleInput, "main menu", false);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void connectToServer(BufferedReader consoleInput) {
+    private static void connectToServer(BufferedReader consoleInput) {
 
         //try with resources will close the socket when done
         try (SocketData socketData = new SocketData(new Socket(SERVER_HOST, SERVER_PORT))) {
@@ -72,7 +72,7 @@ public class Client {
         }
     }
 
-    private LoginResult login(BufferedReader consoleInput, PrintWriter out, BufferedReader in)
+    private static LoginResult login(BufferedReader consoleInput, PrintWriter out, BufferedReader in)
             throws IOException {
 
         LoginResult loginResult = LoginResult.FAILURE;
@@ -95,7 +95,7 @@ public class Client {
         return loginResult;
     }
 
-    private void showBranchInventory(PrintWriter out, BufferedReader in, BufferedReader consoleInput) throws IOException {
+    private static void showBranchInventory(PrintWriter out, BufferedReader in, BufferedReader consoleInput) throws IOException {
         System.out.print("Enter the branch ID to display its inventory: ");
         int branchID = Integer.parseInt(consoleInput.readLine());
 
@@ -114,7 +114,7 @@ public class Client {
         }
     }
 
-    private void saleProduct(PrintWriter out, BufferedReader in, BufferedReader consoleInput) throws IOException {
+    private static void saleProduct(PrintWriter out, BufferedReader in, BufferedReader consoleInput) throws IOException {
         System.out.print("Enter the Customer ID to purchase: ");
         int customerID = Integer.parseInt(consoleInput.readLine());
 
@@ -139,7 +139,7 @@ public class Client {
         }
     }
 
-    private void startInventoryMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    private static void startInventoryMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         MenuItem[] inventoryMenu = {
                 new MenuItem("Show branch inventory", () -> {
                     try {
@@ -163,7 +163,7 @@ public class Client {
     }
 
 
-    private void showAdminOrEmployeeMenu(LoginResult loginResult, BufferedReader consoleInput, PrintWriter out, BufferedReader in) throws IOException {
+    private static void showAdminOrEmployeeMenu(LoginResult loginResult, BufferedReader consoleInput, PrintWriter out, BufferedReader in) throws IOException {
         switch (loginResult) {
             case ADMIN:
                 startAdminMenu(in, out, consoleInput);
@@ -177,17 +177,17 @@ public class Client {
         }
     }
 
-    private void logout(PrintWriter out) {
+    private static void logout(PrintWriter out) {
         String request = admin_handler.logout(id);
         out.println(request);
     }
     //display And Run Menu : to use in the start ... menu
 
-    private void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String title) throws IOException {
+    private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String title) throws IOException {
         displayAndRunMenu(menuItems, consoleInput, title, true);
     }
 
-    private void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String menuTitle,
+    private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String menuTitle,
                                    boolean addBack_ExitOpt) throws IOException {
         if (addBack_ExitOpt) {
             menuItems = Arrays.copyOf(menuItems, menuItems.length + 2);
@@ -224,7 +224,7 @@ public class Client {
         }
     }
 
-    private void exitClient(BufferedReader consoleInput) {
+    private static void exitClient(BufferedReader consoleInput) {
         System.out.println("Exiting the client. Goodbye!");
         try {
             consoleInput.close(); // Close console input
@@ -236,7 +236,7 @@ public class Client {
 
     //all menus functions:
 
-    private void startAdminMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    private static void startAdminMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         MenuItem[] adminMenu = {
                 new MenuItem("Add employee", () -> createAndAddEmployee(in, out, consoleInput)),
                 new MenuItem("Remove employee", () -> {
@@ -266,7 +266,7 @@ public class Client {
         displayAndRunMenu(adminMenu, consoleInput, "Admin Menu");
     }
 
-    private void startEmployeeMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    private static void startEmployeeMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         MenuItem[] employeeMenu = {
                 new MenuItem("Show branch info", () -> System.out.println("Displaying branch info...")),
                 new MenuItem("Inventory menu", () -> {
@@ -303,7 +303,7 @@ public class Client {
         displayAndRunMenu(employeeMenu, consoleInput, "Employee Menu");
     }
 
-    private void startCustomerMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    private static void startCustomerMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         MenuItem[] customerMenu = {
                 new MenuItem("Add customer", () -> addCustomer(in, out, consoleInput)),
                 new MenuItem("Delete customer", () -> deleteCustomer(in, out, consoleInput)),
@@ -312,7 +312,7 @@ public class Client {
         displayAndRunMenu(customerMenu, consoleInput, "Customer Menu");
     }
 
-    private void showCustomers(BufferedReader in, PrintWriter out) {
+    private static  void showCustomers(BufferedReader in, PrintWriter out) {
         String request = CustomerHandler.getInstance().getAllCustomers();
         out.println(request);
 
@@ -330,7 +330,7 @@ public class Client {
         customers.forEach(System.out::println);
     }
 
-    private void deleteCustomer(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+    private static void deleteCustomer(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
         int cid = getInt("Enter customer id to delete:", "Invalid id", consoleInput);
         String request = CustomerHandler.getInstance().deleteCustomer(cid);
         out.println(request);
@@ -343,7 +343,7 @@ public class Client {
         }
     }
 
-    private void addCustomer(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+    private static void addCustomer(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
         NewCustomer customer = null;
         try {
             customer = getNewCustomer(consoleInput);
@@ -362,7 +362,7 @@ public class Client {
         }
     }
 
-    private NewCustomer getNewCustomer(BufferedReader consoleInput) throws IOException {
+    private static NewCustomer getNewCustomer(BufferedReader consoleInput) throws IOException {
         int cid = getInt("Enter customer id: ", "Invalid id", consoleInput);
         System.out.println("Enter first customer name: ");
         String first = consoleInput.readLine();
@@ -375,7 +375,7 @@ public class Client {
     }
 
 
-    private void startSalesReportMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    private static void startSalesReportMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         MenuItem[] salesReportMenu = {
                 new MenuItem("Show sales amount by branch", () -> System.out.println("Displaying sales by branch...")),
                 new MenuItem("Show sales amount by product ID", () -> System.out.println("Displaying sales by product ID...")),
@@ -384,7 +384,7 @@ public class Client {
         displayAndRunMenu(salesReportMenu, consoleInput, "Sales Report Menu");
     }
 
-    private void startChatsMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    private static void startChatsMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         MenuItem[] chatsMenu = {
                 new MenuItem("Open chat", () -> System.out.println("Opening chat...")),
                 new MenuItem("Connect to available chat", () -> System.out.println("Connecting to available chat...")),
@@ -397,7 +397,7 @@ public class Client {
 //all the functions that inside of the menu
 
     //admin menu functions:
-    private void editEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    private static void editEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         int employeeId = getInt("Enter the employee ID you would like to edit:",
                 "Invalid ID. Please enter a numeric value.", consoleInput);
 
@@ -453,7 +453,7 @@ public class Client {
         return menu;
     }
 
-    private void removeEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    private static void removeEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         System.out.println("Enter the employee ID you would like to remove:");
         int employeeId;
         try {
@@ -477,7 +477,7 @@ public class Client {
         }
     }
 
-    private void createAndAddEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+    private static void createAndAddEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
         try {
             System.out.println("Enter employee details:");
             int employeeId = getEmployeeId(in, out, consoleInput);
@@ -546,6 +546,28 @@ public class Client {
         }
     }
 
+    public void openChat(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        int myBranchID = 1;//need to use get brunch id by em id
+        String[] branches = {"Tel Aviv", "Jerusalem", "Haifa", "Beersheba"};
+
+        System.out.println("Branches:");
+        for (int i = 0; i < branches.length; i++) {
+            if (i + 1 != myBranchID) {
+                System.out.println("Branch ID: " + (i + 1) + ", Address: " + branches[i]);
+            }
+        }
+        int selectedBranchID = getInt("Enter branch ID : ",
+                "Invalid input. Please enter a valid branch number.", consoleInput,
+                branch -> branch < 1 || branch > branches.length || branch == myBranchID);
+        // build the request
+        String request = ChatHandler.getInstance().openChat(selectedBranchID,myBranchID);
+        //send the request to the server
+        out.println(request);
+        //get chat from server
+
+
+    }
+
     private int getEmployeeId(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         boolean doesEmployeeExist = true;
         int employeeId = -1;
@@ -590,11 +612,22 @@ public class Client {
 
 
     //input help functions:
-    private int getInt(String msg, String errMsg, BufferedReader consoleInput) {
+    private static int getInt(String msg, String errMsg, BufferedReader consoleInput) {
+        return getInt(msg,errMsg,consoleInput, null);
+    }
+
+    private static int getInt(String msg, String errMsg, BufferedReader consoleInput, Predicate<Integer> test) {
         while (true) {
             System.out.print(msg);
             try {
-                return Integer.parseInt(consoleInput.readLine());
+                int number = Integer.parseInt(consoleInput.readLine());
+                if (test != null){
+                    if (test.test(number)) {
+                        return number;
+                    }
+                }else {
+                    return number;
+                }
             } catch (NumberFormatException e) {
                 System.out.println(errMsg);
             } catch (IOException e) {
@@ -603,7 +636,7 @@ public class Client {
         }
     }
 
-    private long getLong(String msg, String errMsg, BufferedReader consoleInput) {
+    private static long getLong(String msg, String errMsg, BufferedReader consoleInput) {
         while (true) {
             System.out.print(msg);
             try {
