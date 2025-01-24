@@ -31,7 +31,11 @@ public class AdminManagerTest {
                 "SecurePass1!", "Branch01", 12345, Position.CASHIER);
         adminManager.addEmployee(employee);
         final String PASS = "NewPass123!";
-        adminManager.updateEmployee(1,"password", PASS);
+        try {
+            adminManager.editEmployee(1,"password", PASS);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
         assertTrue(adminManager.verifyEmployeePassword(1, PASS));
     }
 

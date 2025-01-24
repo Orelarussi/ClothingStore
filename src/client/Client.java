@@ -8,13 +8,10 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import server.command_executors.ServerDecoder;
 import server.database.SocketData;
-import server.models.Branch;
 import server.models.Employee;
 import server.models.Employee.Position;
 import server.models.customer.Customer;
 import server.models.customer.NewCustomer;
-import server.services.AdminManager;
-import server.services.BranchManager;
 import server.services.LoginResult;
 
 import java.io.BufferedReader;
@@ -27,7 +24,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 
 public class Client {
@@ -263,7 +259,8 @@ public class Client {
                         System.out.println("An error occurred while viewing all employees.");
                     }
                 }),
-                new MenuItem(LOG_OUT, () -> {})
+                new MenuItem(LOG_OUT, () -> {
+                })
         };
         displayAndRunMenu(adminMenu, consoleInput, "Admin Menu");
     }
@@ -400,37 +397,46 @@ public class Client {
 
     //admin menu functions:
     private void editEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
-        int employeeId = getInt("Enter the employee ID you would like to edit:", "Invalid ID. Please enter a numeric value.", consoleInput);
-        while (true) {
+        int employeeId = getInt("Enter the employee ID you would like to edit:",
+                "Invalid ID. Please enter a numeric value.", consoleInput);
 
-            System.out.println("Select the property number you would like to edit:");
-            String[] fields = Arrays.stream(Employee.class.getDeclaredFields())
-//                    .filter(f-> !f.getName().equals("employeesNum") && !f.getName().equals("employeeNumber"))
-                    .map(Field::getName).toArray(String[]::new);
-
-
-            for (int i = 0; i < fields.length; i++) {
-                String fName = fields[i];
-                System.out.println((i + 1) + ". " + fName);
-            }
+        OnEmployeeFieldSelectedListener listener = fieldName -> {
             try {
-                int selectedFieldNum = Integer.parseInt(consoleInput.readLine());
-                String selectedField = fields[selectedFieldNum - 1];
-                System.out.println("Choose the new value for " + selectedField);
-                String val = consoleInput.readLine();
-                JsonObject req = new JsonObject();
-                req.addProperty(selectedField, val);
-                //{selectedField : val } - example { firstName : "Orel" }
+                System.out.println("Choose the new value for " + fieldName);
+                String value = consoleInput.readLine();
+                String request = admin_handler.editEmployee(employeeId, fieldName, value);
+                out.println(request);
 
-                break;
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input");
-            } catch (IndexOutOfBoundsException e) {
-                System.out.println("Please enter a value between 1 to " + fields.length);
+                String response = in.readLine();
+                if (response != null) {
+                    JsonObject jsonObject = JsonParser.parseString(response).getAsJsonObject();
+                    if (jsonObject.has("error")) {
+                        System.out.println(jsonObject.get("error").getAsString());
+                    } else if (jsonObject.has("result") && jsonObject.get("result").getAsString().equals("success")) {
+                        System.out.println("Employee " + employeeId + " has been edited.");
+                    }
+                }
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
+        };
+        MenuItem[] menu = createEditEmployeeMenu(listener);
 
+        displayAndRunMenu(menu, consoleInput, "Select the property number you would like to edit:");
+    }
+
+    private MenuItem[] createEditEmployeeMenu(OnEmployeeFieldSelectedListener listener) {
+        List<Field> fields = Employee.getAllFields();
+
+        MenuItem[] menu = new MenuItem[fields.size()];
+
+        for (int i = 0; i < fields.size(); i++) {
+            String fName = fields.get(i).getName();
+            menu[i] = new MenuItem(fName, () -> listener.onEmployeeFieldSelected(fName));
         }
 
+        return menu;
     }
 
     private void removeEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
@@ -445,7 +451,7 @@ public class Client {
         final String removeEmployeeJsonReq = admin_handler.removeEmployee(employeeId);
         out.println(removeEmployeeJsonReq);
         String response = in.readLine();
-        if (response != null){
+        if (response != null) {
             JsonObject res = new JsonObject();
             if (res.has("error")) {
                 System.out.println("Employee " + employeeId + " failed to remove.");
@@ -509,7 +515,7 @@ public class Client {
             out.println(newEmployeeJsonReq);
 
             String result = in.readLine();
-            if (result != null){
+            if (result != null) {
                 JsonObject res = JsonParser.parseString(result).getAsJsonObject();
                 if (res.has("error")) {
                     System.out.println("Employee " + employee.getFullName() + " failed to add.");
@@ -542,8 +548,8 @@ public class Client {
             if (result != null) {
                 JsonObject obj = JsonParser.parseString(result).getAsJsonObject();
                 doesEmployeeExist = obj.get("exists").getAsBoolean();
-                if(doesEmployeeExist)
-                    System.out.println("Employee with id "+ employeeId + " already exists!");
+                if (doesEmployeeExist)
+                    System.out.println("Employee with id " + employeeId + " already exists!");
             }
         }
         return employeeId;
@@ -560,7 +566,8 @@ public class Client {
             JsonElement element = res.get("employees");
             if (element != null) {
                 //Convert to list of employees
-                Type type = new TypeToken<List<Employee>>() {}.getType();
+                Type type = new TypeToken<List<Employee>>() {
+                }.getType();
                 List<Employee> employees = new Gson().fromJson(element.getAsString(), type);
                 employees.forEach(System.out::println);
             }

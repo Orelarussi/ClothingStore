@@ -24,12 +24,12 @@
   {
     "branchID": 1,
     "accountNumber": 123,
-    "employeeNumber": 1,
+    "employeeNumber": 3,
     "position": "SHIFTMGR",
     "password": "1234",
     "id": 3,
     "firstName": "eran",
-    "lastName": "kar ",
+    "lastName": "karaso",
     "phoneNumber": "050515151"
   }
 ]

@@ -6,8 +6,11 @@ import server.database.SocketData;
 import server.models.Employee;
 import server.services.LoginResult;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,31 +26,39 @@ public class ClientHandler extends Thread {
 
     @Override
     public void run() {
-        try {
-            String request;
-            while ((request = socketData.getInputStream().readLine()) != null) {
-                // generic handler for all cases
-                ServiceType serviceType = ServerDecoder.getServiceType(request);
-                MethodType methodType = ServerDecoder.getMethodType(request);
+        String request;
+        ServiceType serviceType;
+        MethodType methodType;
+        IExecute commandExecutor;
+        String response;
+        BufferedReader inputStream = socketData.getInputStream();
+        PrintWriter outputStream = socketData.getOutputStream();
 
-                IExecute commandExecutor = CommandExecutorFactory.getCommandExecutor(serviceType);
-                String response = commandExecutor.execute(userId,loginResult,request);
+        try {
+            while (true) {
+                if ((request = inputStream.readLine()) == null) break;
+                // generic handler for all cases
+                serviceType = ServerDecoder.getServiceType(request);
+                methodType = ServerDecoder.getMethodType(request);
+
+                commandExecutor = CommandExecutorFactory.getCommandExecutor(serviceType);
+                response = commandExecutor.execute(userId,loginResult,request);
                 if(methodType == MethodType.LOGIN){
                     handleLoginResponse(response);
                 }
 
-                socketData.getOutputStream().println(response);//send response to client
+                outputStream.println(response);//send response to client
             }
+          } catch (SocketException e){
+            System.out.println("Socket Closed from client");
           } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("error", e.getMessage());
-            socketData.getOutputStream().println(jsonObject.toString());
-
-
+            outputStream.println(jsonObject);
         } finally {
             try {
-                socketData.getOutputStream().println("{}");
+                outputStream.println("{}");
                 socketData.close();// closes socket, inputStream and outputStream
                 synchronized (connections) {
                     if(userId != null){

@@ -1,21 +1,26 @@
 package server.services;
 
+import com.sun.javafx.collections.MapAdapterChange;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
+import server.exceptions.IllegalFieldValueException;
 import server.models.Admin;
 import server.models.Employee;
 import server.utils.JsonUtils;
 
-import java.util.*;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
-public class AdminManager implements MapChangeListener<Integer,Employee> {
+public class AdminManager implements MapChangeListener<Integer, Employee> {
     private ObservableMap<Integer, Employee> employees = FXCollections.observableHashMap();
     private static final Admin admin = new Admin(1, "Eran", "karaso", "000", "1234");
     public static int currentUserId = admin.getId();
 
     //singleton
     private static AdminManager instance;
+
     public static synchronized AdminManager getInstance() {
         if (instance == null) {
             instance = new AdminManager();
@@ -24,7 +29,7 @@ public class AdminManager implements MapChangeListener<Integer,Employee> {
         return instance;
     }
 
-    private AdminManager(){
+    private AdminManager() {
         setEmployees(new ArrayList<>());
     }
 
@@ -86,48 +91,42 @@ public class AdminManager implements MapChangeListener<Integer,Employee> {
         }
     }
 
-    public <T> void updateEmployee(int employeeID, String attribute, T value) {
+    public void editEmployee(int employeeID, String attribute, String value)
+            throws IllegalArgumentException, IllegalAccessException {
+
         Employee employee = employees.get(employeeID);
         if (employee == null) {
             throw new IllegalArgumentException("Employee not found with ID: " + employeeID);
         }
 
-        // Update the specified attribute
-        switch (attribute.toLowerCase()) {
-            case "firstname":
-                if (value instanceof String) {
-                    employee.setFirstName((String) value);
-                } else {
-                    throw new IllegalArgumentException("Invalid value type for 'firstname'. Expected: String.");
-                }
-                break;
-            case "lastname":
-                if (value instanceof String) {
-                    employee.setLastName((String) value);
-                } else {
-                    throw new IllegalArgumentException("Invalid value type for 'lastname'. Expected: String.");
-                }
-                break;
-            case "branchid":
-                if (value instanceof Integer) {
-                    employee.setBranchID((int) value);
-                } else {
-                    throw new IllegalArgumentException("Invalid value type for 'branchid'. Expected: String.");
-                }
-                break;
-            case "password":
-                if (value instanceof String) {
-                    employee.setPassword((String) value);
-                } else {
-                    throw new IllegalArgumentException("Invalid value type for 'password'. Expected: String.");
-                }
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid attribute: " + attribute);
+        List<Field> fields = Employee.getAllFields();
+        Field field = fields.stream()
+                .filter(f -> f.getName().equals(attribute))
+                .findFirst().orElse(null);
+
+        if (field == null) {
+            throw new IllegalArgumentException("Employee not found with attribute: " + attribute);
+        }
+
+        field.setAccessible(true);
+        try {
+            if (field.getType() == Integer.class) {
+                field.set(employee, Integer.valueOf(value));
+            } else if (field.getType() == Long.class) {
+                field.set(employee, Long.valueOf(value));
+            } else if (field.getType() == Employee.Position.class) {
+                field.set(employee, Employee.Position.valueOf(value));
+            } else { //string default
+                field.set(employee, value);
+            }
+        } catch (IllegalArgumentException e) {
+            String message = "The value " + value + " is not valid for field " + field.getName();
+            throw new IllegalFieldValueException(message);
         }
 
         // Save the updated employee back to the map
-        employees.put(employeeID, employee);
+        employees.remove(employeeID); //remove
+        employees.put(employeeID, employee); //add to trigger onChange function
     }
 
     public Employee findEmployeeById(int id) {
@@ -143,7 +142,7 @@ public class AdminManager implements MapChangeListener<Integer,Employee> {
     }
 
     public void setEmployees(List<Employee> employees) {
-        ObservableMap<Integer,Employee> map = FXCollections.observableHashMap();
+        ObservableMap<Integer, Employee> map = FXCollections.observableHashMap();
         for (Employee employee : employees) {
             map.put(employee.getId(), employee);
         }
@@ -155,7 +154,8 @@ public class AdminManager implements MapChangeListener<Integer,Employee> {
 
     @Override
     public void onChanged(Change<? extends Integer, ? extends Employee> change) {
-        System.out.println(change);
+        if (change.wasAdded()) System.out.println("added " + change.getValueAdded());
+        else System.out.println("removed " + change.getValueRemoved());
         JsonUtils.saveEmployees();
     }
 }

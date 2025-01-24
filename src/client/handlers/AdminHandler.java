@@ -52,4 +52,12 @@ public class AdminHandler extends BaseHandler {
         data.addProperty("id", id);
         return super.encodeRequest(MethodType.IS_EMPLOYEE_EXISTS,data);
     }
+
+    public String editEmployee(int employeeId, String fieldName, String value) {
+        JsonObject data = new JsonObject();
+        data.addProperty("id", employeeId);
+        data.addProperty("fieldName", fieldName);
+        data.addProperty("value", value);
+        return super.encodeRequest(MethodType.EDIT_EMP,data);
+    }
 }

@@ -1,5 +1,9 @@
 package server.models;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Employee extends User {
     private static long employeesNum = 0;
     private int branchID;
@@ -77,5 +81,25 @@ public class Employee extends User {
         } else {
             throw new IllegalArgumentException("Employee number must be positive.");
         }
+    }
+
+    public static List<Field> getAllFields() {
+        List<Field> fields = new ArrayList<>(List.of(Employee.class.getDeclaredFields()));
+        fields.removeIf(f->f.getName().equals("id"));//should stay the same
+        fields.removeIf(f->f.getName().equals("employeeNumber"));//should stay the same
+        fields.removeIf(f->f.getName().equals("employeesNum"));//static
+
+        Employee employee = new Employee();
+        Class<?> superclass = employee.getClass().getSuperclass();
+        while (superclass != null) {
+            for (Field field : superclass.getDeclaredFields()) {
+                String name = field.getName();
+                if (!name.equals("gson") && !name.equals("id")) {
+                    fields.add(field);
+                }
+            }
+            superclass = superclass.getSuperclass();
+        }
+        return fields;
     }
 }
