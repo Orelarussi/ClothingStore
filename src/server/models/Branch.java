@@ -11,14 +11,12 @@ public class Branch extends JsonSerializable {
     private int employeeAmount;
     private String address;
     private Map<Integer, Integer> inventory; // Map<ProductID, Quantity>
-    private Map<Integer, Integer> sales; // Map<ProductID, Sales Amount>
 
     public Branch(int branchID, int employeeAmount, String address) {
         this.branchID = branchID;
         this.employeeAmount = employeeAmount;
         this.address = address;
         this.inventory = new HashMap<>();
-        this.sales = new HashMap<>();
     }
 
     public int getBranchID() {
@@ -37,26 +35,6 @@ public class Branch extends JsonSerializable {
         return inventory;
     }
 
-    public Map<Integer, Integer> getSales() {
-        return sales;
-    }
-
-    public void updateInventory(int productId, int quantity) {
-        inventory.put(productId, inventory.getOrDefault(productId, 0) + quantity);
-    }
-
-    public void updateSales(int productId, int amount) {
-        sales.put(productId, sales.getOrDefault(productId, 0) + amount);
-    }
-
-    public int showSalesAmountByBranch() {
-        return sales.values().stream().mapToInt(Integer::intValue).sum();
-    }
-
-    public int showSalesAmountByProductID(int productId) {
-        return sales.getOrDefault(productId, 0);
-    }
-
     public void showInventory() {
         System.out.println("Inventory for Branch ID: " + branchID);
         inventory.forEach((productId, quantity) -> System.out.println("Product ID: " + productId + ", Quantity: " + quantity));
@@ -65,7 +43,7 @@ public class Branch extends JsonSerializable {
     public void increaseEmployeeNumberBy1() {
         this.employeeAmount++;
     }
-    public void ReduceEmployeeNumberBy1() {
+    public void reduceEmployeeNumberBy1() {
         this.employeeAmount--;
     }
 
@@ -77,6 +55,5 @@ public class Branch extends JsonSerializable {
         this.employeeAmount = temp.getEmployeeAmount();
         this.address = temp.getAddress();
         this.inventory = temp.getInventory();
-        this.sales = temp.getSales();
     }
 }

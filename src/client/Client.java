@@ -1,11 +1,11 @@
 package client;
 
-import client.handlers.AdminHandler;
-import client.handlers.ChatHandler;
-import client.handlers.CustomerHandler;
-import client.handlers.EmployeeHandler;
+import client.handlers.*;
 import client.menu.MenuItem;
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import server.command_executors.ServerDecoder;
 import server.database.SocketData;
 import server.models.Employee;
@@ -20,8 +20,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.net.Socket;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -31,7 +35,6 @@ public class Client {
     private static final int SERVER_PORT = 12345;
     public static final String LOG_OUT = "Log out";
     private static Integer id;
-    private static boolean up = true;
 
     public static void main(String[] args) {
         BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in));
@@ -380,11 +383,53 @@ public class Client {
 
     private static void startSalesReportMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         MenuItem[] salesReportMenu = {
-                new MenuItem("Show sales amount by branch", () -> System.out.println("Displaying sales by branch...")),
-                new MenuItem("Show sales amount by product ID", () -> System.out.println("Displaying sales by product ID...")),
-                new MenuItem("Show sales amount by category", () -> System.out.println("Displaying sales by category (לא זמין)...")),
+                new MenuItem("Show sales amount by branch", () -> showSalesByBranch(in, out, consoleInput)),
+                new MenuItem("Show sales amount by product ID", () -> showSalesByProduct(in, out, consoleInput)),
+                new MenuItem("Show sales amount by date", () -> showSalesByDate(in, out, consoleInput)),
         };
         displayAndRunMenu(salesReportMenu, consoleInput, "Sales Report Menu");
+    }
+
+    private static void showSalesByBranch(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        int branchId = getInt("Employee Branch Id: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
+
+        String request = SalesHandler.getInstance().showSalesByBranch(branchId);
+        out.println(request);
+
+        try {
+            String response = in.readLine();
+            System.out.println(response);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void showSalesByProduct(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        int productId = getInt("Product Id: ", "Invalid Product ID. Please enter a numeric value.", consoleInput);
+
+        String request = SalesHandler.getInstance().showSalesByProduct(productId);
+        out.println(request);
+
+        try {
+            String response = in.readLine();
+            System.out.println(response);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void showSalesByDate(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        LocalDate date = getDate(consoleInput);
+
+        String request = SalesHandler.getInstance().showSalesByDate(date);
+        out.println(request);
+
+        try {
+            String response = in.readLine();
+            System.out.println(response);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void startChatsMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
@@ -560,6 +605,22 @@ public class Client {
                 System.out.println(e.getLocalizedMessage());
             }
         }
+    }
+
+    public static LocalDate getDate(BufferedReader reader) {
+        LocalDate date = null;
+
+        while (date == null) {
+            System.out.print("Enter a date in the format yyyy-MM-dd: ");
+
+            try {
+                date = LocalDate.parse(reader.readLine(), DateTimeFormatter.ofPattern("yyyy-MM-dd")); // Attempt to parse the date
+            } catch (Exception e) {
+                System.out.println("Invalid date format. Please try again.");
+            }
+        }
+
+        return date;
     }
 }
 

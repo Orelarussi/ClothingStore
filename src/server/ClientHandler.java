@@ -38,45 +38,36 @@ public class ClientHandler extends Thread {
 
                 socketData.getOutputStream().println(response);
             }
-          } catch (IOException e) {
-            e.printStackTrace();
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("error", e.getMessage());
-            socketData.getOutputStream().println(jsonObject);
-        } finally {
+        } catch (SocketException e) {
+            System.out.println("Socket Closed from client");
             try {
                 socketData.getOutputStream().println("{}");
-                socketData.close();// closes socket, inputStream and outputStream
                 synchronized (connections) {
-                    if(userId != null){
+                    if (userId != null) {
                         SocketData removed = connections.remove(userId);
                         removed.close();
                     }
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+                socketData.close();// closes socket, inputStream and outputStream
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
             }
-//            final ChatManager chatManager = ChatManager.getInstance();
-//            if (chatManager.getChattingEmployees().containsKey(socketData)) {
-//                ChatSession chat = chatManager.getChatSessionBySocketData(socketData);
-//                chat.removeListener(socketData);
-//                chatManager.getAvailableEmployees().remove(socketData);
-//            } else {
-//                synchronized (chatManager) {
-//                    chatManager.getAvailableEmployees().remove(socketData);
-//
-//                }
-//            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("error", e.getMessage());
+            socketData.getOutputStream().println(jsonObject);
         }
     }
-    private void handleLoginResponse(String response){
+
+    private void handleLoginResponse(String response) {
         JsonObject responseJsonObject = ServerDecoder.convertToJsonObject(response);
         int id = responseJsonObject.get("id").getAsInt();
         LoginResult result = LoginResult.valueOf(responseJsonObject.get("result").getAsString());
-        if (result!= LoginResult.FAILURE){
-            synchronized(connections){
+        if (result != LoginResult.FAILURE) {
+            synchronized (connections) {
                 SocketData previousConnectionSocketData = connections.get(id);
-                if(previousConnectionSocketData != null){
+                if (previousConnectionSocketData != null) {
                     // disconnect user previous connection
                     try {
                         previousConnectionSocketData.getOutputStream().close();
@@ -87,7 +78,7 @@ public class ClientHandler extends Thread {
                 }
                 userId = id;
                 loginResult = result;
-                connections.put(id,socketData);
+                connections.put(id, socketData);
             }
         }
     }

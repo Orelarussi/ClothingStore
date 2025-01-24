@@ -1,19 +1,15 @@
 package server.services;
-import server.models.Branch;
-import server.services.BranchManager;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.binding.MapBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import server.models.Admin;
+import server.models.Branch;
 import server.models.Employee;
 import server.utils.JsonUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AdminManager implements MapChangeListener {
     private ObservableMap<Integer, Employee> employees = FXCollections.observableHashMap();
@@ -74,7 +70,7 @@ public class AdminManager implements MapChangeListener {
 
     public void addEmployee(Employee employee) {
         employees.put(employee.getId(), employee);
-        Branch branch =BranchManager.getInstance().getBranchById(employee.getBranchID());
+        Branch branch = BranchManager.getInstance().getBranchById(employee.getBranchID());
         branch.increaseEmployeeNumberBy1();
 
         System.out.println("Employee " + employee.getFullName() + " added successfully.");
@@ -82,6 +78,8 @@ public class AdminManager implements MapChangeListener {
 
     public void deleteEmployee(int id) {
         Employee employee = employees.remove(id);
+        Branch branch = BranchManager.getInstance().getBranchById(employee.getBranchID());
+        branch.reduceEmployeeNumberBy1();
         if (employee != null) {
             System.out.println("Employee " + employee.getFirstName() + " removed successfully.");
         } else {

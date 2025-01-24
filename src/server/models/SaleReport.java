@@ -1,19 +1,19 @@
 package server.models;
 
+import server.utils.JsonSerializable;
+
 import java.time.LocalDate;
 
-public class SaleReport {
+public class SaleReport extends JsonSerializable {
     private int branchID;
     private int productId;
     private int quantitySold;
-    private double totalSales;
     private LocalDate date;
 
-    public SaleReport(int branchID, int productId, int quantitySold, double totalSales, LocalDate date) {
+    public SaleReport(int branchID, int productId, int quantitySold, LocalDate date) {
         this.branchID = branchID;
         this.productId = productId;
         this.quantitySold = quantitySold;
-        this.totalSales = totalSales;
         this.date = date;
     }
 
@@ -42,14 +42,6 @@ public class SaleReport {
         this.quantitySold = quantitySold;
     }
 
-    public double getTotalSales() {
-        return totalSales;
-    }
-
-    public void setTotalSales(double totalSales) {
-        this.totalSales = totalSales;
-    }
-
     public LocalDate getDate() {
         return date;
     }
@@ -60,12 +52,21 @@ public class SaleReport {
 
     @Override
     public String toString() {
-        return "SaleReport{" +
+        return "SaleReport {" +
                 "branchID='" + branchID + '\'' +
                 ", productId='" + productId + '\'' +
                 ", quantitySold=" + quantitySold +
-                ", totalSales=" + totalSales +
                 ", date=" + date +
                 '}';
+    }
+
+    @Override
+    protected void populateFromJson(String json) {
+        SaleReport temp = gson.fromJson(json, SaleReport.class);
+
+        this.branchID = temp.getBranchID();
+        this.productId = temp.getProductId();
+        this.quantitySold = temp.quantitySold;
+        this.date = temp.date;
     }
 }

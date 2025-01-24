@@ -38,10 +38,10 @@ public abstract class Customer extends Person {
                 return new NewCustomer(json.get("id").getAsInt(), json.get("firstName").getAsString(), json.get("lastName").getAsString() ,json.get("phoneNumber").getAsString(), json.get("totalPurchases").getAsInt());
             }
             case "RETURNING" -> {
-                return new ReturningCustomer(json.get("id").getAsInt(), json.get("firstName").getAsString(), json.get("lastName").getAsString() ,json.get("phoneNumber").getAsString(), json.get("int totalPurchases").getAsInt());
+                return new ReturningCustomer(json.get("id").getAsInt(), json.get("firstName").getAsString(), json.get("lastName").getAsString() ,json.get("phoneNumber").getAsString(), json.get("totalPurchases").getAsInt());
             }
             case "VIP" -> {
-                return new VIPCustomer(json.get("id").getAsInt(), json.get("firstName").getAsString(), json.get("lastName").getAsString() ,json.get("phoneNumber").getAsString(), json.get("int totalPurchases").getAsInt());
+                return new VIPCustomer(json.get("id").getAsInt(), json.get("firstName").getAsString(), json.get("lastName").getAsString() ,json.get("phoneNumber").getAsString(), json.get("totalPurchases").getAsInt());
             }
             default -> throw new IllegalArgumentException("Unknown class type: " + type);
         }

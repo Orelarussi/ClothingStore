@@ -5,17 +5,7 @@
     "address": "test",
     "inventory": {
       "1": 5,
-      "3": 213
-    },
-    "sales": {}
-  },
-  {
-    "branchID": 2,
-    "employeeAmount": 51,
-    "address": "test",
-    "inventory": {
-      "2": 5
-    },
-    "sales": {}
+      "3": 77
+    }
   }
 ]

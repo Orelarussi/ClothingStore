@@ -9,7 +9,6 @@ import java.net.ServerSocket;
 public class Server {
     public static final int PORT = 12345;
 
-    @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) {
         System.out.println("--> Server is running...");
         Logger.initLogger();
@@ -17,9 +16,9 @@ public class Server {
 
         // server wait to client connection then wrap the handler using thread
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            while (true) {
-                //TODO: Getting Employee When Client-Login Here
-                new ClientHandler(serverSocket.accept()).start();
+            while (!serverSocket.isClosed()) {
+                new ClientHandler(serverSocket.accept()).run();
+                serverSocket.close();
             }
         } catch (IOException e) {
             e.printStackTrace();
