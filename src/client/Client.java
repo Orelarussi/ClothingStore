@@ -35,7 +35,7 @@ public class Client {
     public static final String LOG_OUT = "Log out";
     public static final AdminHandler admin_handler = AdminHandler.getInstance();
 
-    private Integer id;
+    private static Integer id;
 
     public static void main(String[] args) {
         BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in));
@@ -440,7 +440,7 @@ public class Client {
         displayAndRunMenu(menu, consoleInput, "Select the property number you would like to edit:");
     }
 
-    private MenuItem[] createEditEmployeeMenu(OnEmployeeFieldSelectedListener listener) {
+    private static MenuItem[] createEditEmployeeMenu(OnEmployeeFieldSelectedListener listener) {
         List<Field> fields = Employee.getAllFields();
 
         MenuItem[] menu = new MenuItem[fields.size()];
@@ -568,7 +568,7 @@ public class Client {
 
     }
 
-    private int getEmployeeId(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    private static int getEmployeeId(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         boolean doesEmployeeExist = true;
         int employeeId = -1;
         while (doesEmployeeExist) {
@@ -591,7 +591,7 @@ public class Client {
         return employeeId;
     }
 
-    private void viewAllEmployees(BufferedReader in, PrintWriter out) throws IOException {
+    private static void viewAllEmployees(BufferedReader in, PrintWriter out) throws IOException {
         String request = admin_handler.getAllEmployees();
         out.println(request);//send request to server
 

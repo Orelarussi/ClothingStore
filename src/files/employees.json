@@ -1,13 +1,13 @@
 [
   {
-    "branchID": 2,
-    "accountNumber": 2345,
+    "branchID": 1,
+    "accountNumber": 1111111111,
     "employeeNumber": 1,
-    "position": "CASHIER",
-    "password": "1233",
-    "id": 5,
-    "firstName": "daniela",
-    "lastName": "mok",
-    "phoneNumber": "2355477698"
+    "position": "SHIFT_MANAGER",
+    "password": "1111",
+    "id": 1,
+    "firstName": "moshe",
+    "lastName": "mishu",
+    "phoneNumber": "345457"
   }
 ]
