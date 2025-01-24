@@ -1,8 +1,5 @@
 package server.services;
-import server.models.Branch;
-import server.services.BranchManager;
 
-import com.sun.javafx.collections.MapAdapterChange;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
@@ -110,13 +107,23 @@ public class AdminManager implements MapChangeListener<Integer, Employee> {
         }
 
         field.setAccessible(true);
+
         try {
-            if (field.getType() == Integer.class) {
-                field.set(employee, Integer.valueOf(value));
-            } else if (field.getType() == Long.class) {
+            if (field.getType() == int.class) {
+                int newNum = Integer.parseInt(value);
+                if (field.getName().contains("branch")) {
+                    BranchManager manager = BranchManager.getInstance();
+                    manager.removeEmployeeFromBranch(employee.getBranchID());
+                    manager.addEmployeeToBranch(newNum);
+                }
+                field.set(employee, newNum);
+
+            } else if (field.getType() == long.class) {
                 field.set(employee, Long.valueOf(value));
+
             } else if (field.getType() == Employee.Position.class) {
                 field.set(employee, Employee.Position.valueOf(value));
+
             } else { //string default
                 field.set(employee, value);
             }

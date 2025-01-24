@@ -25,7 +25,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 
@@ -42,16 +41,12 @@ public class Client {
 
         MenuItem[] generalMenu = new MenuItem[]{
                 new MenuItem("Login", () -> connectToServer(consoleInput)),
-                new MenuItem("Exit", () -> exitClient(consoleInput))
+                new MenuItem("Exit", Client::exitClient)
         };
 
         while (true) {
             System.out.println("\nWelcome to Clothing Store\n");
-            try {
-                displayAndRunMenu(generalMenu, consoleInput, "main menu", false);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            displayAndRunMenu(generalMenu, consoleInput, "main menu", false);
         }
     }
 
@@ -183,16 +178,16 @@ public class Client {
     }
     //display And Run Menu : to use in the start ... menu
 
-    private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String title) throws IOException {
+    private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String title) {
         displayAndRunMenu(menuItems, consoleInput, title, true);
     }
 
     private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String menuTitle,
-                                   boolean addBack_ExitOpt) throws IOException {
+                                   boolean addBack_ExitOpt) {
         if (addBack_ExitOpt) {
             menuItems = Arrays.copyOf(menuItems, menuItems.length + 2);
             menuItems[menuItems.length - 2] = new MenuItem("Back", null);
-            menuItems[menuItems.length - 1] = new MenuItem("Exit", () -> exitClient(consoleInput));
+            menuItems[menuItems.length - 1] = new MenuItem("Exit", Client::exitClient);
         }
 
         int choice;
@@ -209,6 +204,8 @@ public class Client {
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a valid number.");
                 continue;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
 
             if (choice > 0 && choice <= menuItems.length) {
@@ -224,14 +221,10 @@ public class Client {
         }
     }
 
-    private static void exitClient(BufferedReader consoleInput) {
+    private static void exitClient() {
         System.out.println("Exiting the client. Goodbye!");
-        try {
-            consoleInput.close(); // Close console input
-        } catch (IOException e) {
-            System.out.println("Error closing console input: " + e.getMessage());
-        }
         System.exit(0); // Terminate the client process
+//        TODO logout and close socket
     }
 
     //all menus functions:
@@ -402,42 +395,53 @@ public class Client {
                 "Invalid ID. Please enter a numeric value.", consoleInput);
 
         OnEmployeeFieldSelectedListener listener = fieldName -> {
-            try {
+
                 System.out.println("Choose the new value for " + fieldName);
-                AtomicReference<String> value = new AtomicReference<>();
 
                 if (fieldName.equalsIgnoreCase("position")){
                     MenuItem[] positionMenu = new MenuItem[Position.values().length];
                     Position[] values = Position.values();
                     for (int i = 0; i < values.length; i++) {
                         String name = values[i].name();
-                        positionMenu[i] = new MenuItem(name, () -> value.set(name));
+                        positionMenu[i] = new MenuItem(name, () -> {
+                            try {
+                                requestEditEmployeeAndResponse(in, out, fieldName, employeeId, name);
+
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
                     }
-                    displayAndRunMenu(positionMenu, consoleInput, "Choose a position");
+                    displayAndRunMenu(positionMenu, consoleInput, "Choose a position");//TODO check invalid choice
                 }
-                else
-                    value.set(consoleInput.readLine());
-
-                String request = admin_handler.editEmployee(employeeId, fieldName, value.get());
-                out.println(request);
-
-                String response = in.readLine();
-                if (response != null) {
-                    JsonObject jsonObject = JsonParser.parseString(response).getAsJsonObject();
-                    if (jsonObject.has("error")) {
-                        System.out.println(jsonObject.get("error").getAsString());
-                    } else if (jsonObject.has("result") && jsonObject.get("result").getAsString().equals("success")) {
-                        System.out.println("Employee " + employeeId + " has been edited.");
+                else {
+                    try {
+                        String value = consoleInput.readLine();
+                        requestEditEmployeeAndResponse(in, out, fieldName, employeeId, value);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
                 }
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
         };
         MenuItem[] menu = createEditEmployeeMenu(listener);
 
         displayAndRunMenu(menu, consoleInput, "Select the property number you would like to edit:");
+    }
+
+    private static void requestEditEmployeeAndResponse(BufferedReader in, PrintWriter out,
+                                                       String fieldName, int employeeId, String value) throws IOException {
+        String request = admin_handler.editEmployee(employeeId, fieldName, value);
+        out.println(request);
+
+        String response = in.readLine();
+        if (response != null) {
+            JsonObject jsonObject = JsonParser.parseString(response).getAsJsonObject();
+            if (jsonObject.has("error")) {
+                System.out.println(jsonObject.get("error").getAsString());
+            } else if (jsonObject.has("result") && jsonObject.get("result").getAsString().equals("success")) {
+                System.out.println("Employee " + employeeId + " has been edited.");
+            }
+        }
     }
 
     private static MenuItem[] createEditEmployeeMenu(OnEmployeeFieldSelectedListener listener) {
@@ -466,12 +470,11 @@ public class Client {
         out.println(removeEmployeeJsonReq);
         String response = in.readLine();
         if (response != null) {
-            JsonObject res = new JsonObject();
+            JsonObject res = JsonParser.parseString(response).getAsJsonObject();
             if (res.has("error")) {
                 System.out.println("Employee " + employeeId + " failed to remove.");
                 System.out.println(res.get("error"));
-            }
-            if (res.has("result")) {
+            }else if (res.has("result")) {
                 System.out.println("Employee " + employeeId + " was successfully removed.");
             }
         }
