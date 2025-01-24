@@ -24,6 +24,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 public class Client {
@@ -403,8 +404,21 @@ public class Client {
         OnEmployeeFieldSelectedListener listener = fieldName -> {
             try {
                 System.out.println("Choose the new value for " + fieldName);
-                String value = consoleInput.readLine();
-                String request = admin_handler.editEmployee(employeeId, fieldName, value);
+                AtomicReference<String> value = new AtomicReference<>();
+
+                if (fieldName.equalsIgnoreCase("position")){
+                    MenuItem[] positionMenu = new MenuItem[Position.values().length];
+                    Position[] values = Position.values();
+                    for (int i = 0; i < values.length; i++) {
+                        String name = values[i].name();
+                        positionMenu[i] = new MenuItem(name, () -> value.set(name));
+                    }
+                    displayAndRunMenu(positionMenu, consoleInput, "Choose a position");
+                }
+                else
+                    value.set(consoleInput.readLine());
+
+                String request = admin_handler.editEmployee(employeeId, fieldName, value.get());
                 out.println(request);
 
                 String response = in.readLine();
