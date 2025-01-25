@@ -628,7 +628,7 @@ public class Client {
 
     //input help functions:
     private static int getInt(String msg, String errMsg, BufferedReader consoleInput) {
-        return getInt(msg,errMsg,consoleInput, null);
+        return getInt(msg,errMsg,consoleInput, x-> x > 0);
     }
 
     private static int getInt(String msg, String errMsg, BufferedReader consoleInput, Predicate<Integer> test) {
