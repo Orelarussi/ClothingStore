@@ -20,5 +20,16 @@
     "firstName": "orelarussi",
     "lastName": "inua",
     "phoneNumber": "345345"
+  },
+  {
+    "branchID": 2,
+    "accountNumber": 132154,
+    "employeeNumber": 1,
+    "position": "SHIFT_MANAGER",
+    "password": "@@@",
+    "id": 3,
+    "firstName": "ORELarussi",
+    "lastName": "Admin",
+    "phoneNumber": "0503308010"
   }
 ]

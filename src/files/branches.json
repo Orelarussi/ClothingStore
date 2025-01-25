@@ -8,7 +8,7 @@
   },
   {
     "branchID": 2,
-    "employeeAmount": 0,
+    "employeeAmount": 1,
     "address": "Jerusalem",
     "inventory": {},
     "sales": {}

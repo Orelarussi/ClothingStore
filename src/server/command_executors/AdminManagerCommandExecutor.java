@@ -10,23 +10,15 @@ import server.services.LoginResult;
 import java.util.List;
 
 public class AdminManagerCommandExecutor implements IExecute{
-    private AdminManager adminManager;
 
     @Override
     public String execute(Integer userId,LoginResult loginResult, String request) {
-        this.adminManager = AdminManager.getInstance();
+        AdminManager adminManager = AdminManager.getInstance();
         MethodType method = ServerDecoder.getMethodType(request);
         JsonObject data = ServerDecoder.getData(request);
         JsonObject response = new JsonObject();
         int id;
         switch (method){
-            case LOGIN:
-                id = data.get("id").getAsInt();
-                String password = data.get("password").getAsString();
-                LoginResult result = adminManager.login(id,password);
-                response.addProperty ("id", id);
-                response.addProperty("result", result.toString());
-                break;
             case ADD_EMP:
                 Employee emp= new Employee(data.toString());
                 try {

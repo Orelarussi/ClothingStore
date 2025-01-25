@@ -1,9 +1,6 @@
 package client;
 
-import client.handlers.AdminHandler;
-import client.handlers.ChatHandler;
-import client.handlers.CustomerHandler;
-import client.handlers.EmployeeHandler;
+import client.handlers.*;
 import client.menu.MenuItem;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
@@ -15,10 +12,7 @@ import server.models.customer.Customer;
 import server.models.customer.NewCustomer;
 import server.services.LoginResult;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.net.Socket;
@@ -66,7 +60,7 @@ public class Client {
             //start logic
             PrintWriter out = socketData.getOutputStream();
             BufferedReader in = socketData.getInputStream();
-            LoginResult loginResult = login(consoleInput, out, in);
+            LoginResult loginResult = login(consoleInput, out, in);//should be admin or employee with fullName as message
             showAdminOrEmployeeMenu(loginResult, consoleInput, out, in);
 
         } catch (IOException e) {
@@ -81,22 +75,17 @@ public class Client {
 
         System.out.println("\n=== Login ===");
 
-        while (!(loginResult == LoginResult.ADMIN || loginResult == LoginResult.EMPLOYEE)) {
-            // id
-            id = getInt("Username id: ", "Invalid id. Please enter a numeric value.", consoleInput);
-            // password
-            System.out.print("Password: ");
-            String password = consoleInput.readLine();
-            String request = admin_handler.login(id, password);
-            //send the request to the server
-            out.println(request);
-            String serverResponse = in.readLine();
-            JsonObject loginResponse = ServerDecoder.convertToJsonObject(serverResponse);
-            loginResult = LoginResult.valueOf(loginResponse.get("result").getAsString());
-            if (loginResult == LoginResult.FAILURE) {
-                System.out.println("Username or password is incorrect. Please try again.");
-            }
-        }
+        id = getInt("Username id: ", "Invalid id. Please enter a numeric value.", consoleInput);
+        // password
+        System.out.print("Password: ");
+        String password = consoleInput.readLine();
+        String request = SessionHandler.getInstance().login(id, password);
+        //send the request to the server
+        out.println(request);
+        String serverResponse = in.readLine();
+        JsonObject loginResponse = ServerDecoder.convertToJsonObject(serverResponse);
+        loginResult = LoginResult.fromJson(loginResponse.get("result").getAsString());
+
         return loginResult;
     }
 
@@ -168,23 +157,31 @@ public class Client {
     }
 
 
-    private static void showAdminOrEmployeeMenu(LoginResult loginResult, BufferedReader consoleInput, PrintWriter out, BufferedReader in) throws IOException {
+    private static void showAdminOrEmployeeMenu(LoginResult loginResult, BufferedReader consoleInput,
+                                                PrintWriter out, BufferedReader in) throws IOException {
         switch (loginResult) {
-            case ADMIN:
-                startAdminMenu(in, out, consoleInput);
-                break;
-            case EMPLOYEE:
-                startEmployeeMenu(in, out, consoleInput);
-                break;
-            case FAILURE:
-                System.out.println("User id or password are incorrect, please try again");
-                break;
+            case ADMIN -> startAdminMenu(in, out, consoleInput, loginResult.getMessage());
+            case EMPLOYEE -> startEmployeeMenu(in, out, consoleInput, loginResult.getMessage());
+            case FAILURE -> System.out.println(loginResult.getMessage());
         }
     }
 
-    private static void logout(PrintWriter out) {
-        String request = admin_handler.logout(id);
+    private static void logout(BufferedReader in, PrintWriter out) {
+        String request = SessionHandler.getInstance().logout(id);
         out.println(request);
+
+        try {
+            String response = in.readLine();
+            if (response != null) {
+                JsonObject jsonObject = JsonParser.parseString(response).getAsJsonObject();
+                if (jsonObject.has("error"))
+                    System.out.println(jsonObject.get("error").getAsString());
+                else
+                    System.out.println("Logged out successfully");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     //display And Run Menu : to use in the start ... menu
 
@@ -219,14 +216,15 @@ public class Client {
             }
 
             if (choice > 0 && choice <= menuItems.length) {
-                String title = menuItems[choice - 1].getTitle();
+                MenuItem item = menuItems[choice - 1];
+                String title = item.getTitle();
                 if (title.equals("Back") || title.equals(LOG_OUT)) {
                     return;
                 } else if (title.equals("Exit")) {
-                    menuItems[choice - 1].run();
+                    item.run();
                     return;
                 } else {
-                    menuItems[choice - 1].run();
+                    item.run();
                 }
             } else {
                 System.out.println("Invalid choice. Please try again.");
@@ -241,7 +239,7 @@ public class Client {
 
     //all menus functions:
 
-    private static void startAdminMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    private static void startAdminMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput, String userName) throws IOException {
         MenuItem[] adminMenu = {
                 new MenuItem("Add employee", () -> createAndAddEmployee(in, out, consoleInput)),
                 new MenuItem("Remove employee", () -> {
@@ -265,13 +263,14 @@ public class Client {
                         System.out.println("An error occurred while viewing all employees.");
                     }
                 }),
-                new MenuItem(LOG_OUT, () -> {
-                })
+                new MenuItem(LOG_OUT, () -> logout(in, out))
         };
+        System.out.println("\nHello "+userName);
+
         displayAndRunMenu(adminMenu, consoleInput, "Admin Menu");
     }
 
-    private static void startEmployeeMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    private static void startEmployeeMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput, String userName) throws IOException {
         MenuItem[] employeeMenu = {
                 new MenuItem("Show branch info", () -> System.out.println("Displaying branch info...")),
                 new MenuItem("Inventory menu", () -> {
@@ -302,9 +301,9 @@ public class Client {
                         throw new RuntimeException(e);
                     }
                 }),
-                new MenuItem(LOG_OUT, () -> {
-                })
+                new MenuItem(LOG_OUT, () -> logout(in, out))
         };
+        System.out.println("\nHello "+userName);
         displayAndRunMenu(employeeMenu, consoleInput, "Employee Menu");
     }
 
@@ -349,7 +348,7 @@ public class Client {
     }
 
     private static void addCustomer(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
-        NewCustomer customer = null;
+        NewCustomer customer;
         try {
             customer = getNewCustomer(consoleInput);
         } catch (IOException e) {

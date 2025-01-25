@@ -18,19 +18,6 @@ public class AdminHandler extends BaseHandler {
         super(ServiceType.ADMIN);
     }
 
-    public String login(int id, String password){
-        JsonObject data = new JsonObject();
-        data.addProperty("id",id);
-        data.addProperty("password",password);
-        return super.encodeRequest(MethodType.LOGIN,data);
-    }
-
-    public String logout(Integer id) {
-        JsonObject data = new JsonObject();
-        data.addProperty("id", id);
-        return super.encodeRequest(MethodType.LOGOUT,data);
-    }
-
     public String createEmployee(Employee employee){
         JsonObject data = new Gson().fromJson(employee.serializeToString(), JsonObject.class);
         return super.encodeRequest(MethodType.ADD_EMP,data);
