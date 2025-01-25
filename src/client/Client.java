@@ -35,8 +35,13 @@ public class Client {
     public static final AdminHandler admin_handler = AdminHandler.getInstance();
 
     private static Integer id;
+    private static boolean isOnline = true;
 
     public static void main(String[] args) {
+        start();
+    }
+
+    public static void start() {
         BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in));
 
         MenuItem[] generalMenu = new MenuItem[]{
@@ -44,10 +49,12 @@ public class Client {
                 new MenuItem("Exit", Client::exitClient)
         };
 
-        while (true) {
-            System.out.println("\nWelcome to Clothing Store\n");
-            displayAndRunMenu(generalMenu, consoleInput, "main menu", false);
-        }
+        new Thread(()->{
+            while (isOnline) {
+                System.out.println("\nWelcome to Clothing Store\n");
+                displayAndRunMenu(generalMenu, consoleInput, "main menu", false);
+            }
+        }).start();
     }
 
     private static void connectToServer(BufferedReader consoleInput) {
@@ -212,6 +219,9 @@ public class Client {
                 String title = menuItems[choice - 1].getTitle();
                 if (title.equals("Back") || title.equals(LOG_OUT)) {
                     return;
+                } else if (title.equals("Exit")) {
+                    menuItems[choice - 1].run();
+                    return;
                 } else {
                     menuItems[choice - 1].run();
                 }
@@ -222,9 +232,8 @@ public class Client {
     }
 
     private static void exitClient() {
+        isOnline = false;
         System.out.println("Exiting the client. Goodbye!");
-        System.exit(0); // Terminate the client process
-//        TODO logout and close socket
     }
 
     //all menus functions:
