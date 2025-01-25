@@ -1,39 +1,53 @@
 package server.services;
 
-import server.models.Person;
-import java.util.HashSet;
-import java.util.Set;
+import server.database.SocketData;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SessionManager {
-    private Set<Person> loggedInPeople;
+    private static SessionManager instance;
+    private Map<Integer, SocketData> connections = new HashMap<>();
 
-    public SessionManager() {
-        this.loggedInPeople = new HashSet<>();
+    private SessionManager() {
+
     }
 
-    // Check if user is already logged in
-    public boolean isUserLoggedIn(Person person) {
-        return loggedInPeople.contains(person);
+    public static synchronized SessionManager getInstance() {
+        if (instance == null) {
+            instance = new SessionManager();
+        }
+        return instance;
     }
 
-    // Log in a user
-    public boolean logInUser(Person person) {
-        if (isUserLoggedIn(person)) {
-            System.out.println("User " + person.getFirstName() + " is already logged in.");
-            return false;
-        } else {
-            loggedInPeople.add(person);
-            System.out.println("User " + person.getFirstName() + " logged in successfully.");
-            return true;
+    public synchronized LoginResult login(int userID, String password) {
+        if (connections.get(userID) != null) {
+            LoginResult result = LoginResult.FAILURE;
+            result.setMessage("You are already logged in. please logout first from the other session.");
+            return result;
+        }
+        return AdminManager.getInstance().login(userID,password);
+    }
+
+    public synchronized void logout(int id) throws IOException {
+        SocketData data = connections.remove(id);
+        if(data != null){
+            // disconnect user previous connection
+            data.close();
+            System.out.println("Removed connection from client socket");
         }
     }
 
-    // Log out a user
-    public void logOutUser(Person person) {
-        if (loggedInPeople.remove(person)) {
-            System.out.println("User " + person.getFirstName() + " logged out successfully.");
-        } else {
-            System.out.println("User " + person.getFirstName() + " is not logged in.");
-        }
+    public boolean isLoggedIn(int id) {
+        return connections.get(id) != null;
+    }
+
+    public Map<Integer, SocketData> getConnections() {
+        return connections;
+    }
+
+    public void addConnection(int id, SocketData socketData) {
+        connections.put(id, socketData);
     }
 }

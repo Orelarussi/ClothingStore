@@ -33,20 +33,27 @@ public class AdminManager implements MapChangeListener<Integer, Employee> {
 
 
     public LoginResult login(int id, String pass) {
+        LoginResult result = LoginResult.FAILURE;
+
         // Check if the login is for the admin
         if (admin.getId() == id && admin.getPassword().equals(pass)) {
             currentUserId = id;
-            return LoginResult.ADMIN;
+            result = LoginResult.ADMIN;
+            result.setMessage(admin.getFullName());
+            return result;
         }
 
         // Check if the login is for an employee
         Employee emp = employees.get(id);
         if (emp != null && emp.getPassword().equals(pass)) {
             currentUserId = id;
-            return LoginResult.EMPLOYEE;
+            result = LoginResult.EMPLOYEE;
+            result.setMessage(emp.getFullName());
+            return result;
         }
 
         // Return FAILURE if login credentials are incorrect
+        result.setMessage("Username or password is incorrect. Please try again.");
         return LoginResult.FAILURE;
     }
 
@@ -54,12 +61,6 @@ public class AdminManager implements MapChangeListener<Integer, Employee> {
         List<Employee> onlyEmployees = new ArrayList<>(employees.size());
         onlyEmployees.addAll(employees.values());
         return onlyEmployees; // Return a copy to prevent external modifications
-    }
-
-    public void listEmployees() {
-        for (Employee employee : employees.values()) {
-            System.out.println(employee);
-        }
     }
 
     public List<Employee> getEmployeesByBranch(int branchID) {
@@ -73,6 +74,9 @@ public class AdminManager implements MapChangeListener<Integer, Employee> {
     public void addEmployee(Employee employee) {
         if (employees.containsKey(employee.getId())) {
             throw new IllegalArgumentException("Employee with id " + employee.getId() + " already exists");
+        }
+        if (admin.getId() == employee.getId()) {
+            throw new IllegalArgumentException("Admin with id " + employee.getId() + " already exists");
         }
         employees.put(employee.getId(), employee);
         BranchManager.getInstance().addEmployeeToBranch(employee.getBranchID());
