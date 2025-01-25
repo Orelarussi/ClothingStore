@@ -403,8 +403,24 @@ public class Client {
 
     //admin menu functions:
     private static void editEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+        System.out.println("Enter employee id from the list:");
+
+        viewAllEmployees(in, out);
+
         int employeeId = getInt("Enter the employee ID you would like to edit:",
                 "Invalid ID. Please enter a numeric value.", consoleInput);
+
+        String employeeExistReq = admin_handler.isEmployeeExist(employeeId);
+        out.println(employeeExistReq);
+
+        String response = in.readLine();
+        JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+        boolean exists = json.get("exists").getAsBoolean();
+        if (!exists){
+            System.out.println("Employee with id "+employeeId+" does not exist,please try again");
+            editEmployee(in, out, consoleInput);
+            return;
+        }
 
         OnEmployeeFieldSelectedListener listener = fieldName -> {
 
@@ -588,10 +604,6 @@ public class Client {
         int employeeId = -1;
         while (doesEmployeeExist) {
             employeeId = getInt("Employee ID: ", "Invalid ID. Please enter a numeric value.", consoleInput);
-            if (employeeId <= 0) {
-                System.out.println("ID must be a positive number!");
-                continue;
-            }
             String req = admin_handler.isEmployeeExist(employeeId);
             out.println(req);
 
