@@ -93,6 +93,9 @@ public class Client {
             String serverResponse = in.readLine();
             JsonObject loginResponse = ServerDecoder.convertToJsonObject(serverResponse);
             loginResult = LoginResult.valueOf(loginResponse.get("result").getAsString());
+            if (loginResult == LoginResult.FAILURE) {
+                System.out.println("Username or password is incorrect. Please try again.");
+            }
         }
         return loginResult;
     }
