@@ -92,32 +92,36 @@ public class ChatManagerCommandExecutor implements IExecute {
                 String timeString = data.get("timestamp").getAsString();
                 String content = data.get("content").getAsString();
                 LocalDateTime timestamp = LocalDateTime.parse(timeString);
-                Message message = new Message(senderId,content,timestamp);
+                Message message = new Message(senderId, content, timestamp);
 
                 String senderName = AdminManager.getInstance().getEmployeeNameById(message.getSenderId());
                 message.setSenderName(senderName);
-                data.addProperty("senderName",senderName);
+                data.addProperty("senderName", senderName);
 
-                List<Integer> employeeToSend = chatManager.sendMessage(message,chatId);
-                for (int id :employeeToSend) {
-                    sendResponseToEmployee(id, data); // פונקציה לשליחת התגובה
+                List<Integer> employeeToSend = chatManager.sendMessage(message, chatId);
+                try {
+                    for (int id : employeeToSend) {
+                        sendResponseToEmployee(id, data); // פונקציה לשליחת התגובה
+                    }
+                    response.addProperty("success", true);
+                    response.addProperty("senderID",senderId);
+                    response.addProperty("content",content);
+                } catch (IllegalStateException e) {
+                    System.err.println("Failed to send response to employee " + userId + ": " + e.getMessage());
+                    response.addProperty("success", false);
+                    response.addProperty("error", e.getMessage());
                 }
         }
         return response.toString();
     }
 
-    protected void sendResponseToEmployee(int employeeId, JsonObject response) {
+    protected void sendResponseToEmployee(int employeeId, JsonObject response) throws IllegalStateException {
         // Get the connection for the employee
         SocketData socketData = ClientHandler.getSocketForEmployee(employeeId);
-        if (socketData != null) {
-            try {
-                PrintWriter out = socketData.getOutputStream();
-                out.println(response.toString());
-            } catch (Exception e) {
-                System.err.println("Failed to send response to employee " + employeeId + ": " + e.getMessage());
-            }
-        } else {
-            System.out.println("Employee " + employeeId + " is not currently connected.");
+        if (socketData == null) {
+            throw new IllegalStateException("Employee " + employeeId + " is not currently connected.");
         }
+        PrintWriter out = socketData.getOutputStream();
+        out.println(response.toString());
     }
 }

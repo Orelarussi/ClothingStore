@@ -688,31 +688,28 @@ public class Client {
                 }
             }
         });
-        try {
-            while (true) {
-                //check if the client enter input
-                if (Objects.equals(userInput.get(), "exit")) {
-                    if (isWaiting) {
-                        removeFromWaitingList(out, branchId);
-                    } else {
-                        removeFromAvailableList(out);
-                    }
-                    break;
+        while (true) {
+            //check if the client enter input
+            if (Objects.equals(userInput.get(), "exit")) {
+                if (isWaiting) {
+                    removeFromWaitingList(out, branchId);
+                } else {
+                    removeFromAvailableList(out);
                 }
-                // Check server response
-                if (in.ready()) {
-                    String response = in.readLine();
-                    JsonObject serverResponse = ServerDecoder.convertToJsonObject(response);//גיל
-                    int chatId = serverResponse.get("chatId").getAsInt();
-                    System.out.println("Chat is now available! Chat ID: " + chatId);
-                    joinChat(chatId, in, out, consoleInput);
-                    break;
-                }
+                break;
             }
-        } finally {
-            // Ensure the executor is shut down in all cases
-            executor.shutdownNow();
+            // Check server response
+            if (in.ready()) {
+                String response = in.readLine();
+                JsonObject serverResponse = ServerDecoder.convertToJsonObject(response);//גיל
+                int chatId = serverResponse.get("chatId").getAsInt();
+                System.out.println("Chat is now available! Chat ID: " + chatId);
+                executor.shutdownNow();
+                joinChat(chatId, in, out, consoleInput);
+                break;
+            }
         }
+
     }
 
     private static void removeFromWaitingList(PrintWriter out, int branchId) {
@@ -752,7 +749,7 @@ public class Client {
         displayAndRunMenu(OptionalChat, consoleInput, "Chose available chat");
     }
 
-    private static void joinExistingChat(int chatId, BufferedReader in, PrintWriter out, BufferedReader consoleInput)  {
+    private static void joinExistingChat(int chatId, BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
         String request = ChatHandler.getInstance().joinExistChat(chatId, id);
         out.println(request);
         String serverResponse = null;
@@ -771,8 +768,8 @@ public class Client {
         }
     }
 
-    private static void joinChat(int chatId, BufferedReader in, PrintWriter out, BufferedReader consoleInput)  {
-        //log in to chat message
+    private static void joinChat(int chatId, BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        //log in to chat title
         String request = ChatHandler.getInstance().startChatMessage(chatId, id);
         out.println(request);
         String serverResponse = null;
@@ -793,9 +790,9 @@ public class Client {
             try {
                 while (true) {
                     if (consoleInput.ready()) {
-                        String input = consoleInput.readLine().trim().toLowerCase();
+                        String input = consoleInput.readLine().trim();
                         userInput.set(input); // עדכון הקלט
-                        if ("bye bye".equals(input)) {
+                        if ("bye bye".equalsIgnoreCase(input)) {
                             break; // יציאה מהצ'אט אם המשתמש הקליד "bye bye"
                         }
                     }
@@ -807,15 +804,16 @@ public class Client {
         });
 // האזנה להודעות ולטיפול בקלט
         try {
-            boolean running = true;
-            while (running) {
+            while (true) {
                 // שליחת הודעה אם המשתמש הקליד
                 String input = userInput.getAndSet(null);
                 if (input != null) {
                     LocalDateTime timestamp = LocalDateTime.now();
-                    String messageRequest = ChatHandler.getInstance().sendMessage(chatId, id,input,timestamp);
+                    String messageRequest = ChatHandler.getInstance().sendMessage(chatId, id, input, timestamp);
                     out.println(messageRequest);
-                    serverResponse = in.readLine();
+                    serverResponse = in.readLine();//רספונס ריק == ההודעה נשלחה
+                    System.out.println(serverResponse);
+
                     if ("bye bye".equals(input)) {
                         System.out.println("Exiting chat...");
                         String endChatRequest = ChatHandler.getInstance().closeChat(chatId);//delete chat from active chats
@@ -829,14 +827,14 @@ public class Client {
                     String response = in.readLine();
                     JsonObject messageJson = ServerDecoder.convertToJsonObject(response);
                     Message message = new Message(
-                            messageJson.get("senderId").getAsInt(),
+                            messageJson.get("employeeId").getAsInt(),
                             messageJson.get("content").getAsString(),
                             LocalDateTime.parse(messageJson.get("timestamp").getAsString()));
                     message.setSenderName(messageJson.get("senderName").getAsString());
 
                     // בדיקת תוכן ההודעה לסיום השיחה
-                    String messageContent = message.getContent().trim().toLowerCase();
-                    if ("bye bye".equals(messageContent)) {
+                    String messageContent = message.getContent().trim();
+                    if ("bye bye".equalsIgnoreCase(messageContent)) {
                         System.out.println("Chat ended by the other participant.");
                         break; // סיום השיחה
                     }
@@ -845,10 +843,9 @@ public class Client {
                     System.out.println(message.toString());
                 }
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             System.out.println(e.toString());
-        }
-        finally {
+        } finally {
             executor.shutdownNow(); // סגירת ה-Thread
         }
     }

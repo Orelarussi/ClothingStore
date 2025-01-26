@@ -73,8 +73,6 @@ public class ChatHandler extends BaseHandler{
         data.addProperty("chatId", chatId);
         data.addProperty("timestamp", timestamp.toString());
         data.addProperty("content", content);
-
-
         return super.encodeRequest(MethodType.SEND_MESSAGE, data);
     }
 }
