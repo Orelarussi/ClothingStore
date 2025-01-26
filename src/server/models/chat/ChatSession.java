@@ -73,16 +73,28 @@ public class ChatSession {
         // Get names of employees
         String employee1Name = adminManager.getEmployeeNameById(employee1Id);
         String employee2Name = adminManager.getEmployeeNameById(employee2Id);
+            if (shiftManagerId==null) {
+                return "Chat between " + employee1Name + " " + employee1Id + " and " + employee2Name + " " + employee2Id;
+            }
+        String shiftManagerName = adminManager.getEmployeeNameById(shiftManagerId);
+        return "Chat between " + employee1Name + " " + employee1Id + ", " + employee2Name + " " + employee2Id+ " and " + shiftManagerName + " " + shiftManagerId;
 
-        // Get names of shift managers if available
-        String shiftManager1Name = shiftManagerId != null ? adminManager.getEmployeeNameById(shiftManagerId) : "N/A";
 
-        return "ChatSession{" +
-               "Employee 1: " + employee1Id + " (" + employee1Name + ")" +
-               ", Employee 2: " + employee2Id + " (" + employee2Name + ")" +
-               ", Messages: " + messages +
-               ", Shift Manager 1: " + shiftManager1Name +
-               '}';
     }
 
+    public int getChatId() {
+        return chatSessionId;
+    }
+
+    public List<Integer> getOtherParticipants(int senderId) {
+        List<Integer> otherParticipants = new ArrayList<>();
+        if(senderId!=employee1Id){
+            otherParticipants.add(employee1Id);
+        }if(senderId!=employee2Id){
+            otherParticipants.add(employee2Id);
+        }if( shiftManagerId!=null && senderId!=shiftManagerId) {
+            otherParticipants.add(shiftManagerId);
+        }
+        return otherParticipants;
+    }
 }

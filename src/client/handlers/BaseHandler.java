@@ -1,8 +1,12 @@
 package client.handlers;
 
 import com.google.gson.JsonObject;
+import server.ClientHandler;
 import server.command_executors.MethodType;
 import server.command_executors.ServiceType;
+import server.database.SocketData;
+
+import java.io.PrintWriter;
 
 public abstract class BaseHandler {
     private static final String SERVICE_KEY = "service";
@@ -22,4 +26,5 @@ public abstract class BaseHandler {
         jsonObject.add(DATA_KEY,data);
         return jsonObject.toString();
     }
+
 }

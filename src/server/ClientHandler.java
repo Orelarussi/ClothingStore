@@ -99,4 +99,10 @@ public class ClientHandler extends Thread {
     public static Map<Integer, SocketData> getConnections() {
         return connections;
     }
+
+    public static SocketData getSocketForEmployee(int userId) {
+        synchronized (connections) { // Ensure thread-safety
+            return connections.get(userId);
+        }
+    }
 }

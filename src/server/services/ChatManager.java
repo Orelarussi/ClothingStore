@@ -2,6 +2,7 @@ package server.services;
 
 import server.models.Employee;
 import server.models.chat.ChatSession;
+import server.models.chat.Message;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,12 +28,14 @@ public class ChatManager {
             branchLocks.put(branchId, new Object());
         }
     }
+
     public static synchronized ChatManager getInstance() {
         if (instance == null) {
             instance = new ChatManager();
         }
         return instance;
     }
+
     private synchronized Object getBranchLock(int branchId) {
         return branchLocks.get(branchId);
     }
@@ -40,7 +43,7 @@ public class ChatManager {
     public Boolean joinChatAsManager(int managerId, int targetChatId) {
         ChatSession chatSession = activeChatSessions.get(targetChatId);
         int shiftManagerBranchId = getBranchIdByEmployeeId(managerId);
-        if (chatSession.isRelevantForShiftManager(shiftManagerBranchId)){
+        if (chatSession.isRelevantForShiftManager(shiftManagerBranchId)) {
             chatSession.setShiftManagerID(managerId);
             return true;
         }
@@ -50,7 +53,7 @@ public class ChatManager {
     public List<ChatSession> getOptionalChatToJoin(int managerId) {
         int shiftManagerBranchId = getBranchIdByEmployeeId(managerId);
         return activeChatSessions.values().stream()
-                .filter( chatSession->chatSession.isRelevantForShiftManager(shiftManagerBranchId)).toList();
+                .filter(chatSession -> chatSession.isRelevantForShiftManager(shiftManagerBranchId)).toList();
     }
 
     public Integer waitingForChatRequest(int selectedBranchId, int employeeId) {
@@ -61,12 +64,12 @@ public class ChatManager {
                 return null;
             }
             int availableEmployeeID = availableQueue.poll();
-            return createChat(employeeId,availableEmployeeID);
+            return createChat(employeeId, availableEmployeeID);
         }
 
     }
 
-    public Integer availableForChatRequest( int employeeId) {
+    public Integer availableForChatRequest(int employeeId) {
         int branchId = getBranchIdByEmployeeId(employeeId);
         synchronized (getBranchLock(branchId)) {
             Queue<Integer> waitingQueue = waitingEmployeesByBranch.get(branchId);
@@ -75,14 +78,14 @@ public class ChatManager {
                 return null;
             }
             int waitingEmployeeID = waitingQueue.poll();
-            return createChat(waitingEmployeeID,employeeId);
+            return createChat(waitingEmployeeID, employeeId);
         }
     }
 
     public int createChat(int employee1Id, int employee2Id) {
         int chatSessionId = getNewChatSessionId();
-        ChatSession chatSession = new ChatSession(employee1Id,employee2Id,chatSessionId);
-        activeChatSessions.put(chatSessionId,chatSession);
+        ChatSession chatSession = new ChatSession(employee1Id, employee2Id, chatSessionId);
+        activeChatSessions.put(chatSessionId, chatSession);
         return chatSessionId;
     }
 
@@ -91,13 +94,16 @@ public class ChatManager {
     }
 
 
+
+
     //the synchronized is not! inside the add func ,need to surround.
     public void addWaitingEmployee(int branchId, int employeeId) {
-            Queue<Integer> waitingQueue = waitingEmployeesByBranch.get(branchId);
-            waitingQueue.add(employeeId);
+        Queue<Integer> waitingQueue = waitingEmployeesByBranch.get(branchId);
+        waitingQueue.add(employeeId);
 
     }
-    public void addAvailableEmployee(int branchId,int employeeId) {
+
+    public void addAvailableEmployee(int branchId, int employeeId) {
         Queue<Integer> availableQueue = availableEmployeesByBranch.get(branchId);
         availableQueue.add(employeeId);
     }
@@ -109,6 +115,7 @@ public class ChatManager {
             waitingQueue.remove(employeeId);
         }
     }
+
     public void removeFromAvailableList(int employeeId) {
         int branchId = getBranchIdByEmployeeId(employeeId);
         synchronized (getBranchLock(branchId)) {
@@ -126,5 +133,23 @@ public class ChatManager {
 
     private synchronized int getNewChatSessionId() {
         return nextChatSessionId++;
+    }
+
+    public int getOtherEmployeeIdInChat(Integer chatId, int employeeId) {
+        ChatSession chatSession = activeChatSessions.get(chatId);
+        return (chatSession.getEmployee1Id() == employeeId)
+                ? chatSession.getEmployee2Id()
+                : chatSession.getEmployee1Id();
+    }
+
+    public String startChatMessage(int employeeId, Integer chatId) {
+        String chatSessionMessage = activeChatSessions.get(chatId).toString();
+        return chatSessionMessage;
+    }
+
+    public List<Integer> sendMessage(Message message, int chatId) {
+        ChatSession chatSession = activeChatSessions.get(chatId);
+        chatSession.addMessage(message);
+        return chatSession.getOtherParticipants(message.getSenderId());
     }
 }

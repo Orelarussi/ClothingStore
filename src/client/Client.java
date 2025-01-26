@@ -7,16 +7,13 @@ import client.handlers.EmployeeHandler;
 import client.menu.MenuItem;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.*;
 import server.command_executors.ServerDecoder;
 import server.database.SocketData;
-import server.models.Branch;
 import server.models.Employee;
 import server.models.Employee.Position;
+import server.models.chat.Message;
 import server.models.customer.Customer;
 import server.models.customer.NewCustomer;
-import server.services.AdminManager;
-import server.services.BranchManager;
 import server.services.LoginResult;
 
 import java.io.BufferedReader;
@@ -26,10 +23,10 @@ import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -265,12 +262,13 @@ public class Client {
                 }),
                 new MenuItem("View all employees", () -> {
                     try {
-                        viewAllEmployees(in, out,consoleInput);
+                        viewAllEmployees(in, out, consoleInput);
                     } catch (IOException e) {
                         System.out.println("An error occurred while viewing all employees.");
                     }
                 }),
-                new MenuItem(LOG_OUT, () -> {})
+                new MenuItem(LOG_OUT, () -> {
+                })
         };
         displayAndRunMenu(adminMenu, consoleInput, "Admin Menu");
     }
@@ -315,13 +313,13 @@ public class Client {
     private static void startCustomerMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         MenuItem[] customerMenu = {
                 new MenuItem("Add customer", () -> addCustomer(in, out, consoleInput)),
-                new MenuItem("Delete customer", () -> deleteCustomer(in,out,consoleInput)),
-                new MenuItem("Show all customers in chain", () -> showCustomers(in,out)),
+                new MenuItem("Delete customer", () -> deleteCustomer(in, out, consoleInput)),
+                new MenuItem("Show all customers in chain", () -> showCustomers(in, out)),
         };
         displayAndRunMenu(customerMenu, consoleInput, "Customer Menu");
     }
 
-    private static  void showCustomers(BufferedReader in, PrintWriter out) {
+    private static void showCustomers(BufferedReader in, PrintWriter out) {
         String request = CustomerHandler.getInstance().getAllCustomers();
         out.println(request);
 
@@ -340,7 +338,7 @@ public class Client {
     }
 
     private static void deleteCustomer(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
-        int cid = getInt("Enter customer id to delete:","Invalid id",consoleInput);
+        int cid = getInt("Enter customer id to delete:", "Invalid id", consoleInput);
         String request = CustomerHandler.getInstance().deleteCustomer(cid);
         out.println(request);
 
@@ -372,15 +370,15 @@ public class Client {
     }
 
     private static NewCustomer getNewCustomer(BufferedReader consoleInput) throws IOException {
-        int cid = getInt("Enter customer id: ","Invalid id",consoleInput);
+        int cid = getInt("Enter customer id: ", "Invalid id", consoleInput);
         System.out.println("Enter first customer name: ");
         String first = consoleInput.readLine();
         System.out.println("Enter last customer name: ");
-        String last= consoleInput.readLine();
+        String last = consoleInput.readLine();
         System.out.println("Enter phone number: ");
         String phone = consoleInput.readLine();
 
-        return new NewCustomer(cid,first,last,phone);
+        return new NewCustomer(cid, first, last, phone);
     }
 
 
@@ -398,7 +396,7 @@ public class Client {
         MenuItem[] chatsMenu;
 
         if (isManager) {
-            chatsMenu = new MenuItem[] {
+            chatsMenu = new MenuItem[]{
                     new MenuItem("Start a new chat with another branch", () -> {
                         try {
                             chooseBranchMenu(in, out, consoleInput);
@@ -406,11 +404,23 @@ public class Client {
                             throw new RuntimeException(e);
                         }
                     }),
-                    new MenuItem("Wait for an incoming chat request", () -> System.out.println("Waiting for chat request...")),
-                    new MenuItem("Join an ongoing chat", () -> System.out.println("Joining chat..."))
+                    new MenuItem("Wait for an incoming chat request", () -> {
+                        try {
+                            availableForChat(in, out, consoleInput);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }),
+                    new MenuItem("Join an ongoing chat", () -> {
+                        try {
+                            showOptionalChatSM(in, out, consoleInput);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
             };
         } else {
-            chatsMenu = new MenuItem[] {
+            chatsMenu = new MenuItem[]{
                     new MenuItem("Open chat", () -> {
                         try {
                             chooseBranchMenu(in, out, consoleInput);
@@ -418,7 +428,13 @@ public class Client {
                             throw new RuntimeException(e);
                         }
                     }),
-                    new MenuItem("Wait to chat request", () -> System.out.println("Waiting for chat request..."))
+                    new MenuItem("Wait to chat request", () -> {
+                        try {
+                            availableForChat(in, out, consoleInput);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
             };
         }
         displayAndRunMenu(chatsMenu, consoleInput, "Chats Menu");
@@ -474,7 +490,7 @@ public class Client {
         final String removeEmployeeJsonReq = AdminHandler.getInstance().removeEmployee(employeeId);
         out.println(removeEmployeeJsonReq);
         String response = in.readLine();
-        if (response != null){
+        if (response != null) {
             JsonObject res = new JsonObject();
             if (res.has("error")) {
                 System.out.println("Employee " + employeeId + " failed to remove.");
@@ -530,7 +546,7 @@ public class Client {
             out.println(newEmployeeJsonReq);
 
             String result = in.readLine();
-            if (result != null){
+            if (result != null) {
                 JsonObject res = JsonParser.parseString(result).getAsJsonObject();
                 if (res.has("error")) {
                     System.out.println("Employee " + employee.getFullName() + " failed to add.");
@@ -563,32 +579,52 @@ public class Client {
             if (result != null) {
                 JsonObject obj = JsonParser.parseString(result).getAsJsonObject();
                 doesEmployeeExist = obj.get("exists").getAsBoolean();
-                if(doesEmployeeExist)
-                    System.out.println("Employee with id "+ employeeId + " already exists!");
+                if (doesEmployeeExist)
+                    System.out.println("Employee with id " + employeeId + " already exists!");
             }
         }
         return employeeId;
     }
 
-    private static void viewAllEmployees(BufferedReader in, PrintWriter out, BufferedReader consoleInput)  throws IOException {
+    private static void viewAllEmployees(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
 
     }
+
+    private static void viewAllEmployees(BufferedReader in, PrintWriter out) throws IOException {
+        String request = admin_handler.getAllEmployees();
+        out.println(request);//send request to server
+
+        String result = in.readLine();
+
+        if (result != null) {
+            JsonObject res = JsonParser.parseString(result).getAsJsonObject();
+            JsonElement element = res.get("employees");
+            if (element != null) {
+                //Convert to list of employees
+                Type type = new TypeToken<List<Employee>>() {
+                }.getType();
+                List<Employee> employees = new Gson().fromJson(element.getAsString(), type);
+                employees.forEach(System.out::println);
+            }
+        }
+    }
+
 
     //chat functions:
 
     private static void chooseBranchMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         myBranchID = getBranchId(out, in);
         MenuItem[] customerMenu = {
-                new MenuItem("Tel Aviv", () -> tryOpenChat(in, out, consoleInput,1)),
-                new MenuItem("Jerusalem", () -> tryOpenChat(in, out, consoleInput,2)),
-                new MenuItem("Haifa", () -> tryOpenChat(in, out, consoleInput,3)),
-                new MenuItem("Beer sheba", () -> tryOpenChat(in, out, consoleInput,4)),
+                new MenuItem("Tel Aviv", () -> tryOpenChat(in, out, consoleInput, 1)),
+                new MenuItem("Jerusalem", () -> tryOpenChat(in, out, consoleInput, 2)),
+                new MenuItem("Haifa", () -> tryOpenChat(in, out, consoleInput, 3)),
+                new MenuItem("Beer sheba", () -> tryOpenChat(in, out, consoleInput, 4)),
         };
         displayAndRunMenu(customerMenu, consoleInput, "Chose branch");
     }
 
-    private static void tryOpenChat(BufferedReader in, PrintWriter out, BufferedReader consoleInput, int selectedBranchID){
-        if(selectedBranchID==myBranchID){
+    private static void tryOpenChat(BufferedReader in, PrintWriter out, BufferedReader consoleInput, int selectedBranchID) {
+        if (selectedBranchID == myBranchID) {
             System.out.println("You cannot select your own branch, try again.");
             return;
         }
@@ -600,7 +636,7 @@ public class Client {
             JsonObject serverResponse = ServerDecoder.convertToJsonObject(response);
             if (serverResponse.get("chatId").isJsonNull()) {
                 System.out.println("No chat available at the moment. Waiting for available employee...");
-                waitForChat(in, out, consoleInput,true,selectedBranchID);
+                waitForChat(in, out, consoleInput, true, selectedBranchID);
             } else {
                 int chatId = serverResponse.get("chatId").getAsInt();
                 System.out.println("Chat started with ID: " + chatId);
@@ -620,8 +656,8 @@ public class Client {
         String response = in.readLine();
         JsonObject serverResponse = ServerDecoder.convertToJsonObject(response);
         if (serverResponse.get("chatId").isJsonNull()) {
-            System.out.println("No chat requests at the moment. Waiting for chat request...");
-            waitForChat(in, out, consoleInput,false,null);
+            System.out.println("\nNo chat requests at the moment. Waiting for chat request.");
+            waitForChat(in, out, consoleInput, false, null);
         } else {
             int chatId = serverResponse.get("chatId").getAsInt();
             System.out.println("Chat started with ID: " + chatId);
@@ -629,46 +665,20 @@ public class Client {
         }
     }
 
-    private static void joinChat(int chatId, BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
-    }
+    private static void waitForChat(BufferedReader in, PrintWriter out, BufferedReader consoleInput, boolean isWaiting, Integer branchId) throws IOException {
+        System.out.println("Type 'exit' to leave wait mode at any time.");
 
-    private static void viewAllEmployees(BufferedReader in, PrintWriter out) throws IOException {
-        String request = admin_handler.getAllEmployees();
-        out.println(request);//send request to server
+        AtomicReference<String> userInput = new AtomicReference<>(null);// Shared resource for input
 
-        String result = in.readLine();
-
-        if (result != null) {
-            JsonObject res = JsonParser.parseString(result).getAsJsonObject();
-            JsonElement element = res.get("employees");
-            if (element != null) {
-                //Convert to list of employees
-                Type type = new TypeToken<List<Employee>>() {}.getType();
-                List<Employee> employees = new Gson().fromJson(element.getAsString(), type);
-                employees.forEach(System.out::println);
-            }
-        }
-    }
-
-    private static void waitForChat(BufferedReader in,PrintWriter out, BufferedReader consoleInput, boolean isWaiting,Integer branchId) throws IOException {
-        if (isWaiting) {
-            System.out.println("Waiting for available employee. Type 'exit' to leave wait mode at any time.");
-        }
-        else {
-            System.out.println("Waiting for a chat request. Type 'exit' to leave wait mode at any time.");
-        }
-
-        AtomicReference<String> userInput = new AtomicReference<>(null);
-
-        // Start a thread to read input non-blockingly
+        // Creates a single-thread executor to run a separate thread for non-blocking user input handling
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(() -> {
             while (true) {
                 try {
-                    if(consoleInput.ready()){
-                        String input = consoleInput.readLine();
+                    if (consoleInput.ready()) {
+                        String input = consoleInput.readLine().trim();
                         userInput.set(input); // Read input if available
-                        if(Objects.equals(input, "exit")){
+                        if ("exit".equalsIgnoreCase(input)) {
                             break;
                         }
                     }
@@ -678,30 +688,35 @@ public class Client {
                 }
             }
         });
-
-        while (true) {
-            //check if the client enter input
-            if (Objects.equals(userInput.get(), "exit")) {
-                if (isWaiting) {
-                    removeFromWaitingList(out, branchId);
-                }else {
-                    removeFromAvailableList(out);
+        try {
+            while (true) {
+                //check if the client enter input
+                if (Objects.equals(userInput.get(), "exit")) {
+                    if (isWaiting) {
+                        removeFromWaitingList(out, branchId);
+                    } else {
+                        removeFromAvailableList(out);
+                    }
+                    break;
                 }
-                break;
+                // Check server response
+                if (in.ready()) {
+                    String response = in.readLine();
+                    JsonObject serverResponse = ServerDecoder.convertToJsonObject(response);//גיל
+                    int chatId = serverResponse.get("chatId").getAsInt();
+                    System.out.println("Chat is now available! Chat ID: " + chatId);
+                    joinChat(chatId, in, out, consoleInput);
+                    break;
+                }
             }
-            if (in.ready()) {
-                String response = in.readLine();
-                JsonObject serverResponse = ServerDecoder.convertToJsonObject(response);//גיל
-                int chatId = serverResponse.get("chatId").getAsInt();
-                System.out.println("Chat is now available! Chat ID: " + chatId);
-                //joinChat(chatId, in, consoleInput);
-                break;
-            }
+        } finally {
+            // Ensure the executor is shut down in all cases
+            executor.shutdownNow();
         }
-}
+    }
 
     private static void removeFromWaitingList(PrintWriter out, int branchId) {
-        String request = ChatHandler.getInstance().removeFromWaitingList(id,branchId);
+        String request = ChatHandler.getInstance().removeFromWaitingList(id, branchId);
         out.println(request);
     }
 
@@ -709,6 +724,135 @@ public class Client {
         String request = ChatHandler.getInstance().removeFromAvailableList(id);
         out.println(request);
     }
+
+    private static void showOptionalChatSM(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+        String request = ChatHandler.getInstance().getOptionalChat(id);
+        out.println(request);
+
+        String serverResponse = in.readLine();
+        JsonObject jsonResponse = ServerDecoder.convertToJsonObject(serverResponse).getAsJsonObject();
+        JsonArray chatSessions = jsonResponse.getAsJsonArray("chatSessionsArray");
+        if (chatSessions == null || chatSessions.size() == 0) {
+            System.out.println("No available chats at the moment.");
+            return;
+        }
+        System.out.println("There is available chats at the moment.");
+
+        MenuItem[] OptionalChat = new MenuItem[chatSessions.size()];
+        for (int i = 0; i < chatSessions.size(); i++) {
+            JsonObject chat = chatSessions.get(i).getAsJsonObject();
+            int chatId = chat.get("chatId").getAsInt();
+            String description = chat.get("description").getAsString();
+
+            OptionalChat[i] = new MenuItem(description, () -> {
+                joinExistingChat(chatId, in, out, consoleInput); // התחברות לצ'אט
+            });
+        }
+        //TODO: להכין פונקציית תצוגה תפריט שהיא לא לולאתית כי זה כל פעם מציג את אותם צאטים גם אם השתנה ואת הלולאה לשים בפונקציה הזאת
+        displayAndRunMenu(OptionalChat, consoleInput, "Chose available chat");
+    }
+
+    private static void joinExistingChat(int chatId, BufferedReader in, PrintWriter out, BufferedReader consoleInput)  {
+        String request = ChatHandler.getInstance().joinExistChat(chatId, id);
+        out.println(request);
+        String serverResponse = null;
+        try {
+            serverResponse = in.readLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        JsonObject jsonResponse = ServerDecoder.convertToJsonObject(serverResponse).getAsJsonObject();
+        if (jsonResponse.get("success").getAsBoolean()) {
+            System.out.println("\njoinExistingChat success");
+            joinChat(chatId, in, out, consoleInput);
+            //TODO:לעדכן את חברי הצאט על ההצטרפות של אותו המנהל
+        } else {
+            System.out.println("\njoinExistingChat not success");
+        }
+    }
+
+    private static void joinChat(int chatId, BufferedReader in, PrintWriter out, BufferedReader consoleInput)  {
+        //log in to chat message
+        String request = ChatHandler.getInstance().startChatMessage(chatId, id);
+        out.println(request);
+        String serverResponse = null;
+        try {
+            serverResponse = in.readLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        JsonObject jsonResponse = ServerDecoder.convertToJsonObject(serverResponse).getAsJsonObject();
+        String loginMessage = jsonResponse.get("message").getAsString();
+        System.out.println("\n" + loginMessage);
+
+        // משתנה לניהול קלט משתמש
+        AtomicReference<String> userInput = new AtomicReference<>(null);
+        // יצירת Thread להאזנה לקלט המשתמש
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> {
+            try {
+                while (true) {
+                    if (consoleInput.ready()) {
+                        String input = consoleInput.readLine().trim().toLowerCase();
+                        userInput.set(input); // עדכון הקלט
+                        if ("bye bye".equals(input)) {
+                            break; // יציאה מהצ'אט אם המשתמש הקליד "bye bye"
+                        }
+                    }
+                    Thread.sleep(500); // מניעת לולאה הדוקה
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+// האזנה להודעות ולטיפול בקלט
+        try {
+            boolean running = true;
+            while (running) {
+                // שליחת הודעה אם המשתמש הקליד
+                String input = userInput.getAndSet(null);
+                if (input != null) {
+                    LocalDateTime timestamp = LocalDateTime.now();
+                    String messageRequest = ChatHandler.getInstance().sendMessage(chatId, id,input,timestamp);
+                    out.println(messageRequest);
+                    serverResponse = in.readLine();
+                    if ("bye bye".equals(input)) {
+                        System.out.println("Exiting chat...");
+                        String endChatRequest = ChatHandler.getInstance().closeChat(chatId);//delete chat from active chats
+                        out.println(endChatRequest);
+                        break;
+                    }
+                }
+
+                // קבלת הודעות מהשרת
+                if (in.ready()) {
+                    String response = in.readLine();
+                    JsonObject messageJson = ServerDecoder.convertToJsonObject(response);
+                    Message message = new Message(
+                            messageJson.get("senderId").getAsInt(),
+                            messageJson.get("content").getAsString(),
+                            LocalDateTime.parse(messageJson.get("timestamp").getAsString()));
+                    message.setSenderName(messageJson.get("senderName").getAsString());
+
+                    // בדיקת תוכן ההודעה לסיום השיחה
+                    String messageContent = message.getContent().trim().toLowerCase();
+                    if ("bye bye".equals(messageContent)) {
+                        System.out.println("Chat ended by the other participant.");
+                        break; // סיום השיחה
+                    }
+
+                    // הדפסת ההודעה
+                    System.out.println(message.toString());
+                }
+            }
+        }catch (IOException e){
+            System.out.println(e.toString());
+        }
+        finally {
+            executor.shutdownNow(); // סגירת ה-Thread
+        }
+    }
+
 
     private static boolean isShiftManager(PrintWriter out, BufferedReader in) throws IOException {
         String request = AdminHandler.getInstance().isShiftManger(id);
@@ -735,7 +879,7 @@ public class Client {
 
     //input help functions:
     private static int getInt(String msg, String errMsg, BufferedReader consoleInput) {
-        return getInt(msg,errMsg,consoleInput, null);
+        return getInt(msg, errMsg, consoleInput, null);
     }
 
     private static int getInt(String msg, String errMsg, BufferedReader consoleInput, Predicate<Integer> test) {
@@ -743,11 +887,11 @@ public class Client {
             System.out.print(msg);
             try {
                 int number = Integer.parseInt(consoleInput.readLine());
-                if (test != null){
+                if (test != null) {
                     if (test.test(number)) {
                         return number;
                     }
-                }else {
+                } else {
                     return number;
                 }
             } catch (NumberFormatException e) {
