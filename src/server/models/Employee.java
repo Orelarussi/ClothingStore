@@ -17,7 +17,7 @@ public class Employee extends User {
         populateFromJson(json);
     }
 
-    public enum Position {SHIFTMGR, CASHIER, SELLER;}
+    public enum Position {SHIFTMGR, CASHIER, SELLER}
 
     public Employee(int id, int branchID,String firstName, String lastName, String phoneNumber, String password,
                      long accountNumber, Position position) {
@@ -65,6 +65,23 @@ public class Employee extends User {
         } else {
             throw new IllegalArgumentException("Account number must be positive.");
         }
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee with " +
+                "id = " + getId() + ", " +
+                "full name = " + getFullName() + ", " +
+                "phoneNumber = " + getPhoneNumber() + ", " +
+                "position = " + getPosition();
     }
 
     public long getEmployeeNumber() {

@@ -14,12 +14,12 @@
   },
   {
     "purchasePlan": {
-      "planDetails": "VIP customer: 20% off on all purchases.",
+      "planDetails": "Returning customer: 15% off after 3 purchases.",
       "customerID": 0,
       "purchaseID": 0
     },
-    "type": "VIP",
-    "totalPurchases": 0,
+    "type": "RETURNING",
+    "totalPurchases": 27,
     "id": 2,
     "firstName": "Dani",
     "lastName": "dan",
@@ -37,5 +37,18 @@
     "firstName": "eran",
     "lastName": "banani",
     "phoneNumber": "0523669588"
+  },
+  {
+    "purchasePlan": {
+      "planDetails": "New customer: 10% off on first purchase.",
+      "customerID": 0,
+      "purchaseID": 0
+    },
+    "type": "NEW",
+    "totalPurchases": 0,
+    "id": 4,
+    "firstName": "daniella",
+    "lastName": "Hamo",
+    "phoneNumber": "0548695453"
   }
 ]

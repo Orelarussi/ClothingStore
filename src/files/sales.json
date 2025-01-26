@@ -16,5 +16,23 @@
     "productId": 3,
     "quantitySold": 7,
     "date": "2025-01-24"
+  },
+  {
+    "branchID": 1,
+    "productId": 3,
+    "quantitySold": 7,
+    "date": "2025-01-24"
+  },
+  {
+    "branchID": 1,
+    "productId": 3,
+    "quantitySold": 12,
+    "date": "2025-01-24"
+  },
+  {
+    "branchID": 1,
+    "productId": 3,
+    "quantitySold": 8,
+    "date": "2025-01-26"
   }
 ]

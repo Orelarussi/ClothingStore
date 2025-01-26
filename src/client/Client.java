@@ -10,6 +10,7 @@ import server.command_executors.ServerDecoder;
 import server.database.SocketData;
 import server.models.Employee;
 import server.models.Employee.Position;
+import server.models.Product;
 import server.models.customer.Customer;
 import server.models.customer.NewCustomer;
 import server.services.LoginResult;
@@ -266,7 +267,13 @@ public class Client {
 
     private static void startEmployeeMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         MenuItem[] employeeMenu = {
-                new MenuItem("Show branch info", () -> System.out.println("Displaying branch info...")),
+                new MenuItem("Branch Menu", () ->{
+                    try {
+                        startBranchInfoMenu(in, out, consoleInput);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }),
                 new MenuItem("Inventory menu", () -> {
                     try {
                         startInventoryMenu(in, out, consoleInput);
@@ -390,6 +397,62 @@ public class Client {
         displayAndRunMenu(salesReportMenu, consoleInput, "Sales Report Menu");
     }
 
+    private static void startBranchInfoMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+        MenuItem[] BranchInfoMenu = {
+                new MenuItem("Show branch employees", () -> showBranchEmployee(in, out, consoleInput)),
+                new MenuItem("Add product to branch", () -> addProductToBranch(in, out, consoleInput)),
+        };
+        displayAndRunMenu(BranchInfoMenu, consoleInput, "Branch Menu");
+    }
+
+    private static void addProductToBranch(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        int branchId = getInt("Enter branch id: ","Invalid id",consoleInput);
+        int productId = getInt("Enter product id: ","Invalid id",consoleInput);
+        int amount = getInt("Enter amount: ","Invalid amount",consoleInput);
+
+        String request = EmployeeHandler.getInstance().addProductToBranch(branchId, productId, amount);
+        out.println(request);
+
+        try {
+            String response = in.readLine();
+            System.out.println(response);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void showBranchEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        // קבלת branchId מהמשתמש
+        int branchId = getInt("Branch Id: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
+
+        // יצירת הבקשה ושליחתה לשרת
+        String request = EmployeeHandler.getInstance().showBranchEmployee(branchId);
+        out.println(request);
+
+        try {
+            // קבלת התשובה מהשרת
+            String response = in.readLine();
+            if (response == null || response.isEmpty()) {
+                System.out.println("No response received from the server.");
+                return;
+            }
+
+            // ניתוח התשובה
+            if (response.contains("No employees found")) {
+                System.out.println(response);
+            } else {
+                System.out.println("Employees in Branch " + branchId + ":");
+                String[] employees = response.split(", ");
+                for (String employee : employees) {
+                    System.out.println(employee.trim());
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("An error occurred while fetching branch employees: " + e.getMessage());
+        }
+    }
+
+
     private static void showSalesByBranch(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
         int branchId = getInt("Employee Branch Id: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
 
@@ -444,7 +507,6 @@ public class Client {
     }
 
 
-//all the functions that inside of the menu
 
     //admin menu functions:
     private static void editEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {

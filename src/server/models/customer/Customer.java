@@ -18,7 +18,7 @@ public abstract class Customer extends Person {
         super(id, firstName, lastName, phoneNumber);
         this.purchasePlan = createPurchasePlan();
         this.type = type;
-        this.totalPurchases = 0;
+        this.totalPurchases = totalPurchases;
     }
 
     /**
