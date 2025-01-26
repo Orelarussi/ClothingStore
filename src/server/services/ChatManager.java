@@ -1,6 +1,7 @@
 package server.services;
 
 import server.ClientHandler;
+import server.Server;
 import server.database.Chat;
 import server.database.SocketData;
 import server.models.Employee;
@@ -33,8 +34,9 @@ public class ChatManager {
 
     public static Set<Integer> getAvailableBranches(int branch) {
         Set<Integer> branches = new HashSet<>();
-        for (Map.Entry<Integer, SocketData> entry : ClientHandler.getConnections().entrySet()) {
-            Employee emp = AdminManager.getInstance().findEmployeeById(entry.getKey());
+        Set<Integer> entries = SessionManager.getInstance().getConnections().keySet();
+        for (int id : entries) {
+            Employee emp = AdminManager.getInstance().findEmployeeById(id);
             if (emp.getBranchID() != branch)
                 branches.add(emp.getBranchID());
         }

@@ -18,19 +18,6 @@ public class AdminHandler extends BaseHandler {
         super(ServiceType.ADMIN);
     }
 
-    public String login(int id, String password){
-        JsonObject data = new JsonObject();
-        data.addProperty("id",id);
-        data.addProperty("password",password);
-        return super.encodeRequest(MethodType.LOGIN,data);
-    }
-
-    public String logout(Integer id) {
-        JsonObject data = new JsonObject();
-        data.addProperty("id", id);
-        return super.encodeRequest(MethodType.LOGOUT,data);
-    }
-
     public String createEmployee(Employee employee){
         JsonObject data = new Gson().fromJson(employee.serializeToString(), JsonObject.class);
         return super.encodeRequest(MethodType.ADD_EMP,data);
@@ -40,5 +27,24 @@ public class AdminHandler extends BaseHandler {
         JsonObject data = new JsonObject();
         data.addProperty("id", id);
         return super.encodeRequest(MethodType.REMOVE_EMP,data);
+    }
+
+    public String getAllEmployees(){
+        JsonObject data = new JsonObject();
+        return super.encodeRequest(MethodType.GET_ALL_EMP,data);
+    }
+
+    public String isEmployeeExist(int id) {
+        JsonObject data = new JsonObject();
+        data.addProperty("id", id);
+        return super.encodeRequest(MethodType.IS_EMPLOYEE_EXISTS,data);
+    }
+
+    public String editEmployee(int employeeId, String fieldName, String value) {
+        JsonObject data = new JsonObject();
+        data.addProperty("id", employeeId);
+        data.addProperty("fieldName", fieldName);
+        data.addProperty("value", value);
+        return super.encodeRequest(MethodType.EDIT_EMP,data);
     }
 }

@@ -11,7 +11,7 @@ public class Admin extends User {
         Admin temp = gson.fromJson(json,Admin.class);
 
         //Person
-        this.id = id;
+        this.id = temp.id;
         this.firstName = temp.firstName;
         this.lastName = temp.lastName;
         this.phoneNumber = temp.phoneNumber;
