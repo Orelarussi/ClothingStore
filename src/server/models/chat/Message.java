@@ -1,6 +1,7 @@
 package server.models.chat;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Message {
     private final int senderId; // ID of the sender
@@ -37,6 +38,10 @@ public class Message {
 
     @Override
     public String toString() {
-        return senderName + "> "+ content + ", at" + timestamp + "\n";
-    }
+// Formatter to display only hours and minutes
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        String formattedTime = timestamp.format(formatter);
+
+        // Return a nicely formatted string
+        return "[" + formattedTime + "] " + senderName + ": " + content;    }
 }

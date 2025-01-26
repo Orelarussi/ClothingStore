@@ -639,7 +639,6 @@ public class Client {
                 waitForChat(in, out, consoleInput, true, selectedBranchID);
             } else {
                 int chatId = serverResponse.get("chatId").getAsInt();
-                System.out.println("Chat started with ID: " + chatId);
                 joinChat(chatId, in, out, consoleInput);
             }
         } catch (IOException e) {
@@ -660,7 +659,6 @@ public class Client {
             waitForChat(in, out, consoleInput, false, null);
         } else {
             int chatId = serverResponse.get("chatId").getAsInt();
-            System.out.println("Chat started with ID: " + chatId);
             joinChat(chatId, in, out, consoleInput);
         }
     }
@@ -703,7 +701,6 @@ public class Client {
                 String response = in.readLine();
                 JsonObject serverResponse = ServerDecoder.convertToJsonObject(response);//גיל
                 int chatId = serverResponse.get("chatId").getAsInt();
-                System.out.println("Chat is now available! Chat ID: " + chatId);
                 executor.shutdownNow();
                 joinChat(chatId, in, out, consoleInput);
                 break;
@@ -770,6 +767,7 @@ public class Client {
 
     private static void joinChat(int chatId, BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
         //log in to chat title
+        System.out.println("\n=== Welcome to chat ===");
         String request = ChatHandler.getInstance().startChatMessage(chatId, id);
         out.println(request);
         String serverResponse = null;
@@ -780,40 +778,42 @@ public class Client {
         }
         JsonObject jsonResponse = ServerDecoder.convertToJsonObject(serverResponse).getAsJsonObject();
         String loginMessage = jsonResponse.get("message").getAsString();
-        System.out.println("\n" + loginMessage);
+        System.out.println( loginMessage);
+        System.out.println("To exit the chat, type 'bye bye' and press Enter.");
 
-        // משתנה לניהול קלט משתמש
+        // Variable to manage user input
         AtomicReference<String> userInput = new AtomicReference<>(null);
-        // יצירת Thread להאזנה לקלט המשתמש
+        // Create a thread to listen for user input
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(() -> {
             try {
                 while (true) {
+                    // Check if there is user input
+                    System.out.print("Your message: ");
                     if (consoleInput.ready()) {
                         String input = consoleInput.readLine().trim();
-                        userInput.set(input); // עדכון הקלט
+                        userInput.set(input); // Update the user input
+                        System.out.print("Your message: ");
                         if ("bye bye".equalsIgnoreCase(input)) {
-                            break; // יציאה מהצ'אט אם המשתמש הקליד "bye bye"
+                            break; // // Exit the chat if the user typed 'bye bye'
                         }
                     }
-                    Thread.sleep(500); // מניעת לולאה הדוקה
+                    Thread.sleep(500); // Prevent a tight loop
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
-// האזנה להודעות ולטיפול בקלט
+        // Listen for messages and handle input
         try {
             while (true) {
-                // שליחת הודעה אם המשתמש הקליד
+                // Send a message if the user typed input
                 String input = userInput.getAndSet(null);
                 if (input != null) {
                     LocalDateTime timestamp = LocalDateTime.now();
                     String messageRequest = ChatHandler.getInstance().sendMessage(chatId, id, input, timestamp);
                     out.println(messageRequest);
-                    serverResponse = in.readLine();//רספונס ריק == ההודעה נשלחה
-                    System.out.println(serverResponse);
-
+                    serverResponse = in.readLine();//clean the buffer
                     if ("bye bye".equals(input)) {
                         System.out.println("Exiting chat...");
                         String endChatRequest = ChatHandler.getInstance().closeChat(chatId);//delete chat from active chats
