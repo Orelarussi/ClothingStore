@@ -3,7 +3,7 @@
     <properties maven-id="org.openjfx:javafx-base:17.0.2" />
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/javafx-base-17.0.2.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/javafx-base-17.0.2-win-x86-monocle.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-base-17.0.2-win.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
