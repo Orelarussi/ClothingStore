@@ -690,9 +690,9 @@ public class Client {
             //check if the client enter input
             if (Objects.equals(userInput.get(), "exit")) {
                 if (isWaiting) {
-                    removeFromWaitingList(out, branchId);
+                    removeFromWaitingList(in,out,consoleInput, branchId);
                 } else {
-                    removeFromAvailableList(out);
+                    removeFromAvailableList(in,out,consoleInput);
                 }
                 break;
             }
@@ -709,14 +709,24 @@ public class Client {
 
     }
 
-    private static void removeFromWaitingList(PrintWriter out, int branchId) {
+    private static void removeFromWaitingList(BufferedReader in, PrintWriter out,BufferedReader consoleInput, int branchId) {
         String request = ChatHandler.getInstance().removeFromWaitingList(id, branchId);
         out.println(request);
+        try {
+            in.readLine();
+        } catch (IOException e) {
+             System.out.println(e.toString());
+        }
     }
 
-    private static void removeFromAvailableList(PrintWriter out) {
+    private static void removeFromAvailableList(BufferedReader in, PrintWriter out,BufferedReader consoleInput) {
         String request = ChatHandler.getInstance().removeFromAvailableList(id);
         out.println(request);
+        try {
+            in.readLine();
+        } catch (IOException e) {
+            System.out.println(e.toString());
+        }
     }
 
     private static void showOptionalChatSM(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
