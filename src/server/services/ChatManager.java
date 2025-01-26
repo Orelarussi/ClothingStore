@@ -119,7 +119,7 @@ public class ChatManager {
     public void removeFromAvailableList(int employeeId) {
         int branchId = getBranchIdByEmployeeId(employeeId);
         synchronized (getBranchLock(branchId)) {
-1            Queue<Integer> availableQueue = availableEmployeesByBranch.get(branchId);
+            Queue<Integer> availableQueue = availableEmployeesByBranch.get(branchId);
             availableQueue.remove(employeeId);
         }
     }
