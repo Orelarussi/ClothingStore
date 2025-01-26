@@ -1,12 +1,10 @@
 package server.services;
 
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import com.google.gson.JsonObject;
 import server.models.customer.Customer;
+import server.models.Employee;
 
 public class EmployeeManager {
     private Map<Integer, Customer> customers = new HashMap<>();
@@ -49,6 +47,13 @@ public class EmployeeManager {
 
     public Map<Integer, Customer> getCustomers() {
         return customers;
+    }
+
+    // Get employees by branch ID
+    public List<Employee> getEmployeesByBranchId(int branchId) {
+        return AdminManager.getInstance().getAllEmployees().stream()
+                .filter(employee -> employee.getBranchID() == branchId)
+                .collect(Collectors.toList());
     }
 
     public void setCustomersFromJson(List<JsonObject> employeesJsonList) {

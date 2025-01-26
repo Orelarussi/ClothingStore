@@ -26,7 +26,7 @@ public class Purchase extends JsonSerializable {
      * Creates a new purchase instance with the given customer ID, date, branch, and purchased items.
      *
      * @param customerID The ID of the customer.
-     * @param date Date and time of the purchase.
+     * @param date Date of the purchase.
      * @param branch Branch where the purchase was made.
      * @param purchasedItems List of items that were purchased.
      */

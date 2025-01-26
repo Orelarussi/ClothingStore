@@ -17,11 +17,11 @@ public class Employee extends User {
 
     public Employee(String json) {
         this();
-        employeesNum++; //TODO check if needed?
+        employeesNum++;
         populateFromJson(json);
     }
 
-    public enum Position {SHIFT_MANAGER, CASHIER, SELLER;}
+    public enum Position {SHIFT_MANAGER, CASHIER, SELLER}
 
     public Employee(int id, int branchID, String firstName, String lastName, String phoneNumber, String password,
                     long accountNumber, Position position) {
@@ -69,6 +69,14 @@ public class Employee extends User {
         } else {
             throw new IllegalArgumentException("Account number must be positive.");
         }
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
     }
 
     public long getEmployeeNumber() {

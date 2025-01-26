@@ -13,6 +13,10 @@ public enum MethodType {
     OPEN_CHAT,
     GET_ALL_EMP,
     IS_EMPLOYEE_EXISTS,
-    EDIT_EMP
-    //TODO: add others methods
+    EDIT_EMP,
+    SHOW_SALES_BY_PRODUCT,
+    SHOW_SALES_BY_BRANCH,
+    SHOW_SALES_BY_DATE,
+    SHOW_BRANCH_EMPLOYEE,
+    ADD_PRODUCT_TO_BRANCH
 }

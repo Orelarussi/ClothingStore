@@ -4,6 +4,7 @@ import server.models.Branch;
 import server.models.SaleReport;
 import server.models.customer.Customer;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,10 @@ public class SalesManager {
     public void addSaleReport(SaleReport saleReport) {
         saleReports.add(saleReport);
         System.out.println("Sale report added for product Id: " + saleReport.getProductId());
+    }
+
+    public void setSaleReports(List<SaleReport> saleReports) {
+        this.saleReports = saleReports;
     }
 
     // Get all sale reports
@@ -54,10 +59,10 @@ public class SalesManager {
         }
         else {
             branch.getInventory().put(productId, stock - amount);
-            return String.format("purchased success, only %s remain", branch.getInventory().get(productId));
+            customer.setTotalPurchases(customer.getTotalPurchases() + amount);
+            saleReports.add(new SaleReport(branch.getBranchID(), productId, amount, LocalDate.now()));
+
+            return String.format("purchased success, only %s remain, customer spend total of %s products", branch.getInventory().get(productId), customer.getTotalPurchases());
         }
-
-
-        //return "hello";
     }
 }

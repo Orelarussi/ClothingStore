@@ -1,1 +1,54 @@
-[]
+[
+  {
+    "purchasePlan": {
+      "planDetails": "New customer: 10% off on first purchase.",
+      "customerID": 0,
+      "purchaseID": 0
+    },
+    "type": "NEW",
+    "totalPurchases": 0,
+    "id": 1,
+    "firstName": "assaf",
+    "lastName": "lotz",
+    "phoneNumber": "05465859675"
+  },
+  {
+    "purchasePlan": {
+      "planDetails": "Returning customer: 15% off after 3 purchases.",
+      "customerID": 0,
+      "purchaseID": 0
+    },
+    "type": "RETURNING",
+    "totalPurchases": 27,
+    "id": 2,
+    "firstName": "Dani",
+    "lastName": "dan",
+    "phoneNumber": "0523569486"
+  },
+  {
+    "purchasePlan": {
+      "planDetails": "Returning customer: 15% off after 3 purchases.",
+      "customerID": 0,
+      "purchaseID": 0
+    },
+    "type": "RETURNING",
+    "totalPurchases": 0,
+    "id": 3,
+    "firstName": "eran",
+    "lastName": "banani",
+    "phoneNumber": "0523669588"
+  },
+  {
+    "purchasePlan": {
+      "planDetails": "New customer: 10% off on first purchase.",
+      "customerID": 0,
+      "purchaseID": 0
+    },
+    "type": "NEW",
+    "totalPurchases": 0,
+    "id": 4,
+    "firstName": "daniella",
+    "lastName": "Hamo",
+    "phoneNumber": "0548695453"
+  }
+]

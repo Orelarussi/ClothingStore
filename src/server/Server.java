@@ -1,14 +1,10 @@
 package server;
 
-import server.database.SocketData;
 import server.logger.Logger;
 import server.utils.JsonUtils;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Server {
     public static final int PORT = 12345;
