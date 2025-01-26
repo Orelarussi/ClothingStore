@@ -189,12 +189,11 @@ public class Client {
         displayAndRunMenu(menuItems, consoleInput, title, true);
     }
 
-    private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String menuTitle,
-                                   boolean addBack_ExitOpt) {
-        if (addBack_ExitOpt) {
-            menuItems = Arrays.copyOf(menuItems, menuItems.length + 2);
-            menuItems[menuItems.length - 2] = new MenuItem("Back", null);
-            menuItems[menuItems.length - 1] = new MenuItem("Exit", Client::exitClient);
+    private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput,
+                                          String menuTitle, boolean addBack) {
+        if (addBack) {
+            menuItems = Arrays.copyOf(menuItems, menuItems.length + 1);
+            menuItems[menuItems.length - 1] = new MenuItem("Back", null);
         }
 
         int choice;
@@ -219,9 +218,6 @@ public class Client {
                 MenuItem item = menuItems[choice - 1];
                 String title = item.getTitle();
                 if (title.equals("Back") || title.equals(LOG_OUT)) {
-                    return;
-                } else if (title.equals("Exit")) {
-                    item.run();
                     return;
                 } else {
                     item.run();
