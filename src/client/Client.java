@@ -223,7 +223,10 @@ public class Client {
                 String title = item.getTitle();
                 if (title.equals("Back") || title.equals(LOG_OUT)) {
                     return;
-                } else {
+                }else if (title.equals("Exit")) {
+                    item.run();
+                    return;
+                }else {
                     item.run();
                 }
             } else {
