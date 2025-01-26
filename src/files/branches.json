@@ -1,11 +1,29 @@
 [
   {
     "branchID": 1,
-    "employeeAmount": 51,
-    "address": "test",
+    "employeeAmount": 0,
+    "address": "Tel Aviv",
     "inventory": {
       "1": 5,
       "3": 50
     }
+  },
+  {
+    "branchID": 2,
+    "employeeAmount": 1,
+    "address": "Jerusalem",
+    "inventory": {}
+  },
+  {
+    "branchID": 3,
+    "employeeAmount": 2,
+    "address": "Haifa",
+    "inventory": {}
+  },
+  {
+    "branchID": 4,
+    "employeeAmount": 0,
+    "address": "Beersheba",
+    "inventory": {}
   }
 ]

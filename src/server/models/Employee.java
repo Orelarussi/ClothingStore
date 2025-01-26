@@ -1,5 +1,9 @@
 package server.models;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Employee extends User {
     private static long employeesNum = 0;
     private int branchID;
@@ -7,21 +11,21 @@ public class Employee extends User {
     private long employeeNumber;
     private Position position;
 
-    public Employee(){
+    public Employee() {
         super();
     }
 
-    public Employee(String json){
+    public Employee(String json) {
         this();
-        employeesNum++; //TODO check if needed?
+        employeesNum++;
         populateFromJson(json);
     }
 
-    public enum Position {SHIFTMGR, CASHIER, SELLER}
+    public enum Position {SHIFT_MANAGER, CASHIER, SELLER}
 
-    public Employee(int id, int branchID,String firstName, String lastName, String phoneNumber, String password,
-                     long accountNumber, Position position) {
-        super(id, firstName, lastName, phoneNumber,password);
+    public Employee(int id, int branchID, String firstName, String lastName, String phoneNumber, String password,
+                    long accountNumber, Position position) {
+        super(id, firstName, lastName, phoneNumber, password);
         this.branchID = branchID;
         this.accountNumber = accountNumber;
         this.employeeNumber = ++employeesNum;
@@ -35,16 +39,16 @@ public class Employee extends User {
     // Getters and Setters
     @Override
     protected void populateFromJson(String json) {
-        Employee temp = gson.fromJson(json,Employee.class);
+        Employee temp = gson.fromJson(json, Employee.class);
 
-    //Person
-        this.id = id;
+        //Person
+        this.id = temp.id;
         this.firstName = temp.firstName;
         this.lastName = temp.lastName;
         this.phoneNumber = temp.phoneNumber;
-    //User
+        //User
         this.password = temp.password;
-     //employee
+        //employee
         this.branchID = temp.branchID;
         this.accountNumber = temp.accountNumber;
         this.employeeNumber = temp.employeeNumber;
@@ -75,15 +79,6 @@ public class Employee extends User {
         this.position = position;
     }
 
-    @Override
-    public String toString() {
-        return "Employee with " +
-                "id = " + getId() + ", " +
-                "full name = " + getFullName() + ", " +
-                "phoneNumber = " + getPhoneNumber() + ", " +
-                "position = " + getPosition();
-    }
-
     public long getEmployeeNumber() {
         return employeeNumber;
     }
@@ -94,5 +89,36 @@ public class Employee extends User {
         } else {
             throw new IllegalArgumentException("Employee number must be positive.");
         }
+    }
+
+    public static List<Field> getAllFields() {
+        List<Field> fields = new ArrayList<>(List.of(Employee.class.getDeclaredFields()));
+        fields.removeIf(f -> f.getName().equals("id"));//should stay the same
+        fields.removeIf(f -> f.getName().equals("employeeNumber"));//should stay the same
+        fields.removeIf(f -> f.getName().equals("employeesNum"));//static
+
+        Employee employee = new Employee();
+        Class<?> superclass = employee.getClass().getSuperclass();
+        while (superclass != null) {
+            for (Field field : superclass.getDeclaredFields()) {
+                String name = field.getName();
+                if (!name.equals("gson") && !name.equals("id")) {
+                    fields.add(field);
+                }
+            }
+            superclass = superclass.getSuperclass();
+        }
+        return fields;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                super.toString() +
+                "branchID=" + branchID +
+                ", accountNumber=" + accountNumber +
+                ", employeeNumber=" + employeeNumber +
+                ", position=" + position +
+                '}';
     }
 }

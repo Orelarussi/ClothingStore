@@ -2,7 +2,7 @@ package server.services;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
+import com.google.gson.JsonObject;
 import server.models.customer.Customer;
 import server.models.Employee;
 
@@ -54,5 +54,15 @@ public class EmployeeManager {
         return AdminManager.getInstance().getAllEmployees().stream()
                 .filter(employee -> employee.getBranchID() == branchId)
                 .collect(Collectors.toList());
+    }
+
+    public void setCustomersFromJson(List<JsonObject> employeesJsonList) {
+        List<Customer> customers = employeesJsonList.stream()
+                .map(json -> {
+                    String asString = json.toString();
+                    Customer customer = Customer.deserializeFromString(asString);
+                    return customer;
+                }).toList();
+        this.setCustomers(customers);
     }
 }

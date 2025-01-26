@@ -4,86 +4,79 @@ import com.google.gson.JsonObject;
 import server.command_executors.*;
 import server.database.SocketData;
 import server.services.LoginResult;
-
+import server.services.SessionManager;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class ClientHandler extends Thread {
-    private static final Map<Integer, SocketData> connections = new HashMap<>();
     private Integer userId;
-    private LoginResult loginResult = LoginResult.FAILURE;
     private SocketData socketData;
+
     public ClientHandler(Socket socket) throws IOException {
         this.socketData = new SocketData(socket);
     }
 
     @Override
     public void run() {
+        String request;
+        ServiceType serviceType;
+        MethodType methodType;
+        IExecute commandExecutor;
+        String response;
+        BufferedReader inputStream = socketData.getInputStream();
+        PrintWriter outputStream = socketData.getOutputStream();
+        LoginResult loginResult = LoginResult.FAILURE;
         try {
-            String request;
-            while ((request = socketData.getInputStream().readLine()) != null) {
+            while ((request = inputStream.readLine()) != null) {
                 // generic handler for all cases
-                ServiceType serviceType = ServerDecoder.getServiceType(request);
-                MethodType methodType = ServerDecoder.getMethodType(request);
+                serviceType = ServerDecoder.getServiceType(request);
+                methodType = ServerDecoder.getMethodType(request);
 
-                IExecute commandExecutor = CommandExecutorFactory.getCommandExecutor(serviceType);
-                String response = commandExecutor.execute(userId,loginResult,request);
-                if(methodType == MethodType.LOGIN){
+                commandExecutor = CommandExecutorFactory.getCommandExecutor(serviceType);
+                response = commandExecutor.execute(userId, loginResult, request);
+                if (methodType == MethodType.LOGIN) {
                     handleLoginResponse(response);
                 }
 
-                socketData.getOutputStream().println(response);
+                outputStream.println(response);//send response to client
             }
-        } catch (SocketException e) {
+          } catch (SocketException e){
             System.out.println("Socket Closed from client");
-            try {
-                socketData.getOutputStream().println("{}");
-                synchronized (connections) {
-                    if (userId != null) {
-                        SocketData removed = connections.remove(userId);
-                        removed.close();
-                    }
+          } catch (IOException e) {
+            error(e, outputStream);
+        } finally {
+            if (userId!= null) {
+                try {
+                    SessionManager.getInstance().logout(userId);
+                } catch (IOException e) {
+                    error(e, outputStream);
                 }
-                socketData.close();// closes socket, inputStream and outputStream
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("error", e.getMessage());
-            socketData.getOutputStream().println(jsonObject);
         }
     }
 
-    private void handleLoginResponse(String response) {
+    private static void error(Exception e, PrintWriter outputStream) {
+        System.out.println(e.getMessage());
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("error", e.getMessage());
+        outputStream.println(jsonObject);
+    }
+
+    private void handleLoginResponse(String response){
         JsonObject responseJsonObject = ServerDecoder.convertToJsonObject(response);
         int id = responseJsonObject.get("id").getAsInt();
-        LoginResult result = LoginResult.valueOf(responseJsonObject.get("result").getAsString());
-        if (result != LoginResult.FAILURE) {
-            synchronized (connections) {
-                SocketData previousConnectionSocketData = connections.get(id);
-                if (previousConnectionSocketData != null) {
-                    // disconnect user previous connection
-                    try {
-                        previousConnectionSocketData.getOutputStream().close();
-                        previousConnectionSocketData.getSocket().close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                userId = id;
-                loginResult = result;
-                connections.put(id, socketData);
-            }
-        }
-    }
+        String loginRes = responseJsonObject.get("result").getAsString();
 
-    public static Map<Integer, SocketData> getConnections() {
-        return connections;
+        LoginResult result = LoginResult.fromJson(loginRes);
+        if (result == LoginResult.FAILURE) {
+            System.out.println(result.getMessage());
+            return;
+        }
+        SessionManager.getInstance().addConnection(id,socketData);
+        userId = id;
     }
 }
