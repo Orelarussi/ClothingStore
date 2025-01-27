@@ -8,7 +8,6 @@ import server.command_executors.ServerDecoder;
 import server.database.SocketData;
 import server.models.Employee;
 import server.models.Employee.Position;
-import server.models.Product;
 import server.models.chat.Message;
 import server.models.customer.Customer;
 import server.models.customer.NewCustomer;
@@ -20,7 +19,6 @@ import java.net.Socket;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -711,28 +709,6 @@ public class Client {
         } catch (IOException e) {
             System.out.println(e.getLocalizedMessage());
         }
-    }
-
-    public void openChat(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
-        int myBranchID = 1;//need to use get brunch id by em id
-        String[] branches = {"Tel Aviv", "Jerusalem", "Haifa", "Beersheba"};
-
-        System.out.println("Branches:");
-        for (int i = 0; i < branches.length; i++) {
-            if (i + 1 != myBranchID) {
-                System.out.println("Branch ID: " + (i + 1) + ", Address: " + branches[i]);
-            }
-        }
-        int selectedBranchID = getInt("Enter branch ID : ",
-                "Invalid input. Please enter a valid branch number.", consoleInput,
-                branch -> branch < 1 || branch > branches.length || branch == myBranchID);
-        // build the request
-        String request = ChatHandler.getInstance().openChat(selectedBranchID,myBranchID);
-        //send the request to the server
-        out.println(request);
-        //get chat from server
-
-
     }
 
     private static int getEmployeeId(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
