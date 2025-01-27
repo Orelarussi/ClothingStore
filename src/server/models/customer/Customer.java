@@ -3,13 +3,10 @@ package server.models.customer;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import server.models.Person;
-import server.models.purchase_plan.PurchasePlan;
-import server.models.purchase_plan.ReturningCustomerPurchasePlan;
-import server.models.purchase_plan.VIPCustomerPurchasePlan;
 
 public abstract class Customer extends Person {
 
-    protected PurchasePlan purchasePlan;
+    protected String purchasePlan;
     protected CustomerType type;
     private int totalPurchases;
 
@@ -47,13 +44,13 @@ public abstract class Customer extends Person {
         }
     }
 
-    protected abstract PurchasePlan createPurchasePlan();
+    protected abstract String createPurchasePlan();
 
-    public PurchasePlan getPurchasePlan() {
+    public String getPurchasePlan() {
         return purchasePlan;
     }
 
-    public void setPurchasePlan(PurchasePlan purchasePlan) {
+    public void setPurchasePlan(String purchasePlan) {
         this.purchasePlan = purchasePlan;
     }
 
@@ -66,10 +63,10 @@ public abstract class Customer extends Person {
 
         if(this.type != CustomerType.VIP && this.totalPurchases > 10) {
             this.type = CustomerType.VIP;
-            this.purchasePlan = new VIPCustomerPurchasePlan();
+            this.purchasePlan = PurchasePlan.VIP.getDetails();
         } else if (this.type != CustomerType.RETURNING &&  this.totalPurchases > 5) {
             this.type = CustomerType.RETURNING;
-            this.purchasePlan = new ReturningCustomerPurchasePlan();
+            this.purchasePlan = PurchasePlan.RETURNING.getDetails();
         }
     }
 
@@ -83,5 +80,25 @@ public abstract class Customer extends Person {
 
     public CustomerType getType() {
         return type;
+    }
+
+    enum PurchasePlan{
+        NEW("New customer: 10% off on first purchase."),
+        RETURNING("Returning customer: 15% off after 3 purchases."),
+        VIP("VIP customer: 20% off on all purchases.");
+
+        private String details;
+
+        PurchasePlan(String s) {
+            this.details = s;
+        }
+
+        public String getDetails() {
+            return details;
+        }
+
+        public void setDetails(String details) {
+            this.details = details;
+        }
     }
 }

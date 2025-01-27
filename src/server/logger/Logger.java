@@ -3,7 +3,6 @@ package server.logger;
 import server.database.PropertiesHandler;
 import server.models.Employee;
 import server.models.Purchase;
-import server.models.User;
 import server.models.customer.Customer;
 
 import java.io.BufferedWriter;

@@ -25,6 +25,9 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Predicate;
 
 
@@ -35,18 +38,26 @@ public class Client {
     public static final AdminHandler admin_handler = AdminHandler.getInstance();
     private static Integer myBranchID;
     private static Integer id;
+    private static boolean isOnline = true;
 
     public static void main(String[] args) {
+        start();
+    }
+
+    public static void start() {
         BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in));
 
         MenuItem[] generalMenu = new MenuItem[]{
                 new MenuItem("Login", () -> connectToServer(consoleInput)),
-                new MenuItem("Exit", () -> exitClient())
+                new MenuItem("Exit", Client::exitClient)
         };
-        while (true) {
-            System.out.println("\nWelcome to Clothing Store\n");
-            displayAndRunMenu(generalMenu, consoleInput, "main menu", false);
-        }
+
+        new Thread(()->{
+            while (isOnline) {
+                System.out.println("\nWelcome to Clothing Store\n");
+                displayAndRunMenu(generalMenu, consoleInput, "main menu", false);
+            }
+        }).start();
     }
 
     private static void connectToServer(BufferedReader consoleInput) {
@@ -100,7 +111,9 @@ public class Client {
         String response = in.readLine();
         if (response != null) {
             System.out.println("Inventory for Branch ID " + branchID + ":");
-            System.out.println(response);
+            JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+            String inventory = json.get("result").getAsString();
+            System.out.println(!inventory.isEmpty() ? inventory : "Inventory is empty");
         } else {
             System.out.println("No response received from the server.");
         }
@@ -230,6 +243,7 @@ public class Client {
     }
 
     private static void exitClient() {
+        isOnline = false;
         System.out.println("Exiting the client. Goodbye!");
     }
 
@@ -423,81 +437,58 @@ public class Client {
     }
 
     private static void showBranchEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
-        // קבלת branchId מהמשתמש
+
         int branchId = getInt("Branch Id: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
 
-        // יצירת הבקשה ושליחתה לשרת
+
         String request = EmployeeHandler.getInstance().showBranchEmployee(branchId);
         out.println(request);
 
         try {
-            // קבלת התשובה מהשרת
+
             String response = in.readLine();
             if (response == null || response.isEmpty()) {
                 System.out.println("No response received from the server.");
                 return;
             }
-
-            // ניתוח התשובה
-            if (response.contains("No employees found")) {
-                System.out.println(response);
-            } else {
-                System.out.println("Employees in Branch " + branchId + ":");
-                String[] employees = response.split(", ");
-                for (String employee : employees) {
-                    System.out.println(employee.trim());
-                }
-            }
+            JsonObject object = JsonParser.parseString(response).getAsJsonObject();
+            String employees = object.get("result").getAsString();
+            System.out.println(!employees.isEmpty() ? employees : "No employees found");
         } catch (IOException e) {
             System.out.println("An error occurred while fetching branch employees: " + e.getMessage());
+        }
+    }
+
+    private static void basicSalesAction(BufferedReader in, PrintWriter out, String req) {
+        out.println(req);
+        try {
+            String response = in.readLine();
+            JsonObject obj = JsonParser.parseString(response).getAsJsonObject();
+            String sales = obj.get("sales").getAsString();
+            System.out.println(!sales.isEmpty() ? sales : "No sales found");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
 
     private static void showSalesByBranch(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
         int branchId = getInt("Employee Branch Id: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
-
         String request = SalesHandler.getInstance().showSalesByBranch(branchId);
-        out.println(request);
-
-        try {
-            String response = in.readLine();
-            JsonObject obj = JsonParser.parseString(response).getAsJsonObject();
-            String sales = obj.get("sales").getAsString();
-            System.out.println(sales);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        basicSalesAction(in, out, request);
     }
 
     private static void showSalesByProduct(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
         int productId = getInt("Product Id: ", "Invalid Product ID. Please enter a numeric value.", consoleInput);
-
         String request = SalesHandler.getInstance().showSalesByProduct(productId);
-        out.println(request);
-
-        try {
-            String response = in.readLine();
-            System.out.println(response);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        basicSalesAction(in, out, request);
     }
 
     private static void showSalesByDate(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
         LocalDate date = getDate(consoleInput);
-
         String request = SalesHandler.getInstance().showSalesByDate(date);
-        out.println(request);
-
-        try {
-            String response = in.readLine();
-            System.out.println(response);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        basicSalesAction(in, out, request);
     }
-
 
     private static void startChatsMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         boolean isManager = isShiftManager(out, in);
@@ -673,10 +664,6 @@ public class Client {
 
             System.out.print("Employee Password : ");
             String password = consoleInput.readLine();
-//            Map<Integer, Branch> branches = BranchManager.getInstance().getBranches();
-//            for (Branch branch : branches.values()) {
-//                System.out.println(branch);
-//            }
 
             int branchId = getInt("Employee Branch Id: ",
                     "Invalid Branch ID. Please enter a numeric value.",
@@ -724,6 +711,28 @@ public class Client {
         } catch (IOException e) {
             System.out.println(e.getLocalizedMessage());
         }
+    }
+
+    public void openChat(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        int myBranchID = 1;//need to use get brunch id by em id
+        String[] branches = {"Tel Aviv", "Jerusalem", "Haifa", "Beersheba"};
+
+        System.out.println("Branches:");
+        for (int i = 0; i < branches.length; i++) {
+            if (i + 1 != myBranchID) {
+                System.out.println("Branch ID: " + (i + 1) + ", Address: " + branches[i]);
+            }
+        }
+        int selectedBranchID = getInt("Enter branch ID : ",
+                "Invalid input. Please enter a valid branch number.", consoleInput,
+                branch -> branch < 1 || branch > branches.length || branch == myBranchID);
+        // build the request
+        String request = ChatHandler.getInstance().openChat(selectedBranchID,myBranchID);
+        //send the request to the server
+        out.println(request);
+        //get chat from server
+
+
     }
 
     private static int getEmployeeId(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {

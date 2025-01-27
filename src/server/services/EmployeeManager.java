@@ -1,10 +1,15 @@
 package server.services;
 
-import java.util.*;
-import java.util.stream.Collectors;
 import com.google.gson.JsonObject;
-import server.models.customer.Customer;
 import server.models.Employee;
+import server.models.customer.Customer;
+import server.utils.JsonUtils;
+
+import java.util.AbstractMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class EmployeeManager {
     private Map<Integer, Customer> customers = new HashMap<>();
@@ -22,6 +27,7 @@ public class EmployeeManager {
         if (customers.containsKey(id)) {
             customers.remove(id);
             System.out.println("Customer with ID " + id + " removed.");
+            JsonUtils.saveCustomers();
             return true;
         }
         System.out.println("Customer with ID " + id + " not found.");
@@ -32,6 +38,7 @@ public class EmployeeManager {
         if (!customers.containsKey(customer.getId())) {
             customers.put(customer.getId(), customer);
             System.out.println("Customer added: " + customer.getFirstName() + " " + customer.getLastName());
+            JsonUtils.saveCustomers();
             return true;
         } else {
             System.out.println("Customer with ID " + customer.getId() + " already exists.");

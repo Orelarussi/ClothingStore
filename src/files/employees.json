@@ -1,14 +1,14 @@
 [
   {
-    "branchID": 1,
-    "accountNumber": 1,
+    "branchID": 3,
+    "accountNumber": 3333,
     "employeeNumber": 1,
-    "position": "SHIFT_MANAGER",
-    "password": "1",
-    "id": 212303366,
-    "firstName": "gil",
-    "lastName": "re",
-    "phoneNumber": "1"
+    "position": "CASHIER",
+    "password": "1111",
+    "id": 4,
+    "firstName": "aokok",
+    "lastName": "momaa",
+    "phoneNumber": "235356"
   },
   {
     "branchID": 3,
@@ -29,19 +29,8 @@
     "password": "@@@",
     "id": 3,
     "firstName": "ORELarussi",
-    "lastName": "Admin",
+    "lastName": "tired",
     "phoneNumber": "0503308010"
-  },
-  {
-    "branchID": 3,
-    "accountNumber": 3333,
-    "employeeNumber": 1,
-    "position": "CASHIER",
-    "password": "1111",
-    "id": 4,
-    "firstName": "aokok",
-    "lastName": "momaa",
-    "phoneNumber": "235356"
   },
   {
     "branchID": 1,
@@ -53,5 +42,27 @@
     "firstName": "neta",
     "lastName": "halfon",
     "phoneNumber": "09"
+  },
+  {
+    "branchID": 1,
+    "accountNumber": 4,
+    "employeeNumber": 1,
+    "position": "SELLER",
+    "password": "0000",
+    "id": 6,
+    "firstName": "Daniiella",
+    "lastName": "Hamo",
+    "phoneNumber": "0536987654"
+  },
+  {
+    "branchID": 1,
+    "accountNumber": 3,
+    "employeeNumber": 1,
+    "position": "CASHIER",
+    "password": "050202",
+    "id": 7,
+    "firstName": "Neta",
+    "lastName": "pinyeta",
+    "phoneNumber": "0541239685"
   }
 ]

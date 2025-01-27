@@ -1,13 +1,9 @@
 package server.command_executors;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import server.models.Branch;
-import server.models.Product;
-import server.models.customer.Customer;
-import server.services.*;
 import server.models.Employee;
+import server.services.*;
 
 import java.util.List;
 
@@ -26,14 +22,13 @@ public class EmployeeManagerCommandExecutor implements IExecute{
             case GET_INVENTORY_BY_BRANCH:
                 int branchId = data.get("branchId").getAsInt();
 
-                branchManager.getBranchById(branchId).getInventory().forEach((productId, value) ->
-                        result.append(String.format("ProductId %s  : amount %s, ", productId, value)));
-
-                if (!result.isEmpty()) {
-                    result.setLength(result.length() - 2);
-                }
-
-                return result.toString();
+                branchManager.getBranchById(branchId).getInventory()
+                        .forEach((productId, value) -> {
+                            String formatted = String.format("ProductId %s  : amount %s", productId, value);
+                            result.append(formatted).append(System.lineSeparator());
+                        });
+                response.addProperty("result", result.toString());
+                return response.toString();
 
             case SALE_PRODUCT:
                 int customerId = data.get("customerId").getAsInt();
@@ -50,31 +45,20 @@ public class EmployeeManagerCommandExecutor implements IExecute{
                 List<Employee> employees = EmployeeManager.getInstance().getEmployeesByBranchId(branchEmployeeId);
 
                 // Build the result string
-                employees.forEach(employee ->
-                        result.append(String.format("Employee -> %s, ", employee))
-                );
-
-                // If no employees found, return an appropriate message
-                if (!result.isEmpty()) {
-                    result.setLength(result.length() - 2); // Remove trailing ", "
-                } else {
-                    return "No employees found for this branch.";
-                }
-
-                return result.toString();
+                employees.forEach(employee -> result.append(employee).append("\n"));
+                response.addProperty("result", result.toString());
+                return response.toString();
 
             case ADD_PRODUCT_TO_BRANCH:
                 int productBranchId = data.get("branchId").getAsInt();
                 int productToAddId = data.get("productId").getAsInt();
                 int amountToAdd = data.get("amount").getAsInt();
 
-                Branch branch = BranchManager.getInstance().getBranchById(productBranchId);
+                BranchManager.getInstance().addProductToBranch(productBranchId,productToAddId,amountToAdd);
 
                 if (ProductManager.getInstance().getProduct(productToAddId) == null) {
                     return "No found product.";
                 }
-
-                branch.getInventory().put(productToAddId, branch.getInventory().getOrDefault(productToAddId, 0) + amountToAdd);
 
                 return "Product Added Successfully.";
             default:

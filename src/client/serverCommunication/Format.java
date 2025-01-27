@@ -9,7 +9,7 @@ import server.database.Chat;
 import server.models.Employee;
 import server.models.Product;
 import server.models.customer.Customer;
-import server.models.purchaseHistory.PurchasedItem;
+import server.models.PurchasedItem;
 import server.services.AdminManager;
 
 import java.lang.reflect.Type;

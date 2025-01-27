@@ -1,6 +1,7 @@
 package server.services;
 
 import com.google.gson.*;
+
 import java.lang.reflect.Type;
 
 public enum LoginResult {

@@ -1,10 +1,10 @@
 [
   {
     "branchID": 1,
-    "employeeAmount": 2,
+    "employeeAmount": 4,
     "address": "Tel Aviv",
     "inventory": {
-      "1": 5,
+      "1": 17,
       "3": 50
     }
   },
@@ -16,7 +16,7 @@
   },
   {
     "branchID": 3,
-    "employeeAmount": 2,
+    "employeeAmount": 1,
     "address": "Haifa",
     "inventory": {}
   },

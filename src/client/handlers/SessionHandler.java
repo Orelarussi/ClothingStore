@@ -3,9 +3,6 @@ package client.handlers;
 import com.google.gson.JsonObject;
 import server.command_executors.MethodType;
 import server.command_executors.ServiceType;
-import server.models.Person;
-import java.util.HashSet;
-import java.util.Set;
 
 public class SessionHandler extends BaseHandler{
     private static SessionHandler instance;
