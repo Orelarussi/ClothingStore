@@ -426,15 +426,15 @@ public class Client {
     }
 
     private static void showBranchEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
-        // קבלת branchId מהמשתמש
+
         int branchId = getInt("Branch Id: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
 
-        // יצירת הבקשה ושליחתה לשרת
+
         String request = EmployeeHandler.getInstance().showBranchEmployee(branchId);
         out.println(request);
 
         try {
-            // קבלת התשובה מהשרת
+
             String response = in.readLine();
             if (response == null || response.isEmpty()) {
                 System.out.println("No response received from the server.");
@@ -613,10 +613,6 @@ public class Client {
 
             System.out.print("Employee Password : ");
             String password = consoleInput.readLine();
-//            Map<Integer, Branch> branches = BranchManager.getInstance().getBranches();
-//            for (Branch branch : branches.values()) {
-//                System.out.println(branch);
-//            }
 
             int branchId = getInt("Employee Branch Id: ",
                     "Invalid Branch ID. Please enter a numeric value.",

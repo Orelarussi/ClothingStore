@@ -22,8 +22,7 @@ public abstract class User extends Person {
 
     @Override
     public String toString() {
-        return "User{" +
-                "password='" + password + '\'' +
+        return "password='" + password + '\'' +
                 ", id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
