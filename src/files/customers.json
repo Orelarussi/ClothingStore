@@ -1,10 +1,6 @@
 [
   {
-    "purchasePlan": {
-      "planDetails": "New customer: 10% off on first purchase.",
-      "customerID": 0,
-      "purchaseID": 0
-    },
+    "purchasePlan": "New customer: 10% off on first purchase.",
     "type": "NEW",
     "totalPurchases": 0,
     "id": 1,
@@ -13,11 +9,7 @@
     "phoneNumber": "05465859675"
   },
   {
-    "purchasePlan": {
-      "planDetails": "Returning customer: 15% off after 3 purchases.",
-      "customerID": 0,
-      "purchaseID": 0
-    },
+    "purchasePlan": "Returning customer: 15% off after 3 purchases.",
     "type": "RETURNING",
     "totalPurchases": 27,
     "id": 2,
@@ -26,11 +18,7 @@
     "phoneNumber": "0523569486"
   },
   {
-    "purchasePlan": {
-      "planDetails": "Returning customer: 15% off after 3 purchases.",
-      "customerID": 0,
-      "purchaseID": 0
-    },
+    "purchasePlan": "Returning customer: 15% off after 3 purchases.",
     "type": "RETURNING",
     "totalPurchases": 0,
     "id": 3,
@@ -39,11 +27,7 @@
     "phoneNumber": "0523669588"
   },
   {
-    "purchasePlan": {
-      "planDetails": "New customer: 10% off on first purchase.",
-      "customerID": 0,
-      "purchaseID": 0
-    },
+    "purchasePlan": "New customer: 10% off on first purchase.",
     "type": "NEW",
     "totalPurchases": 0,
     "id": 4,
@@ -52,11 +36,7 @@
     "phoneNumber": "0548695453"
   },
   {
-    "purchasePlan": {
-      "planDetails": "New customer: 10% off on first purchase.",
-      "customerID": 0,
-      "purchaseID": 0
-    },
+    "purchasePlan": "New customer: 10% off on first purchase.",
     "type": "NEW",
     "totalPurchases": 0,
     "id": 5,

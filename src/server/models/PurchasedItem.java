@@ -1,4 +1,4 @@
-package server.models.purchaseHistory;
+package server.models;
 
 
 import com.google.gson.Gson;
