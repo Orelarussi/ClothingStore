@@ -57,4 +57,10 @@ public class Branch extends JsonSerializable {
         this.address = temp.getAddress();
         this.inventory = temp.getInventory();
     }
+
+    public void updateProduct(int productToAddId, int amountToAdd) {
+        Map<Integer, Integer> inv = getInventory();
+        Integer productAmount = inv.getOrDefault(productToAddId, 0);
+        inv.put(productToAddId, productAmount + amountToAdd);
+    }
 }

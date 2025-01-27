@@ -29,10 +29,18 @@ public class ProductManager {
     }
 
     public Product getProduct(int productId) {
-        return products.get(productId);
+        System.out.println("Fetching product with ID: " + productId);
+        Product product = products.get(productId);
+        if (product != null) {
+            System.out.println("Product found: " + product.getName());
+        } else {
+            System.out.println("Product with ID " + productId + " not found.");
+        }
+        return product;
     }
 
     public Map<Integer, Product> getProducts() {
+        System.out.println("Fetching all products.");
         return products;
     }
 
@@ -40,12 +48,18 @@ public class ProductManager {
         this.products = products.stream()
                 .map(product -> new AbstractMap.SimpleEntry<>(product.getId(), product))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        System.out.println("Products list set successfully.");
     }
 
     public void displayProducts() {
-        System.out.println("Product List:");
-        for (Product product : products.values()) {
-            System.out.println("ID: " + product.getId() + ", Name: " + product.getName() + ", Category: " + product.getCategory() + ", Price: $" + product.getPrice());
+        System.out.println("Displaying all products:");
+        if (products.isEmpty()) {
+            System.out.println("No products available.");
+        } else {
+            for (Product product : products.values()) {
+                System.out.println("ID: " + product.getId() + ", Name: " + product.getName() +
+                        ", Category: " + product.getCategory() + ", Price: $" + product.getPrice());
+            }
         }
     }
 }

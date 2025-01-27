@@ -64,13 +64,11 @@ public class EmployeeManagerCommandExecutor implements IExecute{
                 int productToAddId = data.get("productId").getAsInt();
                 int amountToAdd = data.get("amount").getAsInt();
 
-                Branch branch = BranchManager.getInstance().getBranchById(productBranchId);
+                BranchManager.getInstance().addProductToBranch(productBranchId,productToAddId,amountToAdd);
 
                 if (ProductManager.getInstance().getProduct(productToAddId) == null) {
                     return "No found product.";
                 }
-
-                branch.getInventory().put(productToAddId, branch.getInventory().getOrDefault(productToAddId, 0) + amountToAdd);
 
                 return "Product Added Successfully.";
             default:

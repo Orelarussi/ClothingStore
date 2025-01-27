@@ -50,5 +50,18 @@
     "firstName": "daniella",
     "lastName": "Hamo",
     "phoneNumber": "0548695453"
+  },
+  {
+    "purchasePlan": {
+      "planDetails": "New customer: 10% off on first purchase.",
+      "customerID": 0,
+      "purchaseID": 0
+    },
+    "type": "NEW",
+    "totalPurchases": 0,
+    "id": 5,
+    "firstName": "Neta",
+    "lastName": "pinyeta",
+    "phoneNumber": "0548785995"
   }
 ]

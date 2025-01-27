@@ -36,6 +36,7 @@ public class SalesManager {
 
     // Get all sale reports
     public List<SaleReport> getAllSaleReports() {
+        System.out.println("Fetching all sale reports. Total reports: " + saleReports.size());
         return new ArrayList<>(saleReports); // Return a copy to prevent external modifications
     }
 
@@ -43,18 +44,24 @@ public class SalesManager {
         Branch branch = BranchManager.getInstance().getBranchById(branchId);
 
         if (branch == null) {
+            String error = "Branch with ID " + branchId + " not found.";
+            System.out.println(error);
             return "NOT FOUND BRANCH WITH ID " + customerId;
         }
 
         Customer customer = EmployeeManager.getInstance().getCustomers().getOrDefault(customerId, null);
 
         if (customer == null) {
+            String error = "Customer with ID " + customerId + " not found.";
+            System.out.println(error);
             return "NOT FOUND CUSTOMER WITH ID " + customerId;
         }
 
          int stock = branch.getInventory().getOrDefault(productId, 0);
 
         if (amount > stock) {
+            String error = "Not enough products in stock. Only " + stock + " remain.";
+            System.out.println(error);
             return String.format("not enough products , only %s remain", stock);
         }
         else {
@@ -62,6 +69,9 @@ public class SalesManager {
             customer.setTotalPurchases(customer.getTotalPurchases() + amount);
             saleReports.add(new SaleReport(branch.getBranchID(), productId, amount, LocalDate.now()));
 
+            String successMessage = String.format("Purchase successful. Remaining stock: %s. Customer total purchases: %s.",
+                    branch.getInventory().get(productId), customer.getTotalPurchases());
+            System.out.println(successMessage);
             return String.format("purchased success, only %s remain, customer spend total of %s products", branch.getInventory().get(productId), customer.getTotalPurchases());
         }
     }

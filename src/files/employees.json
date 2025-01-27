@@ -18,7 +18,7 @@
     "password": "@@@",
     "id": 3,
     "firstName": "ORELarussi",
-    "lastName": "Admin",
+    "lastName": "tired",
     "phoneNumber": "0503308010"
   },
   {
@@ -42,5 +42,27 @@
     "firstName": "Dani",
     "lastName": "Banani",
     "phoneNumber": "0524567895"
+  },
+  {
+    "branchID": 1,
+    "accountNumber": 4,
+    "employeeNumber": 1,
+    "position": "SELLER",
+    "password": "0000",
+    "id": 6,
+    "firstName": "Daniiella",
+    "lastName": "Hamo",
+    "phoneNumber": "0536987654"
+  },
+  {
+    "branchID": 1,
+    "accountNumber": 3,
+    "employeeNumber": 1,
+    "position": "CASHIER",
+    "password": "050202",
+    "id": 7,
+    "firstName": "Neta",
+    "lastName": "pinyeta",
+    "phoneNumber": "0541239685"
   }
 ]

@@ -44,14 +44,17 @@ public class BranchManager implements MapChangeListener<Integer, Branch> {
     }
 
     public Branch getBranchById(int branchID) {
+        System.out.println("Fetching branch with ID: " + branchID);
         return branches.get(branchID);
     }
 
     public ObservableMap<Integer, Branch> getBranches() {
+        System.out.println("Fetching all branches.");
         return branches;
     }
 
     public void setBranches(List<Branch> branchList) {
+        System.out.println("Setting branches.");
         ObservableMap<Integer, Branch> map = FXCollections.observableHashMap();
         branchList.forEach(branch -> map.put(branch.getBranchID(), branch));
         if (this.branches != null) {
@@ -59,11 +62,14 @@ public class BranchManager implements MapChangeListener<Integer, Branch> {
         }
         this.branches = map;
         this.branches.addListener(this);
+        System.out.println("Branches have been set successfully.");
     }
 
     public void addEmployeeToBranch(int branchID) {
         Branch b = branches.get(branchID);
         if (b == null) {
+            String error = "Branch with ID " + branchID + " doesn't exist!";
+            System.out.println(error);
             throw new IllegalArgumentException("Branch with id" + branchID+ " doesn't exist!");
         }
         b.increaseEmployeeNumberBy1();
@@ -71,19 +77,35 @@ public class BranchManager implements MapChangeListener<Integer, Branch> {
         System.out.println("Updated branches employees successfully");
     }
 
+    public void addProductToBranch(int branchID , int productToAddId , int amountToAdd) {
+        Branch branch = branches.get(branchID);
+        if (branch == null) {
+            String error = "Branch with ID " + branchID + " doesn't exist!";
+            System.out.println(error);
+            throw new IllegalArgumentException("Branch with id" + branchID+ " doesn't exist!");
+        }
+        branch.updateProduct(productToAddId,amountToAdd);
+        
+        JsonUtils.saveBranches();
+        System.out.println("Updated branches employees successfully");
+    }
+
     public void removeEmployeeFromBranch(int branchID) {
         Branch b = branches.get(branchID);
         if (b == null) {
+            String error = "Branch with ID " + branchID + " doesn't exist!";
+            System.out.println(error);
             throw new IllegalArgumentException("Branch with id" + branchID+ " doesn't exist!");
         }
         b.reduceEmployeeNumberBy1();
         JsonUtils.saveBranches();
-        System.out.println("Updated branches successfully");
+        System.out.println("Updated branches employees successfully");
     }
 
     @Override
     public void onChanged(Change change) {
         System.out.println("Branch change detected: " + change);
         JsonUtils.saveBranches();
+        System.out.println("Branch changes saved.");
     }
 }
