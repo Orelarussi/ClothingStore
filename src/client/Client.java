@@ -11,11 +11,7 @@ import server.models.Employee.Position;
 import server.models.customer.Customer;
 import server.models.customer.NewCustomer;
 import server.services.LoginResult;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.net.Socket;
@@ -224,10 +220,7 @@ public class Client {
                 String title = item.getTitle();
                 if (title.equals("Back") || title.equals(LOG_OUT)) {
                     return;
-                }else if (title.equals("Exit")) {
-                    item.run();
-                    return;
-                }else {
+                } else {
                     item.run();
                 }
             } else {
@@ -461,49 +454,35 @@ public class Client {
         }
     }
 
-
-    private static void showSalesByBranch(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
-        int branchId = getInt("Employee Branch Id: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
-
-        String request = SalesHandler.getInstance().showSalesByBranch(branchId);
-        out.println(request);
-
+    private static void basicSalesAction(BufferedReader in, PrintWriter out, String req) {
+        out.println(req);
         try {
             String response = in.readLine();
             JsonObject obj = JsonParser.parseString(response).getAsJsonObject();
             String sales = obj.get("sales").getAsString();
-            System.out.println(sales);
+            System.out.println(!sales.isEmpty() ? sales : "No sales found");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+    }
+
+
+    private static void showSalesByBranch(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        int branchId = getInt("Employee Branch Id: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
+        String request = SalesHandler.getInstance().showSalesByBranch(branchId);
+        basicSalesAction(in, out, request);
     }
 
     private static void showSalesByProduct(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
         int productId = getInt("Product Id: ", "Invalid Product ID. Please enter a numeric value.", consoleInput);
-
         String request = SalesHandler.getInstance().showSalesByProduct(productId);
-        out.println(request);
-
-        try {
-            String response = in.readLine();
-            System.out.println(response);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        basicSalesAction(in, out, request);
     }
 
     private static void showSalesByDate(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
         LocalDate date = getDate(consoleInput);
-
         String request = SalesHandler.getInstance().showSalesByDate(date);
-        out.println(request);
-
-        try {
-            String response = in.readLine();
-            System.out.println(response);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        basicSalesAction(in, out, request);
     }
 
     private static void startChatsMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {

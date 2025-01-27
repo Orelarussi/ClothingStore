@@ -7,62 +7,36 @@ import server.services.SalesManager;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.function.Predicate;
 
-public class SalesManagerCommandExecutor implements IExecute{
+public class SalesManagerCommandExecutor implements IExecute {
 
     @Override
-    public String execute(Integer userId,LoginResult loginResult, String request) {
-        SalesManager salesManager = SalesManager.getInstance();
+    public String execute(Integer userId, LoginResult loginResult, String request) {
         MethodType method = ServerDecoder.getMethodType(request);
         JsonObject data = ServerDecoder.getData(request);
-        JsonObject response = new JsonObject();
-        StringBuilder result = new StringBuilder();
-
-        switch (method){
-            case SHOW_SALES_BY_BRANCH:
+        Predicate<SaleReport> filter = switch (method) {
+            case SHOW_SALES_BY_BRANCH -> {
                 int branchId = data.get("branchId").getAsInt();
-
-                for (SaleReport report : salesManager.getAllSaleReports()) {
-                    if (report.getBranchID() == branchId) {
-                        String str = report + "\n";
-                        result.append(str);
-                    }
-                }
-
-                response.addProperty("sales",result.toString());
-
-                return response.toString();
-            case SHOW_SALES_BY_PRODUCT:
+                yield report -> report.getBranchID() == branchId;
+            }
+            case SHOW_SALES_BY_PRODUCT -> {
                 int productId = data.get("productId").getAsInt();
-
-                salesManager.getAllSaleReports().stream()
-                        .filter(saleReport -> saleReport.getProductId() == productId)
-                        .forEach(saleReport -> result.append(String.format("sale -> %s , ", saleReport)));
-
-                if (result.isEmpty()) {
-                    return "Not Found Sales";
-                }
-
-                result.setLength(result.length() - 2);
-                return result.toString();
-            case SHOW_SALES_BY_DATE:
+                yield saleReport -> saleReport.getProductId() == productId;
+            }
+            case SHOW_SALES_BY_DATE -> {
                 LocalDate date = LocalDate.parse(data.get("date").getAsString(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                yield saleReport -> saleReport.getDate().isEqual(date);
+            }
+            default -> _ -> false;
+        };
 
-                salesManager.getAllSaleReports().stream()
-                        .filter(saleReport -> saleReport.getDate().isEqual(date))
-                        .forEach(saleReport -> result.append(String.format("sale -> %s , ", saleReport)));
+        StringBuilder result = new StringBuilder();
+        SalesManager.getInstance().getAllSaleReports().stream().filter(filter)
+                .forEach(report -> result.append(report).append("\n"));
 
-                if (result.isEmpty()) {
-                    return "Not Found Sales";
-                }
-
-                result.setLength(result.length() - 2);
-                return result.toString();
-            default:
-                response.addProperty("success", false);
-                break;
-        }
-
+        JsonObject response = new JsonObject();
+        response.addProperty("sales", result.toString());
         return response.toString();
     }
 }
