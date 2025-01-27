@@ -22,10 +22,10 @@ public class AdminManagerCommandExecutor implements IExecute{
 
         switch (method){
             case LOGIN:
-                int id = data.get("id").getAsInt();
+                employeeId = data.get("id").getAsInt();
                 String password = data.get("password").getAsString();
-                LoginResult result = adminManager.login(id,password);
-                response.addProperty ("id", id);
+                LoginResult result = adminManager.login(employeeId,password);
+                response.addProperty ("id", employeeId);
                 response.addProperty("result", result.toString());
                 break;
             case ADD_EMP:
@@ -38,10 +38,22 @@ public class AdminManagerCommandExecutor implements IExecute{
                 }
                 break;
             case REMOVE_EMP:
+                employeeId = data.get("id").getAsInt();
                 try {
-                    adminManager.deleteEmployee(data.get("id").getAsInt());
+                    adminManager.deleteEmployee(employeeId);
                     response.addProperty("result","success");
-                } catch (ClassCastException | IllegalStateException e){
+                } catch (Exception e){
+                    response.addProperty("error",e.getMessage());
+                }
+                break;
+            case EDIT_EMP:
+                employeeId = data.get("id").getAsInt();
+                String attr = data.get("fieldName").getAsString();
+                String value = data.get("value").getAsString();
+                try {
+                    adminManager.editEmployee(employeeId,attr,value);
+                    response.addProperty("result","success");
+                }catch (Exception e){
                     response.addProperty("error",e.getMessage());
                 }
                 break;
@@ -52,7 +64,8 @@ public class AdminManagerCommandExecutor implements IExecute{
                 response.addProperty("result","success");
                 break;
             case IS_EMPLOYEE_EXISTS:
-                employee = adminManager.findEmployeeById(data.get("id").getAsInt());
+                employeeId = data.get("id").getAsInt();
+                employee = adminManager.findEmployeeById(employeeId);
                 response.addProperty("exists",employee != null);
                 break;
             case IS_SHIFT_MANAGER: // New case for checking role

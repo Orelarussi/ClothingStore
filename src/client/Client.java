@@ -1,9 +1,6 @@
 package client;
 
-import client.handlers.AdminHandler;
-import client.handlers.ChatHandler;
-import client.handlers.CustomerHandler;
-import client.handlers.EmployeeHandler;
+import client.handlers.*;
 import client.menu.MenuItem;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
@@ -11,23 +8,20 @@ import server.command_executors.ServerDecoder;
 import server.database.SocketData;
 import server.models.Employee;
 import server.models.Employee.Position;
+import server.models.Product;
 import server.models.chat.Message;
 import server.models.customer.Customer;
 import server.models.customer.NewCustomer;
 import server.services.LoginResult;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.net.Socket;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
@@ -39,9 +33,8 @@ public class Client {
     private static final int SERVER_PORT = 12345;
     public static final String LOG_OUT = "Log out";
     public static final AdminHandler admin_handler = AdminHandler.getInstance();
-    private static Integer id;
-    private static int myBranchID;
 
+    private static Integer id;
 
     public static void main(String[] args) {
         BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in));
@@ -50,14 +43,9 @@ public class Client {
                 new MenuItem("Login", () -> connectToServer(consoleInput)),
                 new MenuItem("Exit", () -> exitClient(consoleInput))
         };
-
         while (true) {
             System.out.println("\nWelcome to Clothing Store\n");
-            try {
-                displayAndRunMenu(generalMenu, consoleInput, "main menu", false);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            displayAndRunMenu(generalMenu, consoleInput, "main menu", false);
         }
     }
 
@@ -70,7 +58,7 @@ public class Client {
             //start logic
             PrintWriter out = socketData.getOutputStream();
             BufferedReader in = socketData.getInputStream();
-            LoginResult loginResult = login(consoleInput, out, in);
+            LoginResult loginResult = login(consoleInput, out, in);//should be admin or employee with fullName as message
             showAdminOrEmployeeMenu(loginResult, consoleInput, out, in);
 
         } catch (IOException e) {
@@ -85,20 +73,17 @@ public class Client {
 
         System.out.println("\n=== Login ===");
 
-        while (!(loginResult == LoginResult.ADMIN || loginResult == LoginResult.EMPLOYEE)) {
-            // id
-            id = getInt("Username id: ", "Invalid id. Please enter a numeric value.", consoleInput);
-            // password
-            System.out.print("Password: ");
-            String password = consoleInput.readLine();
-            String request = AdminHandler.getInstance().login(id, password);
-            //send the request to the server
-            out.println(request);
-            //server response
-            String serverResponse = in.readLine();
-            JsonObject loginResponse = ServerDecoder.convertToJsonObject(serverResponse);
-            loginResult = LoginResult.valueOf(loginResponse.get("result").getAsString());
-        }
+        id = getInt("Username id: ", "Invalid id. Please enter a numeric value.", consoleInput);
+        // password
+        System.out.print("Password: ");
+        String password = consoleInput.readLine();
+        String request = SessionHandler.getInstance().login(id, password);
+        //send the request to the server
+        out.println(request);
+        String serverResponse = in.readLine();
+        JsonObject loginResponse = ServerDecoder.convertToJsonObject(serverResponse);
+        loginResult = LoginResult.fromJson(loginResponse.get("result").getAsString());
+
         return loginResult;
     }
 
@@ -170,36 +155,43 @@ public class Client {
     }
 
 
-    private static void showAdminOrEmployeeMenu(LoginResult loginResult, BufferedReader consoleInput, PrintWriter out, BufferedReader in) throws IOException {
+    private static void showAdminOrEmployeeMenu(LoginResult loginResult, BufferedReader consoleInput,
+                                                PrintWriter out, BufferedReader in) throws IOException {
         switch (loginResult) {
-            case ADMIN:
-                startAdminMenu(in, out, consoleInput);
-                break;
-            case EMPLOYEE:
-                startEmployeeMenu(in, out, consoleInput);
-                break;
-            case FAILURE:
-                System.out.println("User id or password are incorrect, please try again");
-                break;
+            case ADMIN -> startAdminMenu(in, out, consoleInput, loginResult.getMessage());
+            case EMPLOYEE -> startEmployeeMenu(in, out, consoleInput, loginResult.getMessage());
+            case FAILURE -> System.out.println(loginResult.getMessage());
         }
     }
 
-    private static void logout(PrintWriter out) {
-        String request = AdminHandler.getInstance().logout(id);
+    private static void logout(BufferedReader in, PrintWriter out) {
+        String request = SessionHandler.getInstance().logout(id);
         out.println(request);
+
+        try {
+            String response = in.readLine();
+            if (response != null) {
+                JsonObject jsonObject = JsonParser.parseString(response).getAsJsonObject();
+                if (jsonObject.has("error"))
+                    System.out.println(jsonObject.get("error").getAsString());
+                else
+                    System.out.println("Logged out successfully");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     //display And Run Menu : to use in the start ... menu
 
-    private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String title) throws IOException {
+    private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String title) {
         displayAndRunMenu(menuItems, consoleInput, title, true);
     }
 
-    private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput, String menuTitle,
-                                          boolean addBack_ExitOpt) throws IOException {
-        if (addBack_ExitOpt) {
-            menuItems = Arrays.copyOf(menuItems, menuItems.length + 2);
-            menuItems[menuItems.length - 2] = new MenuItem("Back", null);
-            menuItems[menuItems.length - 1] = new MenuItem("Exit", () -> exitClient(consoleInput));
+    private static void displayAndRunMenu(MenuItem[] menuItems, BufferedReader consoleInput,
+                                          String menuTitle, boolean addBack) {
+        if (addBack) {
+            menuItems = Arrays.copyOf(menuItems, menuItems.length + 1);
+            menuItems[menuItems.length - 1] = new MenuItem("Back", null);
         }
 
         int choice;
@@ -216,14 +208,20 @@ public class Client {
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a valid number.");
                 continue;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
 
             if (choice > 0 && choice <= menuItems.length) {
-                String title = menuItems[choice - 1].getTitle();
+                MenuItem item = menuItems[choice - 1];
+                String title = item.getTitle();
                 if (title.equals("Back") || title.equals(LOG_OUT)) {
                     return;
-                } else {
-                    menuItems[choice - 1].run();
+                }else if (title.equals("Exit")) {
+                    item.run();
+                    return;
+                }else {
+                    item.run();
                 }
             } else {
                 System.out.println("Invalid choice. Please try again.");
@@ -231,19 +229,13 @@ public class Client {
         }
     }
 
-    private static void exitClient(BufferedReader consoleInput) {
+    private static void exitClient() {
         System.out.println("Exiting the client. Goodbye!");
-        try {
-            consoleInput.close(); // Close console input
-        } catch (IOException e) {
-            System.out.println("Error closing console input: " + e.getMessage());
-        }
-        System.exit(0); // Terminate the client process
     }
 
     //all menus functions:
 
-    private static void startAdminMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    private static void startAdminMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput, String userName) throws IOException {
         MenuItem[] adminMenu = {
                 new MenuItem("Add employee", () -> createAndAddEmployee(in, out, consoleInput)),
                 new MenuItem("Remove employee", () -> {
@@ -262,20 +254,27 @@ public class Client {
                 }),
                 new MenuItem("View all employees", () -> {
                     try {
-                        viewAllEmployees(in, out, consoleInput);
+                        viewAllEmployees(in, out);
                     } catch (IOException e) {
                         System.out.println("An error occurred while viewing all employees.");
                     }
                 }),
-                new MenuItem(LOG_OUT, () -> {
-                })
+                new MenuItem(LOG_OUT, () -> logout(in, out))
         };
+        System.out.println("\nHello "+userName);
+
         displayAndRunMenu(adminMenu, consoleInput, "Admin Menu");
     }
 
-    private static void startEmployeeMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    private static void startEmployeeMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput, String userName) throws IOException {
         MenuItem[] employeeMenu = {
-                new MenuItem("Show branch info", () -> System.out.println("Displaying branch info...")),
+                new MenuItem("Branch Menu", () ->{
+                    try {
+                        startBranchInfoMenu(in, out, consoleInput);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }),
                 new MenuItem("Inventory menu", () -> {
                     try {
                         startInventoryMenu(in, out, consoleInput);
@@ -304,9 +303,9 @@ public class Client {
                         throw new RuntimeException(e);
                     }
                 }),
-                new MenuItem(LOG_OUT, () -> {
-                })
+                new MenuItem(LOG_OUT, () -> logout(in, out))
         };
+        System.out.println("\nHello "+userName);
         displayAndRunMenu(employeeMenu, consoleInput, "Employee Menu");
     }
 
@@ -319,22 +318,30 @@ public class Client {
         displayAndRunMenu(customerMenu, consoleInput, "Customer Menu");
     }
 
-    private static void showCustomers(BufferedReader in, PrintWriter out) {
+    private static  void showCustomers(BufferedReader in, PrintWriter out) {
         String request = CustomerHandler.getInstance().getAllCustomers();
         out.println(request);
 
         List<Customer> customers = new ArrayList<>();
         try {
             String response = in.readLine();
-            JsonArray jsonArray = JsonParser.parseString(response).getAsJsonArray();
-            for (JsonElement jsonElement : jsonArray) {
-                Customer customer = Customer.deserializeFromString(jsonElement.toString());
-                customers.add(customer);
+            JsonObject object = JsonParser.parseString(response).getAsJsonObject();
+
+            if (object.get("success").getAsBoolean()) {
+                JsonArray jsonArray = object.get("customers").getAsJsonArray();
+                for (JsonElement jsonElement : jsonArray) {
+                    Customer customer = Customer.deserializeFromString(jsonElement.toString());
+                    customers.add(customer);
+                }
+
+                System.out.println(String.join("\n",customers.stream().map(Customer::toString).toList()));
+            }
+            else {
+                System.out.println("failed to fetched customers");
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        customers.forEach(System.out::println);
     }
 
     private static void deleteCustomer(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
@@ -351,7 +358,7 @@ public class Client {
     }
 
     private static void addCustomer(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
-        NewCustomer customer = null;
+        NewCustomer customer;
         try {
             customer = getNewCustomer(consoleInput);
         } catch (IOException e) {
@@ -378,18 +385,119 @@ public class Client {
         System.out.println("Enter phone number: ");
         String phone = consoleInput.readLine();
 
-        return new NewCustomer(cid, first, last, phone);
+        return new NewCustomer(cid, first, last, phone, 0);
     }
 
 
     private static void startSalesReportMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         MenuItem[] salesReportMenu = {
-                new MenuItem("Show sales amount by branch", () -> System.out.println("Displaying sales by branch...")),
-                new MenuItem("Show sales amount by product ID", () -> System.out.println("Displaying sales by product ID...")),
-                new MenuItem("Show sales amount by category", () -> System.out.println("Displaying sales by category (לא זמין)...")),
+                new MenuItem("Show sales amount by branch", () -> showSalesByBranch(in, out, consoleInput)),
+                new MenuItem("Show sales amount by product ID", () -> showSalesByProduct(in, out, consoleInput)),
+                new MenuItem("Show sales amount by date", () -> showSalesByDate(in, out, consoleInput)),
         };
         displayAndRunMenu(salesReportMenu, consoleInput, "Sales Report Menu");
     }
+
+    private static void startBranchInfoMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+        MenuItem[] BranchInfoMenu = {
+                new MenuItem("Show branch employees", () -> showBranchEmployee(in, out, consoleInput)),
+                new MenuItem("Add product to branch", () -> addProductToBranch(in, out, consoleInput)),
+        };
+        displayAndRunMenu(BranchInfoMenu, consoleInput, "Branch Menu");
+    }
+
+    private static void addProductToBranch(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        int branchId = getInt("Enter branch id: ","Invalid id",consoleInput);
+        int productId = getInt("Enter product id: ","Invalid id",consoleInput);
+        int amount = getInt("Enter amount: ","Invalid amount",consoleInput);
+
+        String request = EmployeeHandler.getInstance().addProductToBranch(branchId, productId, amount);
+        out.println(request);
+
+        try {
+            String response = in.readLine();
+            System.out.println(response);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void showBranchEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        // קבלת branchId מהמשתמש
+        int branchId = getInt("Branch Id: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
+
+        // יצירת הבקשה ושליחתה לשרת
+        String request = EmployeeHandler.getInstance().showBranchEmployee(branchId);
+        out.println(request);
+
+        try {
+            // קבלת התשובה מהשרת
+            String response = in.readLine();
+            if (response == null || response.isEmpty()) {
+                System.out.println("No response received from the server.");
+                return;
+            }
+
+            // ניתוח התשובה
+            if (response.contains("No employees found")) {
+                System.out.println(response);
+            } else {
+                System.out.println("Employees in Branch " + branchId + ":");
+                String[] employees = response.split(", ");
+                for (String employee : employees) {
+                    System.out.println(employee.trim());
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("An error occurred while fetching branch employees: " + e.getMessage());
+        }
+    }
+
+
+    private static void showSalesByBranch(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        int branchId = getInt("Employee Branch Id: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
+
+        String request = SalesHandler.getInstance().showSalesByBranch(branchId);
+        out.println(request);
+
+        try {
+            String response = in.readLine();
+            JsonObject obj = JsonParser.parseString(response).getAsJsonObject();
+            String sales = obj.get("sales").getAsString();
+            System.out.println(sales);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void showSalesByProduct(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        int productId = getInt("Product Id: ", "Invalid Product ID. Please enter a numeric value.", consoleInput);
+
+        String request = SalesHandler.getInstance().showSalesByProduct(productId);
+        out.println(request);
+
+        try {
+            String response = in.readLine();
+            System.out.println(response);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void showSalesByDate(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        LocalDate date = getDate(consoleInput);
+
+        String request = SalesHandler.getInstance().showSalesByDate(date);
+        out.println(request);
+
+        try {
+            String response = in.readLine();
+            System.out.println(response);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     private static void startChatsMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         boolean isManager = isShiftManager(out, in);
@@ -441,41 +549,89 @@ public class Client {
     }
 
 
-//all the functions that inside of the menu
 
     //admin menu functions:
     private static void editEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
-        int employeeId = getInt("Enter the employee ID you would like to edit:", "Invalid ID. Please enter a numeric value.", consoleInput);
-        while (true) {
+        System.out.println("Enter employee id from the list:");
 
-            System.out.println("Select the property number you would like to edit:");
-            String[] fields = Arrays.stream(Employee.class.getDeclaredFields())
-//                    .filter(f-> !f.getName().equals("employeesNum") && !f.getName().equals("employeeNumber"))
-                    .map(Field::getName).toArray(String[]::new);
+        viewAllEmployees(in, out);
 
+        int employeeId = getInt("Enter the employee ID you would like to edit:",
+                "Invalid ID. Please enter a numeric value.", consoleInput);
 
-            for (int i = 0; i < fields.length; i++) {
-                String fName = fields[i];
-                System.out.println((i + 1) + ". " + fName);
-            }
-            try {
-                int selectedFieldNum = Integer.parseInt(consoleInput.readLine());
-                String selectedField = fields[selectedFieldNum - 1];
-                System.out.println("Choose the new value for " + selectedField);
-                String val = consoleInput.readLine();
-                JsonObject req = new JsonObject();
-                req.addProperty(selectedField, val);
-                //{selectedField : val } - example { firstName : "Orel" }
+        String employeeExistReq = admin_handler.isEmployeeExist(employeeId);
+        out.println(employeeExistReq);
 
-                break;
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input");
-            } catch (IndexOutOfBoundsException e) {
-                System.out.println("Please enter a value between 1 to " + fields.length);
-            }
-
+        String response = in.readLine();
+        JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+        boolean exists = json.get("exists").getAsBoolean();
+        if (!exists){
+            System.out.println("Employee with id "+employeeId+" does not exist,please try again");
+            editEmployee(in, out, consoleInput);
+            return;
         }
 
+        OnEmployeeFieldSelectedListener listener = fieldName -> {
+
+            System.out.println("Choose the new value for " + fieldName);
+
+            if (fieldName.equalsIgnoreCase("position")){
+                MenuItem[] positionMenu = new MenuItem[Position.values().length];
+                Position[] values = Position.values();
+                for (int i = 0; i < values.length; i++) {
+                    String name = values[i].name();
+                    positionMenu[i] = new MenuItem(name, () -> {
+                        try {
+                            requestEditEmployeeAndResponse(in, out, fieldName, employeeId, name);
+
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }
+                displayAndRunMenu(positionMenu, consoleInput, "Choose a position");//TODO check invalid choice
+            }
+            else {
+                try {
+                    String value = consoleInput.readLine();
+                    requestEditEmployeeAndResponse(in, out, fieldName, employeeId, value);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+        MenuItem[] menu = createEditEmployeeMenu(listener);
+
+        displayAndRunMenu(menu, consoleInput, "Select the property number you would like to edit:");
+    }
+
+    private static void requestEditEmployeeAndResponse(BufferedReader in, PrintWriter out,
+                                                       String fieldName, int employeeId, String value) throws IOException {
+        String request = admin_handler.editEmployee(employeeId, fieldName, value);
+        out.println(request);
+
+        String response = in.readLine();
+        if (response != null) {
+            JsonObject jsonObject = JsonParser.parseString(response).getAsJsonObject();
+            if (jsonObject.has("error")) {
+                System.out.println(jsonObject.get("error").getAsString());
+            } else if (jsonObject.has("result") && jsonObject.get("result").getAsString().equals("success")) {
+                System.out.println("Employee " + employeeId + " has been edited.");
+            }
+        }
+    }
+
+    private static MenuItem[] createEditEmployeeMenu(OnEmployeeFieldSelectedListener listener) {
+        List<Field> fields = Employee.getAllFields();
+
+        MenuItem[] menu = new MenuItem[fields.size()];
+
+        for (int i = 0; i < fields.size(); i++) {
+            String fName = fields.get(i).getName();
+            menu[i] = new MenuItem(fName, () -> listener.onEmployeeFieldSelected(fName));
+        }
+
+        return menu;
     }
 
     private static void removeEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
@@ -487,25 +643,24 @@ public class Client {
             System.out.println("Invalid ID. Please enter a numeric value.");
             return;
         }
-        final String removeEmployeeJsonReq = AdminHandler.getInstance().removeEmployee(employeeId);
+        final String removeEmployeeJsonReq = admin_handler.removeEmployee(employeeId);
         out.println(removeEmployeeJsonReq);
         String response = in.readLine();
         if (response != null) {
-            JsonObject res = new JsonObject();
+            JsonObject res = JsonParser.parseString(response).getAsJsonObject();
             if (res.has("error")) {
                 System.out.println("Employee " + employeeId + " failed to remove.");
                 System.out.println(res.get("error"));
-            }
-            if (res.has("result")) {
+            }else if (res.has("result")) {
                 System.out.println("Employee " + employeeId + " was successfully removed.");
             }
         }
     }
 
     private static void createAndAddEmployee(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
-        System.out.println("Enter employee details:");
         try {
-            int employeeId = getInt("Employee ID: ", "Invalid ID. Please enter a numeric value.", consoleInput);
+            System.out.println("Enter employee details:");
+            int employeeId = getEmployeeId(in, out, consoleInput);
 
             System.out.print("Employee First Name: ");
             String firstName = consoleInput.readLine();
@@ -518,10 +673,18 @@ public class Client {
 
             System.out.print("Employee Password : ");
             String password = consoleInput.readLine();
+//            Map<Integer, Branch> branches = BranchManager.getInstance().getBranches();
+//            for (Branch branch : branches.values()) {
+//                System.out.println(branch);
+//            }
 
-            int branchId = getInt("Employee Branch Id: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
+            int branchId = getInt("Employee Branch Id: ",
+                    "Invalid Branch ID. Please enter a numeric value.",
+                    consoleInput);
 
-            long accountNumber = getLong("Employee account number: ", "Invalid Branch ID. Please enter a numeric value.", consoleInput);
+            long accountNumber = getLong("Employee account number: ",
+                    "Invalid Branch ID. Please enter a numeric value.",
+                    consoleInput);
 
             // Position selection
             System.out.println("Select Employee Position:");
@@ -539,10 +702,10 @@ public class Client {
             }
             position = positions[positionChoice - 1];
 
-            Employee employee = new Employee(employeeId, branchId, firstName,
-                    lastName, phoneNumber, password, accountNumber, position);
+            Employee employee = new Employee(employeeId, branchId, firstName, lastName,
+                    phoneNumber, password, accountNumber, position);
 
-            final String newEmployeeJsonReq = AdminHandler.getInstance().createEmployee(employee);
+            final String newEmployeeJsonReq = admin_handler.createEmployee(employee);
             out.println(newEmployeeJsonReq);
 
             String result = in.readLine();
@@ -563,15 +726,33 @@ public class Client {
         }
     }
 
-    private int getEmployeeId(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
+    public void openChat(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
+        int myBranchID = 1;//need to use get brunch id by em id
+        String[] branches = {"Tel Aviv", "Jerusalem", "Haifa", "Beersheba"};
+
+        System.out.println("Branches:");
+        for (int i = 0; i < branches.length; i++) {
+            if (i + 1 != myBranchID) {
+                System.out.println("Branch ID: " + (i + 1) + ", Address: " + branches[i]);
+            }
+        }
+        int selectedBranchID = getInt("Enter branch ID : ",
+                "Invalid input. Please enter a valid branch number.", consoleInput,
+                branch -> branch < 1 || branch > branches.length || branch == myBranchID);
+        // build the request
+        String request = ChatHandler.getInstance().openChat(selectedBranchID,myBranchID);
+        //send the request to the server
+        out.println(request);
+        //get chat from server
+
+
+    }
+
+    private static int getEmployeeId(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
         boolean doesEmployeeExist = true;
         int employeeId = -1;
         while (doesEmployeeExist) {
             employeeId = getInt("Employee ID: ", "Invalid ID. Please enter a numeric value.", consoleInput);
-            if (employeeId <= 0) {
-                System.out.println("ID must be a positive number!");
-                continue;
-            }
             String req = admin_handler.isEmployeeExist(employeeId);
             out.println(req);
 
@@ -584,10 +765,6 @@ public class Client {
             }
         }
         return employeeId;
-    }
-
-    private static void viewAllEmployees(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
-
     }
 
     private static void viewAllEmployees(BufferedReader in, PrintWriter out) throws IOException {
@@ -609,7 +786,7 @@ public class Client {
         }
     }
 
-
+    /////////////
     //chat functions:
 
     private static void chooseBranchMenu(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {
@@ -715,7 +892,7 @@ public class Client {
         try {
             in.readLine();
         } catch (IOException e) {
-             System.out.println(e.toString());
+            System.out.println(e.toString());
         }
     }
 
@@ -882,11 +1059,12 @@ public class Client {
         JsonObject jsonResponse = ServerDecoder.convertToJsonObject(serverResponse).getAsJsonObject();
         return jsonResponse.get("branchId").getAsInt();
     }
+    /// ////////////
 
 
     //input help functions:
     private static int getInt(String msg, String errMsg, BufferedReader consoleInput) {
-        return getInt(msg, errMsg, consoleInput, null);
+        return getInt(msg,errMsg,consoleInput, x-> x > 0);
     }
 
     private static int getInt(String msg, String errMsg, BufferedReader consoleInput, Predicate<Integer> test) {
@@ -894,11 +1072,11 @@ public class Client {
             System.out.print(msg);
             try {
                 int number = Integer.parseInt(consoleInput.readLine());
-                if (test != null) {
+                if (test != null){
                     if (test.test(number)) {
                         return number;
                     }
-                } else {
+                }else {
                     return number;
                 }
             } catch (NumberFormatException e) {
@@ -920,6 +1098,22 @@ public class Client {
                 System.out.println(e.getLocalizedMessage());
             }
         }
+    }
+
+    public static LocalDate getDate(BufferedReader reader) {
+        LocalDate date = null;
+
+        while (date == null) {
+            System.out.print("Enter a date in the format yyyy-MM-dd: ");
+
+            try {
+                date = LocalDate.parse(reader.readLine(), DateTimeFormatter.ofPattern("yyyy-MM-dd")); // Attempt to parse the date
+            } catch (Exception e) {
+                System.out.println("Invalid date format. Please try again.");
+            }
+        }
+
+        return date;
     }
 }
 

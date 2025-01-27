@@ -1,35 +1,35 @@
 [
   {
-    "branchID": 1,
-    "accountNumber": 123,
-    "employeeNumber": 2,
-    "position": "SHIFTMGR",
-    "password": "1234",
-    "id": 323859629,
-    "firstName": "orel",
-    "lastName": "arussi",
-    "phoneNumber": "0503308010"
+    "branchID": 3,
+    "accountNumber": 3333,
+    "employeeNumber": 1,
+    "position": "CASHIER",
+    "password": "1111",
+    "id": 4,
+    "firstName": "aokok",
+    "lastName": "momaa",
+    "phoneNumber": "235356"
   },
   {
-    "branchID": 1,
-    "accountNumber": 1,
+    "branchID": 3,
+    "accountNumber": 234,
     "employeeNumber": 1,
-    "position": "SHIFTMGR",
-    "password": "1234",
-    "id": 1,
-    "firstName": "orel",
-    "lastName": "arussi",
-    "phoneNumber": "0503308151"
+    "position": "SHIFT_MANAGER",
+    "password": "1111",
+    "id": 2,
+    "firstName": "orelarussi",
+    "lastName": "inua",
+    "phoneNumber": "345345"
   },
   {
-    "branchID": 1,
-    "accountNumber": 123,
+    "branchID": 2,
+    "accountNumber": 132154,
     "employeeNumber": 1,
-    "position": "SHIFTMGR",
-    "password": "1234",
+    "position": "SHIFT_MANAGER",
+    "password": "@@@",
     "id": 3,
-    "firstName": "eran",
-    "lastName": "kar ",
-    "phoneNumber": "050515151"
+    "firstName": "ORELarussi",
+    "lastName": "Admin",
+    "phoneNumber": "0503308010"
   }
 ]

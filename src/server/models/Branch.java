@@ -65,8 +65,9 @@ public class Branch extends JsonSerializable {
     public void increaseEmployeeNumberBy1() {
         this.employeeAmount++;
     }
+
     public void reduceEmployeeNumberBy1() {
-        this.employeeAmount--;
+        this.employeeAmount = Math.max(this.employeeAmount-1, 0);
     }
 
     @Override

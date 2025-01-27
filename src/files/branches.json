@@ -1,30 +1,29 @@
 [
   {
     "branchID": 1,
-    "employeeAmount": 3,
+    "employeeAmount": 0,
     "address": "Tel Aviv",
-    "inventory": {},
-    "sales": {}
+    "inventory": {
+      "1": 5,
+      "3": 50
+    }
   },
   {
     "branchID": 2,
-    "employeeAmount": 0,
+    "employeeAmount": 1,
     "address": "Jerusalem",
-    "inventory": {},
-    "sales": {}
+    "inventory": {}
   },
   {
     "branchID": 3,
-    "employeeAmount": 0,
+    "employeeAmount": 2,
     "address": "Haifa",
-    "inventory": {},
-    "sales": {}
+    "inventory": {}
   },
   {
     "branchID": 4,
     "employeeAmount": 0,
     "address": "Beersheba",
-    "inventory": {},
-    "sales": {}
+    "inventory": {}
   }
 ]

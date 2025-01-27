@@ -6,17 +6,16 @@ import com.google.gson.reflect.TypeToken;
 import server.models.Branch;
 import server.models.Employee;
 import server.models.Product;
+import server.models.SaleReport;
 import server.models.customer.Customer;
-import server.services.AdminManager;
-import server.services.BranchManager;
-import server.services.EmployeeManager;
-import server.services.ProductManager;
+import server.services.*;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +25,8 @@ public class JsonUtils {
         Employees("employees"),
         Customers("customers"),
         Branches("branches"),
-        Products("products");
+        Products("products"),
+        Sales("sales");
 
         private final String fileName;
 
@@ -39,7 +39,7 @@ public class JsonUtils {
         }
     }
 
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(LocalDate.class, new LocalDateAdapter()).create();
     private static final String dirPath = "src" + File.separator + "files";
 
     // Generic method to read a JSON file and convert it to a list of objects
@@ -81,6 +81,8 @@ public class JsonUtils {
         saveBranches();
         System.out.println("Saving Products...");
         saveProducts();
+        System.out.println("Saving Sales...");
+        saveSaleReports();
         System.out.println("JSON files saved successfully.");
     }
 
@@ -94,6 +96,8 @@ public class JsonUtils {
         loadBranches();
         System.out.println("Loading Products...");
         loadProducts();
+        System.out.println("Loading Sales...");
+        loadSales();
         System.out.println("JSON files loaded successfully.");
     }
 
@@ -105,6 +109,10 @@ public class JsonUtils {
     public static void saveProducts() {
         List<Product> products = ProductManager.getInstance().getProducts().values().stream().toList();
         writeJsonFile(Files.Products.getFileName(), products);
+    }
+
+    private static void saveSaleReports() {
+        writeJsonFile(Files.Sales.getFileName(), SalesManager.getInstance().getAllSaleReports());
     }
 
     public static void saveCustomers() {
@@ -120,6 +128,13 @@ public class JsonUtils {
     public static void loadBranches() {
         List<Branch> branches = basicLoad(Files.Branches, Branch.class);
         BranchManager.getInstance().setBranches(branches);
+    }
+
+    public static void loadSales() {
+        List<SaleReport> sales = basicLoad(Files.Sales, SaleReport.class);
+        if (sales != null) {
+            SalesManager.getInstance().setSaleReports(sales);
+        }
     }
 
     public static void loadProducts() {

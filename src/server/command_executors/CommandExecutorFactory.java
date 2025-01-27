@@ -10,6 +10,8 @@ public class CommandExecutorFactory {
         commandExecutorDictionary.put(ServiceType.CUSTOMER, new CustomerManagerCommandExecutor());
         commandExecutorDictionary.put(ServiceType.EMPLOYEE, new EmployeeManagerCommandExecutor());
         commandExecutorDictionary.put(ServiceType.CHAT, new ChatManagerCommandExecutor());
+        commandExecutorDictionary.put(ServiceType.SALES, new SalesManagerCommandExecutor());
+        commandExecutorDictionary.put(ServiceType.SESSION, new SessionHandlerCommandExecutor());
     }
 
     public static IExecute getCommandExecutor(ServiceType serviceType) {
