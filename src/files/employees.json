@@ -29,8 +29,8 @@
     "password": "1111",
     "id": 4,
     "firstName": "aokok",
-    "lastName": "momaa",
-    "phoneNumber": "235356"
+    "lastName": "56",
+    "phoneNumber": "tg"
   },
   {
     "branchID": 1,
@@ -42,5 +42,16 @@
     "firstName": "Dani",
     "lastName": "Banani",
     "phoneNumber": "0524567895"
+  },
+  {
+    "branchID": 8,
+    "accountNumber": 76,
+    "employeeNumber": 1,
+    "position": "CASHIER",
+    "password": "7654",
+    "id": 6,
+    "firstName": "65",
+    "lastName": "65",
+    "phoneNumber": "tf"
   }
 ]

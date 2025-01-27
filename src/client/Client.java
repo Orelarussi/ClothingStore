@@ -103,7 +103,9 @@ public class Client {
         String response = in.readLine();
         if (response != null) {
             System.out.println("Inventory for Branch ID " + branchID + ":");
-            System.out.println(response);
+            JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+            String inventory = json.get("result").getAsString();
+            System.out.println(!inventory.isEmpty() ? inventory : "Inventory is empty");
         } else {
             System.out.println("No response received from the server.");
         }
@@ -438,17 +440,9 @@ public class Client {
                 System.out.println("No response received from the server.");
                 return;
             }
-
-            // ניתוח התשובה
-            if (response.contains("No employees found")) {
-                System.out.println(response);
-            } else {
-                System.out.println("Employees in Branch " + branchId + ":");
-                String[] employees = response.split(", ");
-                for (String employee : employees) {
-                    System.out.println(employee.trim());
-                }
-            }
+            JsonObject object = JsonParser.parseString(response).getAsJsonObject();
+            String employees = object.get("result").getAsString();
+            System.out.println(!employees.isEmpty() ? employees : "No employees found");
         } catch (IOException e) {
             System.out.println("An error occurred while fetching branch employees: " + e.getMessage());
         }

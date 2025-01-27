@@ -64,7 +64,7 @@ public class BranchManager implements MapChangeListener<Integer, Branch> {
     public void addEmployeeToBranch(int branchID) {
         Branch b = branches.get(branchID);
         if (b == null) {
-            throw new IllegalArgumentException("Branch with id" + branchID+ " doesn't exist!");
+            throw new IllegalArgumentException("Branch with id " + branchID+ " doesn't exist!");
         }
         b.increaseEmployeeNumberBy1();
         JsonUtils.saveBranches();
