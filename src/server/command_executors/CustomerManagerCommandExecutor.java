@@ -3,7 +3,6 @@ package server.command_executors;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import server.models.customer.Customer;
-import server.services.BranchManager;
 import server.services.EmployeeManager;
 import server.services.LoginResult;
 

@@ -5,7 +5,6 @@ import server.command_executors.MethodType;
 import server.command_executors.ServiceType;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public class SalesHandler extends BaseHandler{
 

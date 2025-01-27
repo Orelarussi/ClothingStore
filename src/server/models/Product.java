@@ -1,10 +1,6 @@
 package server.models;
 
-import server.exceptions.InvalidQuantityException;
 import server.utils.JsonSerializable;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class Product extends JsonSerializable{
     private int id;

@@ -1,13 +1,9 @@
 package server.command_executors;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import server.models.Branch;
-import server.models.Product;
-import server.models.customer.Customer;
-import server.services.*;
 import server.models.Employee;
+import server.services.*;
 
 import java.util.List;
 

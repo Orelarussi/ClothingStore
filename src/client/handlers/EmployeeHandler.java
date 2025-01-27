@@ -1,10 +1,8 @@
 package client.handlers;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import server.command_executors.MethodType;
 import server.command_executors.ServiceType;
-import server.models.Product;
 
 public class EmployeeHandler extends BaseHandler {
 

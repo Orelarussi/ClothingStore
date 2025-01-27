@@ -68,7 +68,7 @@ public class BranchManager implements MapChangeListener<Integer, Branch> {
         }
         b.increaseEmployeeNumberBy1();
         JsonUtils.saveBranches();
-        System.out.println("Updated branches successfully");
+        System.out.println("Updated branches employees successfully");
     }
 
     public void removeEmployeeFromBranch(int branchID) {

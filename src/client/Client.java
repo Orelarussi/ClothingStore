@@ -8,20 +8,21 @@ import server.command_executors.ServerDecoder;
 import server.database.SocketData;
 import server.models.Employee;
 import server.models.Employee.Position;
-import server.models.Product;
 import server.models.customer.Customer;
 import server.models.customer.NewCustomer;
 import server.services.LoginResult;
-import java.io.*;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.net.Socket;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 
