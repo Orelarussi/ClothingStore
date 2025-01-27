@@ -71,7 +71,7 @@ public class AdminManagerCommandExecutor implements IExecute{
             case IS_SHIFT_MANAGER: // New case for checking role
                 employeeId = data.get("employeeId").getAsInt();
                 employee = adminManager.findEmployeeById(employeeId);
-                boolean isShiftManager = employee != null && employee.getPosition() == Employee.Position.SHIFTMGR;
+                boolean isShiftManager = employee != null && employee.getPosition() == Employee.Position.SHIFT_MANAGER;
                 response.addProperty("isShiftManager", isShiftManager);
                 break;
             case GET_BRANCH_ID:

@@ -33,7 +33,7 @@ public class Client {
     private static final int SERVER_PORT = 12345;
     public static final String LOG_OUT = "Log out";
     public static final AdminHandler admin_handler = AdminHandler.getInstance();
-
+    private static Integer myBranchID;
     private static Integer id;
 
     public static void main(String[] args) {
@@ -41,7 +41,7 @@ public class Client {
 
         MenuItem[] generalMenu = new MenuItem[]{
                 new MenuItem("Login", () -> connectToServer(consoleInput)),
-                new MenuItem("Exit", () -> exitClient(consoleInput))
+                new MenuItem("Exit", () -> exitClient())
         };
         while (true) {
             System.out.println("\nWelcome to Clothing Store\n");
@@ -724,28 +724,6 @@ public class Client {
         } catch (IOException e) {
             System.out.println(e.getLocalizedMessage());
         }
-    }
-
-    public void openChat(BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
-        int myBranchID = 1;//need to use get brunch id by em id
-        String[] branches = {"Tel Aviv", "Jerusalem", "Haifa", "Beersheba"};
-
-        System.out.println("Branches:");
-        for (int i = 0; i < branches.length; i++) {
-            if (i + 1 != myBranchID) {
-                System.out.println("Branch ID: " + (i + 1) + ", Address: " + branches[i]);
-            }
-        }
-        int selectedBranchID = getInt("Enter branch ID : ",
-                "Invalid input. Please enter a valid branch number.", consoleInput,
-                branch -> branch < 1 || branch > branches.length || branch == myBranchID);
-        // build the request
-        String request = ChatHandler.getInstance().openChat(selectedBranchID,myBranchID);
-        //send the request to the server
-        out.println(request);
-        //get chat from server
-
-
     }
 
     private static int getEmployeeId(BufferedReader in, PrintWriter out, BufferedReader consoleInput) throws IOException {

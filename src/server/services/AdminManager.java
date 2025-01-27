@@ -32,6 +32,7 @@ public class AdminManager implements MapChangeListener<Integer, Employee> {
 
     public LoginResult login(int id, String pass) {
         // Check if the login is for the admin
+        LoginResult result = LoginResult.FAILURE;
         if (admin.getId() == id && admin.getPassword().equals(pass)) {
             currentUserId = id;
             result = LoginResult.ADMIN;
@@ -50,7 +51,7 @@ public class AdminManager implements MapChangeListener<Integer, Employee> {
 
         // Return FAILURE if login credentials are incorrect
         result.setMessage("Username or password is incorrect. Please try again.");
-        return LoginResult.FAILURE;
+        return result;
     }
 
     public List<Employee> getAllEmployees() {
@@ -104,7 +105,7 @@ public class AdminManager implements MapChangeListener<Integer, Employee> {
     }
 
     public void editEmployee(int employeeID, String attribute, String value)
-            throws Exception {
+            throws IllegalAccessException {
 
         Employee employee = employees.get(employeeID);
         if (employee == null) {
@@ -143,7 +144,7 @@ public class AdminManager implements MapChangeListener<Integer, Employee> {
             }
         } catch (IllegalArgumentException e) {
             String message = "The value " + value + " is not valid for field " + field.getName();
-            throw new Exception(message);
+            throw new IllegalAccessException(message);
         }
 
         // Save the updated employee back to the map

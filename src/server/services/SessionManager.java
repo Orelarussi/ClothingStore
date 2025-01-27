@@ -47,7 +47,7 @@ public class SessionManager {
         return connections;
     }
 
-    public void addConnection(int id, SocketData socketData) {
+    public synchronized void addConnection(int id, SocketData socketData) {
         connections.put(id, socketData);
     }
 }

@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class ClientHandler extends Thread {
@@ -78,11 +80,5 @@ public class ClientHandler extends Thread {
         }
         SessionManager.getInstance().addConnection(id,socketData);
         userId = id;
-    }
-
-    public static SocketData getSocketForEmployee(int userId) {
-        synchronized (connections) { // Ensure thread-safety
-            return connections.get(userId);
-        }
     }
 }

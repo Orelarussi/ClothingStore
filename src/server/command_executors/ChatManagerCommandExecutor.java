@@ -9,6 +9,7 @@ import server.models.chat.Message;
 import server.services.AdminManager;
 import server.services.ChatManager;
 import server.services.LoginResult;
+import server.services.SessionManager;
 
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
@@ -117,7 +118,7 @@ public class ChatManagerCommandExecutor implements IExecute {
 
     protected void sendResponseToEmployee(int employeeId, JsonObject response) throws IllegalStateException {
         // Get the connection for the employee
-        SocketData socketData = ClientHandler.getSocketForEmployee(employeeId);
+        SocketData socketData = SessionManager.getInstance().getConnections().get(employeeId);
         if (socketData == null) {
             throw new IllegalStateException("Employee " + employeeId + " is not currently connected.");
         }

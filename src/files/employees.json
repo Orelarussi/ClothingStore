@@ -1,14 +1,14 @@
 [
   {
-    "branchID": 3,
-    "accountNumber": 3333,
+    "branchID": 1,
+    "accountNumber": 1,
     "employeeNumber": 1,
-    "position": "CASHIER",
-    "password": "1111",
-    "id": 4,
-    "firstName": "aokok",
-    "lastName": "momaa",
-    "phoneNumber": "235356"
+    "position": "SHIFT_MANAGER",
+    "password": "1",
+    "id": 212303366,
+    "firstName": "gil",
+    "lastName": "re",
+    "phoneNumber": "1"
   },
   {
     "branchID": 3,
@@ -31,5 +31,27 @@
     "firstName": "ORELarussi",
     "lastName": "Admin",
     "phoneNumber": "0503308010"
+  },
+  {
+    "branchID": 3,
+    "accountNumber": 3333,
+    "employeeNumber": 1,
+    "position": "CASHIER",
+    "password": "1111",
+    "id": 4,
+    "firstName": "aokok",
+    "lastName": "momaa",
+    "phoneNumber": "235356"
+  },
+  {
+    "branchID": 1,
+    "accountNumber": 8,
+    "employeeNumber": 1,
+    "position": "SHIFT_MANAGER",
+    "password": "",
+    "id": 212,
+    "firstName": "neta",
+    "lastName": "halfon",
+    "phoneNumber": "09"
   }
 ]
