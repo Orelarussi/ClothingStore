@@ -799,11 +799,9 @@ public class Client {
             try {
                 while (true) {
                     // Check if there is user input
-                    System.out.print("Your message: ");
                     if (consoleInput.ready()) {
                         String input = consoleInput.readLine().trim();
                         userInput.set(input); // Update the user input
-                        System.out.print("Your message: ");
                         if ("bye bye".equalsIgnoreCase(input)) {
                             break; // // Exit the chat if the user typed 'bye bye'
                         }
@@ -820,6 +818,7 @@ public class Client {
                 // Send a message if the user typed input
                 String input = userInput.getAndSet(null);
                 if (input != null) {
+                    System.out.print("Your message: ");
                     LocalDateTime timestamp = LocalDateTime.now();
                     String messageRequest = ChatHandler.getInstance().sendMessage(chatId, id, input, timestamp);
                     out.println(messageRequest);
@@ -850,7 +849,8 @@ public class Client {
                     }
 
                     // הדפסת ההודעה
-                    System.out.println(message.toString());
+                    System.out.println("\n"+message.toString());
+                    System.out.print("Your message: ");
                 }
             }
         } catch (IOException e) {
