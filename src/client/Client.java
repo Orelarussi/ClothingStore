@@ -958,15 +958,15 @@ public class Client {
                 // Send a message if the user typed input
                 String input = userInput.getAndSet(null);
                 if (input != null) {
-                    System.out.print("Your message: ");
                     LocalDateTime timestamp = LocalDateTime.now();
                     String messageRequest = ChatHandler.getInstance().sendMessage(chatId, id, input, timestamp);
                     out.println(messageRequest);
                     serverResponse = in.readLine();//clean the buffer
-                    if ("bye bye".equals(input)) {
+                    if ("bye bye".equalsIgnoreCase(input)) {
                         System.out.println("Exiting chat...");
                         String endChatRequest = ChatHandler.getInstance().closeChat(chatId);//delete chat from active chats
                         out.println(endChatRequest);
+                        serverResponse = in.readLine();//clean the buffer
                         break;
                     }
                 }
@@ -990,7 +990,6 @@ public class Client {
 
                     // הדפסת ההודעה
                     System.out.println("\n"+message.toString());
-                    System.out.print("Your message: ");
                 }
             }
         } catch (IOException e) {
