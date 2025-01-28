@@ -1,6 +1,5 @@
 package server;
 
-import server.logger.Logger;
 import server.utils.JsonUtils;
 
 import java.io.IOException;
@@ -18,7 +17,6 @@ public class Server {
 
     public void start() {
         System.out.println("--> Server is running...");
-        Logger.initLogger();
         JsonUtils.load();
 
         // server wait to client connection then wrap the handler using thread

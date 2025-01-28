@@ -1,5 +1,6 @@
 package server.services;
 
+import server.logger.Logger;
 import server.models.Employee;
 import server.models.chat.ChatSession;
 import server.models.chat.Message;
@@ -49,6 +50,8 @@ public class ChatManager {
         int shiftManagerBranchId = getBranchIdByEmployeeId(managerId);
         if (chatSession.isRelevantForShiftManager(shiftManagerBranchId)) {
             chatSession.setShiftManagerID(managerId);
+            Logger.log("Shift manager with ID " + managerId + " joined chat with ID " + targetChatId+"\n", Logger.LogType.CHAT);
+            System.out.println("Manager with ID " + managerId + " joined chat with ID " + targetChatId);
             return true;
         }
         return false;
@@ -90,10 +93,21 @@ public class ChatManager {
         int chatSessionId = getNewChatSessionId();
         ChatSession chatSession = new ChatSession(employee1Id, employee2Id, chatSessionId);
         activeChatSessions.put(chatSessionId, chatSession);
+        Logger.log(chatSession.toString()+"opened. chat ID: "+chatSessionId+"\n", Logger.LogType.CHAT);
+        System.out.println(chatSession.toString()+". chat ID: "+chatSessionId);
         return chatSessionId;
     }
 
     public void closeChat(int chatSessionId) {
+        //update the log
+        ChatSession chatSession= activeChatSessions.get(chatSessionId);
+        String logMessage = "Chat " + chatSessionId + " closed successfully. Messages:\n";
+        for(Message message :chatSession.getMessages()){
+            logMessage+=message.toString()+"\n";
+        }
+        Logger.log(logMessage, Logger.LogType.CHAT);
+        System.out.println("Chat " + chatSessionId + " closed successfully.");
+        //close
         activeChatSessions.remove(chatSessionId);//The chat object will be eligible for garbage collection if no other references exist
     }
 

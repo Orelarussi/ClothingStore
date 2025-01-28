@@ -1,6 +1,7 @@
 package server.services;
 
 import com.google.gson.JsonObject;
+import server.logger.Logger;
 import server.models.Employee;
 import server.models.customer.Customer;
 import server.utils.JsonUtils;
@@ -27,6 +28,8 @@ public class EmployeeManager {
         if (customers.containsKey(id)) {
             customers.remove(id);
             System.out.println("Customer with ID " + id + " removed.");
+            Logger.log("Customer with ID " + id + " removed.", Logger.LogType.CUSTOMER);
+
             JsonUtils.saveCustomers();
             return true;
         }
@@ -38,6 +41,7 @@ public class EmployeeManager {
         if (!customers.containsKey(customer.getId())) {
             customers.put(customer.getId(), customer);
             System.out.println("Customer added: " + customer.getFirstName() + " " + customer.getLastName());
+            Logger.log("Customer added: " + customer.getFirstName() + " " + customer.getLastName(), Logger.LogType.CUSTOMER);
             JsonUtils.saveCustomers();
             return true;
         } else {
