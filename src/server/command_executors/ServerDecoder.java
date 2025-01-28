@@ -43,41 +43,4 @@ public class ServerDecoder {
         JsonElement jsonElement = JsonParser.parseString(jsonString);
         return jsonElement.getAsJsonObject();
     }
-
-    /**
-     * Create an unauthorized response in JSON format
-     */
-    public static String unAuthResponse(ServiceType serviceType, MethodType methodType) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty(SERVICE_KEY, serviceType.toString());
-        jsonObject.addProperty(METHOD_KEY, methodType.toString());
-        jsonObject.addProperty("message", "Method not premiered, please login with the right permissions!");
-        return jsonObject.toString();
-    }
-
-    /**
-     * Handle "showInventory" request
-     */
-    public static void handleShowInventory(String input, PrintWriter out) {
-        JsonObject request = convertToJsonObject(input);
-
-        // Parse branchID from the request
-        int branchID = request.get("branchID").getAsInt();
-
-        // Use BranchManager to get the inventory of the branch
-        BranchManager branchManager = BranchManager.getInstance();
-        JsonObject response = new JsonObject();
-
-        if (branchManager.getBranchById(branchID) != null) {
-            branchManager.getBranchById(branchID).getInventory()
-                    .forEach((productId, quantity) ->
-                            response.addProperty("Product ID: " + productId, "Quantity: " + quantity)
-                    );
-        } else {
-            response.addProperty("error", "Branch not found.");
-        }
-
-        // Send the response back to the client
-        out.println(response.toString());
-    }
 }

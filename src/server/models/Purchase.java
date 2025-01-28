@@ -1,6 +1,5 @@
 package server.models;
 
-import client.serverCommunication.Format;
 import server.utils.JsonSerializable;
 
 import java.time.LocalDateTime;
@@ -121,29 +120,14 @@ public class Purchase extends JsonSerializable {
         return this.purchasedItems;
     }
 
-    /**
-    * Returns a string representation of the purchase.
-    *
-    * @return The string representation of the purchase.
-    */
     @Override
     public String toString() {
-        return  purchaseID + Format.fieldSeparator +
-                customerID + Format.fieldSeparator +
-                date + Format.fieldSeparator +
-                branch;
+        return "Purchase{" +
+               "purchaseID=" + purchaseID +
+               ", customerID=" + customerID +
+               ", date=" + date +
+               ", branch='" + branch + '\'' +
+               ", purchasedItems=" + purchasedItems +
+               '}';
     }
-
-    // Type 1: createNewPurchase, Type 2: Import Purchases List<> for Reports
-    public String toString(int type) {
-        String response = customerID + Format.fieldSeparator + Format.dateToString(date) + Format.fieldSeparator + branch;
-
-        return switch (type) {
-            case 1 ->
-                    response + Format.paramsSeparator + Format.encodeProducts(purchasedItems) + Format.paramsSeparator;
-            case 2 -> purchaseID + Format.paramsSeparator + response + Format.paramsSeparator;
-            default -> null;
-        };
-    }
-
 }

@@ -1,12 +1,15 @@
-package server.command_executors;
+package server.command_executors.executors;
 
 import com.google.gson.JsonObject;
+import server.command_executors.IExecute;
+import server.command_executors.MethodType;
+import server.command_executors.ServerDecoder;
 import server.services.LoginResult;
 import server.services.SessionManager;
 
 import java.io.IOException;
 
-public class SessionHandlerCommandExecutor implements IExecute{
+public class SessionHandlerCommandExecutor implements IExecute {
     @Override
     public String execute(Integer userId, LoginResult loginResult, String request) {
         SessionManager manager = SessionManager.getInstance();

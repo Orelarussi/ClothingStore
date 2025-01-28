@@ -1,14 +1,17 @@
-package server.command_executors;
+package server.command_executors.executors;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import server.command_executors.IExecute;
+import server.command_executors.MethodType;
+import server.command_executors.ServerDecoder;
 import server.models.customer.Customer;
 import server.services.EmployeeManager;
 import server.services.LoginResult;
 
 import java.util.Map;
 
-public class CustomerManagerCommandExecutor implements IExecute{
+public class CustomerManagerCommandExecutor implements IExecute {
 
     @Override
     public String execute(Integer userId,LoginResult loginResult, String request) {

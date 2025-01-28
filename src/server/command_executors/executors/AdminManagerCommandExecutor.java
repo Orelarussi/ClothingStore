@@ -1,14 +1,17 @@
-package server.command_executors;
+package server.command_executors.executors;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import server.command_executors.IExecute;
+import server.command_executors.MethodType;
+import server.command_executors.ServerDecoder;
 import server.models.Employee;
 import server.services.AdminManager;
 import server.services.LoginResult;
 
 import java.util.List;
 
-public class AdminManagerCommandExecutor implements IExecute{
+public class AdminManagerCommandExecutor implements IExecute {
     private AdminManager adminManager;
 
     @Override

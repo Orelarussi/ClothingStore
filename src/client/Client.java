@@ -775,7 +775,7 @@ public class Client {
             String response = in.readLine();
             JsonObject serverResponse = ServerDecoder.convertToJsonObject(response);
             if (serverResponse.get("chatId").isJsonNull()) {
-                System.out.println("No chat available at the moment. Waiting for available employee...");
+                System.out.println("\nNo chat available at the moment. Waiting for available employee...");
                 waitForChat(in, out, consoleInput, true, selectedBranchID);
             } else {
                 int chatId = serverResponse.get("chatId").getAsInt();

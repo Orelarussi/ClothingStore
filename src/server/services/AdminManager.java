@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import server.exceptions.IllegalFieldValueException;
+import server.logger.Logger;
 import server.models.Admin;
 import server.models.Employee;
 import server.utils.JsonUtils;
@@ -105,6 +106,7 @@ public class AdminManager implements MapChangeListener<Integer, Employee> {
         employees.put(employee.getId(), employee);
         BranchManager.getInstance().addEmployeeToBranch(employee.getBranchID());
         System.out.println("Employee " + employee.getFullName() + " added successfully.");
+        Logger.addEmployee(employee);
     }
 
     public void deleteEmployee(int id) {
@@ -113,8 +115,10 @@ public class AdminManager implements MapChangeListener<Integer, Employee> {
         if (employee != null) {
             System.out.println("Employee " + employee.getFirstName() + " removed successfully.");
             BranchManager.getInstance().removeEmployeeFromBranch(employee.getBranchID());
+            Logger.deleteEmployee(employee);
         } else {
             System.out.println("Employee not found.");
+            Logger.log("Employee not found.");
         }
     }
 

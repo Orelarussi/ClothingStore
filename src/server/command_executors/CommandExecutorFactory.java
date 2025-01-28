@@ -1,5 +1,7 @@
 package server.command_executors;
 
+import server.command_executors.executors.*;
+
 import java.util.HashMap;
 
 public class CommandExecutorFactory {
