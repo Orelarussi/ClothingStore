@@ -63,8 +63,12 @@ cd ClothingStore
 # Compile the Java source files.
 javac -d bin src/*.java
 # Navigate to the bin directory and execute the main class.
-java MainClass
-# Replace MainClass with the actual name of your main class.
+For the Server:
+To start the server, use the following command:
+java server.Server
+For the Client:
+To start the client, use the following command:
+java client.Client
 
 ---
 
