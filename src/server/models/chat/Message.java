@@ -1,5 +1,7 @@
 package server.models.chat;
 
+import com.google.gson.JsonObject;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -9,21 +11,17 @@ public class Message {
     private final String content; // Message content
     private final LocalDateTime timestamp; // Time the message was sent
 
-    public Message(int senderId, String content,LocalDateTime timestamp ) {
+    public Message(int senderId, String content, LocalDateTime timestamp, String senderName) {
         this.senderId = senderId;
         this.content = content;
         this.timestamp = timestamp;
+        this.senderName= senderName;
     }
-
+    // Getters
     public String getSenderName() {
         return senderName;
     }
 
-    public void setSenderName(String senderName) {
-        this.senderName = senderName;
-    }
-
-    // Getters
     public int getSenderId() {
         return senderId;
     }
@@ -44,4 +42,13 @@ public class Message {
 
         // Return a nicely formatted string
         return "[" + formattedTime + "] " + senderName + ": " + content;    }
+
+    public JsonObject toJson() {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("employeeId", senderId);
+        jsonObject.addProperty("senderName", senderName);
+        jsonObject.addProperty("content", content);
+        jsonObject.addProperty("timestamp", timestamp.toString());
+        return jsonObject;
+    }
 }
