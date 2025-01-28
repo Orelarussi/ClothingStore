@@ -93,10 +93,8 @@ public class ChatManagerCommandExecutor implements IExecute {
                 String timeString = data.get("timestamp").getAsString();
                 String content = data.get("content").getAsString();
                 LocalDateTime timestamp = LocalDateTime.parse(timeString);
-                Message message = new Message(senderId, content, timestamp);
-
-                String senderName = AdminManager.getInstance().getEmployeeNameById(message.getSenderId());
-                message.setSenderName(senderName);
+                String senderName = AdminManager.getInstance().getEmployeeNameById(senderId);
+                Message message = new Message(senderId, content, timestamp,senderName);
                 data.addProperty("senderName", senderName);
 
                 List<Integer> employeeToSend = chatManager.sendMessage(message, chatId);
