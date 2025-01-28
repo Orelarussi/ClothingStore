@@ -977,8 +977,8 @@ public class Client {
                     Message message = new Message(
                             messageJson.get("employeeId").getAsInt(),
                             messageJson.get("content").getAsString(),
-                            LocalDateTime.parse(messageJson.get("timestamp").getAsString()));
-                    message.setSenderName(messageJson.get("senderName").getAsString());
+                            LocalDateTime.parse(messageJson.get("timestamp").getAsString()),
+                            messageJson.get("senderName").getAsString());
 
                     // בדיקת תוכן ההודעה לסיום השיחה
                     String messageContent = message.getContent().trim();
@@ -988,7 +988,7 @@ public class Client {
                     }
 
                     // הדפסת ההודעה
-                    System.out.println("\n"+message.toString());
+                    System.out.println(message.toString());
                 }
             }
         } catch (IOException e) {
