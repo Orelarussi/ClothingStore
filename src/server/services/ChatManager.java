@@ -42,6 +42,10 @@ public class ChatManager {
 
     public Boolean joinChatAsManager(int managerId, int targetChatId) {
         ChatSession chatSession = activeChatSessions.get(targetChatId);
+        if (chatSession == null) {
+            System.out.println("The chat the shift manager tried to join is no longer available. chat target" + targetChatId);
+            return false;
+        }
         int shiftManagerBranchId = getBranchIdByEmployeeId(managerId);
         if (chatSession.isRelevantForShiftManager(shiftManagerBranchId)) {
             chatSession.setShiftManagerID(managerId);
