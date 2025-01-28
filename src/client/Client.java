@@ -892,8 +892,7 @@ public class Client {
                 joinExistingChat(chatId, in, out, consoleInput); // התחברות לצ'אט
             });
         }
-        //TODO: להכין פונקציית תצוגה תפריט שהיא לא לולאתית כי זה כל פעם מציג את אותם צאטים גם אם השתנה ואת הלולאה לשים בפונקציה הזאת
-        displayAndRunMenu(OptionalChat, consoleInput, "Chose available chat");
+        displayAndRunMenuOnce(OptionalChat, consoleInput, "Chose available chat",true);
     }
 
     private static void joinExistingChat(int chatId, BufferedReader in, PrintWriter out, BufferedReader consoleInput) {
@@ -1008,6 +1007,48 @@ public class Client {
         String serverResponse = in.readLine();
         JsonObject jsonResponse = ServerDecoder.convertToJsonObject(serverResponse);
         return jsonResponse.get("isShiftManager").getAsBoolean();
+    }
+
+    private static void displayAndRunMenuOnce(MenuItem[] menuItems, BufferedReader consoleInput,
+                                          String menuTitle, boolean addBack) {
+        if (addBack) {
+            menuItems = Arrays.copyOf(menuItems, menuItems.length + 1);
+            menuItems[menuItems.length - 1] = new MenuItem("Back", null);
+        }
+
+        int choice;
+
+            // display the menu
+            System.out.println("\n=== " + menuTitle + " ===");
+            for (int i = 0; i < menuItems.length; i++) {
+                System.out.println((i + 1) + ". " + menuItems[i].getTitle());
+            }
+
+            System.out.print("Choose an option: ");
+            try {
+                choice = Integer.parseInt(consoleInput.readLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number.");
+                return;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (choice > 0 && choice <= menuItems.length) {
+                MenuItem item = menuItems[choice - 1];
+                String title = item.getTitle();
+                if (title.equals("Back") || title.equals(LOG_OUT)) {
+                    return;
+                }else if (title.equals("Exit")) {
+                    item.run();
+                    return;
+                }else {
+                    item.run();
+                }
+            } else {
+                System.out.println("Invalid choice. Please try again.");
+            }
+
     }
 
 
