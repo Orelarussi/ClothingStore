@@ -15,7 +15,7 @@ import java.util.List;
 
 public class AdminManager implements MapChangeListener<Integer, Employee> {
     private ObservableMap<Integer, Employee> employees = FXCollections.observableHashMap();
-    private static final Admin admin = new Admin(1, "Eran", "karaso", "000", "1234");
+    private static final Admin admin = new Admin(1, "Roi", "The Admin", "000", "1234");
     public static int currentUserId = admin.getId();
 
     //singleton

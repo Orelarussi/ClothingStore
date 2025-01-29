@@ -5,14 +5,21 @@
     "address": "Tel Aviv",
     "inventory": {
       "1": 17,
-      "3": 50
+      "2": 23,
+      "3": 50,
+      "4": 89
     }
   },
   {
     "branchID": 2,
     "employeeAmount": 1,
     "address": "Jerusalem",
-    "inventory": {}
+    "inventory": {
+      "1": 17,
+      "2": 23,
+      "3": 50,
+      "4": 89
+    }
   },
   {
     "branchID": 3,
