@@ -3,9 +3,45 @@
     "purchasePlan": "New customer: 10% off on first purchase.",
     "type": "NEW",
     "totalPurchases": 0,
+    "id": 1,
+    "firstName": "assaf",
+    "lastName": "lotz",
+    "phoneNumber": "05465859675"
+  },
+  {
+    "purchasePlan": "Returning customer: 15% off after 3 purchases.",
+    "type": "RETURNING",
+    "totalPurchases": 27,
     "id": 2,
-    "firstName": "Jane",
-    "lastName": "Smith",
-    "phoneNumber": "987654321"
+    "firstName": "Dani",
+    "lastName": "dan",
+    "phoneNumber": "0523569486"
+  },
+  {
+    "purchasePlan": "Returning customer: 15% off after 3 purchases.",
+    "type": "RETURNING",
+    "totalPurchases": 0,
+    "id": 3,
+    "firstName": "eran",
+    "lastName": "banani",
+    "phoneNumber": "0523669588"
+  },
+  {
+    "purchasePlan": "New customer: 10% off on first purchase.",
+    "type": "NEW",
+    "totalPurchases": 0,
+    "id": 4,
+    "firstName": "daniella",
+    "lastName": "Hamo",
+    "phoneNumber": "0548695453"
+  },
+  {
+    "purchasePlan": "New customer: 10% off on first purchase.",
+    "type": "NEW",
+    "totalPurchases": 0,
+    "id": 5,
+    "firstName": "Neta",
+    "lastName": "pinyeta",
+    "phoneNumber": "0548785995"
   }
 ]
