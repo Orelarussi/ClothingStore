@@ -1,5 +1,16 @@
 [
   {
+    "branchID": 1,
+    "accountNumber": 1,
+    "employeeNumber": 2,
+    "position": "SHIFT_MANAGER",
+    "password": "32",
+    "id": 32,
+    "firstName": "32",
+    "lastName": "32",
+    "phoneNumber": "32"
+  },
+  {
     "branchID": 3,
     "accountNumber": 234,
     "employeeNumber": 1,
@@ -44,6 +55,17 @@
     "phoneNumber": "09"
   },
   {
+    "branchID": 3,
+    "accountNumber": 5,
+    "employeeNumber": 1,
+    "position": "SHIFT_MANAGER",
+    "password": "5",
+    "id": 5,
+    "firstName": "5",
+    "lastName": "5",
+    "phoneNumber": "5"
+  },
+  {
     "branchID": 1,
     "accountNumber": 4,
     "employeeNumber": 1,
@@ -64,5 +86,27 @@
     "firstName": "Neta",
     "lastName": "pinyeta",
     "phoneNumber": "0541239685"
+  },
+  {
+    "branchID": 2,
+    "accountNumber": 5,
+    "employeeNumber": 1,
+    "position": "CASHIER",
+    "password": "25",
+    "id": 25,
+    "firstName": "israel",
+    "lastName": "map",
+    "phoneNumber": "0"
+  },
+  {
+    "branchID": 1,
+    "accountNumber": 234,
+    "employeeNumber": 1,
+    "position": "SHIFT_MANAGER",
+    "password": "yalile",
+    "id": 14,
+    "firstName": "yali",
+    "lastName": "halfon",
+    "phoneNumber": "0544466677"
   }
 ]

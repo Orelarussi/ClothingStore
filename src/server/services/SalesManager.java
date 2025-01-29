@@ -1,5 +1,6 @@
 package server.services;
 
+import server.logger.Logger;
 import server.models.Branch;
 import server.models.SaleReport;
 import server.models.customer.Customer;
@@ -72,6 +73,7 @@ public class SalesManager {
             String successMessage = String.format("Purchase successful. Remaining stock: %s. Customer total purchases: %s.",
                     branch.getInventory().get(productId), customer.getTotalPurchases());
             System.out.println(successMessage);
+            Logger.log("Customer with ID "+customerId+" purchased "+amount+" units of Product ID "+productId+ " from Branch ID "+branchId+" successfully\n", Logger.LogType.SALE);
             return String.format("purchased success, only %s remain, customer spend total of %s products", branch.getInventory().get(productId), customer.getTotalPurchases());
         }
     }

@@ -39,6 +39,15 @@
     "purchasePlan": "New customer: 10% off on first purchase.",
     "type": "NEW",
     "totalPurchases": 0,
+    "id": 20,
+    "firstName": "net",
+    "lastName": "net",
+    "phoneNumber": "09888"
+  },
+  {
+    "purchasePlan": "New customer: 10% off on first purchase.",
+    "type": "NEW",
+    "totalPurchases": 0,
     "id": 5,
     "firstName": "Neta",
     "lastName": "pinyeta",

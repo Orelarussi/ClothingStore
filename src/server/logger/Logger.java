@@ -13,12 +13,15 @@ public class Logger {
     private static final String EMPLOYEE_LOG_FILE_PATH = basicPath + "employee_log.txt";
     private static final String CUSTOMER_LOG_FILE_PATH = basicPath + "customer_log.txt";
     private static final String CHAT_LOG_FILE_PATH = basicPath + "chat_log.txt";
-    private static final DateTimeFormatter DATE_TIME_FORMATTER =DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm") ;
+    private static final String SALE_LOG_FILE_PATH = basicPath + "sale_log.txt";
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public enum LogType {
         EMPLOYEE,
         CUSTOMER,
-        CHAT
+        CHAT,
+        SALE
     }
 
     public static void log(String message, LogType logType) {
@@ -34,10 +37,13 @@ public class Logger {
             case CHAT:
                 filePath = CHAT_LOG_FILE_PATH;
                 break;
+            case SALE:
+                filePath = SALE_LOG_FILE_PATH;
+                break;
             default:
                 throw new IllegalArgumentException("Invalid log type");
         }
-        writeToFile(message,filePath);
+        writeToFile(message, filePath);
     }
 
     private static void writeToFile(String message, String filePath) {
