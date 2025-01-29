@@ -19,8 +19,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static server.logger.Logger.log;
-
 public class JsonUtils {
 
     public enum Files {
@@ -48,13 +46,9 @@ public class JsonUtils {
     public static <T> List<T> readJsonFile(String filePath, Class<T> clazz) {
         try (FileReader reader = new FileReader(filePath)) {
             Type listType = TypeToken.getParameterized(List.class, clazz).getType();
-            List<T> list = gson.fromJson(reader, listType);
-            log("Read file "+filePath+" successfully");
-            return list;
+            return gson.fromJson(reader, listType);
         } catch (IOException e) {
-            String err = "Error reading JSON file: " + e.getMessage();
-            System.out.println(err);
-            log(err);
+            System.out.println("Error reading JSON file: " + e.getMessage());
             return null;
         }
     }
@@ -63,19 +57,13 @@ public class JsonUtils {
     public static <T> void writeJsonFile(String filePath, List<T> objects) {
         File file = new File(filePath);
         if (!file.exists()) {
-            boolean created = file.getParentFile().mkdirs();//create folder
-            if (!created) {
-                throw new RuntimeException("Couldn't create directory: " + file.getParent());
-            }
+            file.getParentFile().mkdirs();//create folder
         }
         try (FileWriter writer = new FileWriter(filePath)) {
             gson.toJson(objects, writer);
-            log("JSON file "+filePath+ " updated successfully.");
             System.out.println("JSON file updated successfully.");
         } catch (IOException e) {
-            String s = "Error writing to JSON file: " + e.getMessage();
-            System.out.println(s);
-            log(s);
+            System.out.println("Error writing to JSON file: " + e.getMessage());
         }
     }
 

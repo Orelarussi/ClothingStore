@@ -1,6 +1,7 @@
 package server.services;
 
 import com.google.gson.JsonObject;
+import server.logger.Logger;
 import server.models.Employee;
 import server.models.customer.Customer;
 import server.utils.JsonUtils;
@@ -10,8 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static server.logger.Logger.log;
 
 public class EmployeeManager {
     private Map<Integer, Customer> customers = new HashMap<>();
@@ -29,7 +28,7 @@ public class EmployeeManager {
         if (customers.containsKey(id)) {
             customers.remove(id);
             System.out.println("Customer with ID " + id + " removed.");
-            log("Customer with ID " + id + " removed.");
+            Logger.log("Customer with ID " + id + " removed.", Logger.LogType.CUSTOMER);
 
             JsonUtils.saveCustomers();
             return true;
@@ -41,9 +40,8 @@ public class EmployeeManager {
     public boolean addCustomer(Customer customer) {
         if (!customers.containsKey(customer.getId())) {
             customers.put(customer.getId(), customer);
-            String s = "Customer added: " + customer.getFirstName() + " " + customer.getLastName();
-            System.out.println(s);
-            log(s);
+            System.out.println("Customer added: " + customer.getFirstName() + " " + customer.getLastName());
+            Logger.log("Customer added: " + customer.getFirstName() + " " + customer.getLastName(), Logger.LogType.CUSTOMER);
             JsonUtils.saveCustomers();
             return true;
         } else {
@@ -64,7 +62,9 @@ public class EmployeeManager {
 
     // Get employees by branch ID
     public List<Employee> getEmployeesByBranchId(int branchId) {
-        return AdminManager.getInstance().getEmployeesByBranch(branchId);
+        return AdminManager.getInstance().getAllEmployees().stream()
+                .filter(employee -> employee.getBranchID() == branchId)
+                .collect(Collectors.toList());
     }
 
     public void setCustomersFromJson(List<JsonObject> employeesJsonList) {

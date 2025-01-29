@@ -9,17 +9,40 @@ import java.time.format.DateTimeFormatter;
 public class Logger {
 
     private static final String basicPath = "src/server/logger/";
-    private static final String LOG_FILE_PATH = basicPath + "log.txt";
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm") ;
 
-    public static void log(String message) {
-        writeToFile(message);
+    private static final String EMPLOYEE_LOG_FILE_PATH = basicPath + "employee_log.txt";
+    private static final String CUSTOMER_LOG_FILE_PATH = basicPath + "customer_log.txt";
+    private static final String CHAT_LOG_FILE_PATH = basicPath + "chat_log.txt";
+    private static final DateTimeFormatter DATE_TIME_FORMATTER =DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm") ;
+
+    public enum LogType {
+        EMPLOYEE,
+        CUSTOMER,
+        CHAT
     }
 
-    private static void writeToFile(String message) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(Logger.LOG_FILE_PATH, true))) {
-            String line = "[" + LocalDateTime.now().format(DATE_TIME_FORMATTER) + "] " + message + "\n";
-            writer.write(line);
+    public static void log(String message, LogType logType) {
+        String filePath;
+
+        switch (logType) {
+            case EMPLOYEE:
+                filePath = EMPLOYEE_LOG_FILE_PATH;
+                break;
+            case CUSTOMER:
+                filePath = CUSTOMER_LOG_FILE_PATH;
+                break;
+            case CHAT:
+                filePath = CHAT_LOG_FILE_PATH;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid log type");
+        }
+        writeToFile(message,filePath);
+    }
+
+    private static void writeToFile(String message, String filePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+            writer.write("[" + LocalDateTime.now().format(DATE_TIME_FORMATTER) + "] " + message + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }

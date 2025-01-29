@@ -1,6 +1,5 @@
 package server.services;
 
-import server.logger.Logger;
 import server.models.Branch;
 import server.models.SaleReport;
 import server.models.customer.Customer;
@@ -8,8 +7,6 @@ import server.models.customer.Customer;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-import static server.logger.Logger.log;
 
 public class SalesManager {
     private static SalesManager instance;
@@ -39,9 +36,7 @@ public class SalesManager {
 
     // Get all sale reports
     public List<SaleReport> getAllSaleReports() {
-        String s = "Fetching all sale reports. Total reports: " + saleReports.size();
-        System.out.println(s);
-        log(s);
+        System.out.println("Fetching all sale reports. Total reports: " + saleReports.size());
         return new ArrayList<>(saleReports); // Return a copy to prevent external modifications
     }
 
@@ -51,7 +46,6 @@ public class SalesManager {
         if (branch == null) {
             String error = "Branch with ID " + branchId + " not found.";
             System.out.println(error);
-            log(error);
             return "NOT FOUND BRANCH WITH ID " + customerId;
         }
 
@@ -60,7 +54,6 @@ public class SalesManager {
         if (customer == null) {
             String error = "Customer with ID " + customerId + " not found.";
             System.out.println(error);
-            log(error);
             return "NOT FOUND CUSTOMER WITH ID " + customerId;
         }
 
@@ -69,8 +62,7 @@ public class SalesManager {
         if (amount > stock) {
             String error = "Not enough products in stock. Only " + stock + " remain.";
             System.out.println(error);
-            log(error);
-            return error;
+            return String.format("not enough products , only %s remain", stock);
         }
         else {
             branch.getInventory().put(productId, stock - amount);
@@ -80,8 +72,7 @@ public class SalesManager {
             String successMessage = String.format("Purchase successful. Remaining stock: %s. Customer total purchases: %s.",
                     branch.getInventory().get(productId), customer.getTotalPurchases());
             System.out.println(successMessage);
-            log(successMessage);
-            return successMessage;
+            return String.format("purchased success, only %s remain, customer spend total of %s products", branch.getInventory().get(productId), customer.getTotalPurchases());
         }
     }
 }
