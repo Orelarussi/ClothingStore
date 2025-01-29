@@ -1,5 +1,6 @@
 package server.services;
 
+import server.logger.Logger;
 import server.models.Product;
 
 import java.util.AbstractMap;
@@ -31,11 +32,9 @@ public class ProductManager {
     public Product getProduct(int productId) {
         System.out.println("Fetching product with ID: " + productId);
         Product product = products.get(productId);
-        if (product != null) {
-            System.out.println("Product found: " + product.getName());
-        } else {
-            System.out.println("Product with ID " + productId + " not found.");
-        }
+        String s = product != null ? "Product found: " + product.getName() : "Product with ID " + productId + " not found.";
+        System.out.println(s);
+        Logger.log(s);
         return product;
     }
 
@@ -49,18 +48,6 @@ public class ProductManager {
                 .map(product -> new AbstractMap.SimpleEntry<>(product.getId(), product))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         System.out.println("Products list set successfully.");
-    }
-
-    public void displayProducts() {
-        System.out.println("Displaying all products:");
-        if (products.isEmpty()) {
-            System.out.println("No products available.");
-        } else {
-            for (Product product : products.values()) {
-                System.out.println("ID: " + product.getId() + ", Name: " + product.getName() +
-                        ", Category: " + product.getCategory() + ", Price: $" + product.getPrice());
-            }
-        }
     }
 }
 

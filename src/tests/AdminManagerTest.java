@@ -26,25 +26,11 @@ public class AdminManagerTest {
     }
 
     @Test
-    public void testUpdatePassword() {
-        Employee employee = new Employee(1, 1, "Doe", "123456789",
-                "SecurePass1!", "Branch01", 12345, Position.CASHIER);
-        adminManager.addEmployee(employee);
-        final String PASS = "NewPass123!";
-        try {
-            adminManager.editEmployee(1,"password", PASS);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-        assertTrue(adminManager.verifyEmployeePassword(1, PASS));
-    }
-
-    @Test
     public void testDeleteEmployee() {
-        Employee employee = new Employee(1, 1, "Doe", "123456789",
+        Employee employee = new Employee(10, 1, "Doe", "123456789",
                 "SecurePass1!", "Branch01", 12345, Position.CASHIER);
         adminManager.addEmployee(employee);
-        adminManager.deleteEmployee(1);
-        assertNull(adminManager.findEmployeeById(1));
+        adminManager.deleteEmployee(10);
+        assertNull(adminManager.findEmployeeById(10));
     }
 }

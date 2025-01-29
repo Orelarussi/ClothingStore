@@ -1,6 +1,7 @@
 package server.services;
 
 import server.database.SocketData;
+import server.logger.Logger;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -22,9 +23,11 @@ public class SessionManager {
     }
 
     public synchronized LoginResult login(int userID, String password) {
-        if (connections.get(userID) != null) {
+        if (isLoggedIn(userID)) {
             LoginResult result = LoginResult.FAILURE;
-            result.setMessage("You are already logged in. please logout first from the other session.");
+            String message = "You are already logged in. please logout first from the other session.";
+            result.setMessage(message);
+            Logger.log(message);
             return result;
         }
         return AdminManager.getInstance().login(userID,password);
@@ -35,7 +38,9 @@ public class SessionManager {
         if(data != null){
             // disconnect user previous connection
             data.close();
-            System.out.println("Removed connection from client socket");
+            String s = "Removed connection from client socket";
+            Logger.log(s);
+            System.out.println(s);
         }
     }
 

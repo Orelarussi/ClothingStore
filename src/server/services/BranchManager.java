@@ -3,6 +3,7 @@ package server.services;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
+import server.logger.Logger;
 import server.models.Branch;
 import server.utils.JsonUtils;
 
@@ -147,7 +148,9 @@ public class BranchManager implements MapChangeListener<Integer, Branch> {
 
     @Override
     public void onChanged(Change change) {
-        System.out.println("Branch change detected: " + change);
+        String s1 = "Branch change detected: " + change;
+        System.out.println(s1);
+        Logger.log(s1);
         JsonUtils.saveBranches();
         System.out.println("Branch changes saved.");
     }
