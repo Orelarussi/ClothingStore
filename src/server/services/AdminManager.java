@@ -106,7 +106,7 @@ public class AdminManager implements MapChangeListener<Integer, Employee> {
         employees.put(employee.getId(), employee);
         BranchManager.getInstance().addEmployeeToBranch(employee.getBranchID());
         System.out.println("Employee " + employee.getFullName() + " added successfully.");
-        Logger.addEmployee(employee);
+        Logger.log("Employee " + employee.getFullName() + " added successfully.", Logger.LogType.EMPLOYEE);
     }
 
     public void deleteEmployee(int id) {
@@ -115,10 +115,9 @@ public class AdminManager implements MapChangeListener<Integer, Employee> {
         if (employee != null) {
             System.out.println("Employee " + employee.getFirstName() + " removed successfully.");
             BranchManager.getInstance().removeEmployeeFromBranch(employee.getBranchID());
-            Logger.deleteEmployee(employee);
+            Logger.log("Employee " + employee.getFullName() + " deleted successfully.", Logger.LogType.EMPLOYEE);
         } else {
             System.out.println("Employee not found.");
-            Logger.log("Employee not found.");
         }
     }
 
@@ -166,6 +165,7 @@ public class AdminManager implements MapChangeListener<Integer, Employee> {
                 field.set(employee, value);
             }
              System.out.println("Updated attribute " + attribute + " for employee with ID: " + employeeID);
+            Logger.log("Updated attribute " + attribute + " for employee with ID: " + employeeID, Logger.LogType.EMPLOYEE);
         } catch (IllegalArgumentException e) {
             String message = "The value " + value + " is not valid for field " + field.getName();
             System.out.println(message);

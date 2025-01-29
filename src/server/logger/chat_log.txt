@@ -1,0 +1,42 @@
+[2025-01-29T00:44:27.704252100] Chat between israel map 25 and neta halfon 212. chat ID: 1
+
+[2025-01-29T00:44:37.902615100] Chat 1 closed successfully. Messages:
+[00:44] neta halfon: hi
+[00:44] neta halfon: hi
+[00:44] neta halfon: hi
+[00:44] neta halfon: bye bye
+
+[2025-01-29T00:49:15.089230100] Chat between aokok momaa 4 and neta halfon 212opened. chat ID: 1
+
+[2025-01-29T00:49:34.428024300] Chat 1 closed successfully. Messages:
+[00:49] aokok momaa: hiiii
+[00:49] neta halfon: njnj
+[00:49] aokok momaa: bye bye
+
+[2025-01-29T00:49:41.567805700] Chat between aokok momaa 4 and neta halfon 212opened. chat ID: 2
+
+[2025-01-29T00:50:08.884161800] Shift manager with ID 2 joined chat with ID 2
+
+[2025-01-29T00:50:23.062904] Chat 2 closed successfully. Messages:
+[00:49] neta halfon: hiiii
+[00:49] aokok momaa: hiii
+[00:50] orelarussi inua: hiiiii
+[00:50] orelarussi inua: hi
+[00:50] orelarussi inua: hi
+[00:50] orelarussi inua: bye bye
+
+[29/01/2025 13:14] Chat between orelarussi inua 2 and neta halfon 212opened. chat ID: 1
+
+[29/01/2025 13:45] Chat between aokok momaa 4 and neta halfon 212opened. chat ID: 1
+
+[29/01/2025 13:47] Chat 1 closed successfully. Messages:
+[13:45] aokok momaa: hiiiii
+[13:46] neta halfon: what is upp
+[13:46] aokok momaa: b
+[13:46] neta halfon: hiiiii
+[13:47] neta halfon: bye bye
+
+[29/01/2025 13:49] Chat between orelarussi inua 2 and neta halfon 212opened. chat ID: 2
+
+[29/01/2025 14:26] Chat between orelarussi inua 2 and neta halfon 212opened. chat ID: 1
+

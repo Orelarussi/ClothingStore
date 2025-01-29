@@ -24,10 +24,6 @@ public class ProductManager {
         this.products = new HashMap<>();
     }
 
-    public void addProduct(Product product) {
-        products.put(product.getId(), product);
-    }
-
     public Product getProduct(int productId) {
         System.out.println("Fetching product with ID: " + productId);
         Product product = products.get(productId);

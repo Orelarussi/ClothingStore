@@ -3,6 +3,7 @@ package server.services;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
+import server.logger.Logger;
 import server.models.Branch;
 import server.utils.JsonUtils;
 
@@ -130,7 +131,9 @@ public class BranchManager implements MapChangeListener<Integer, Branch> {
         branch.updateProduct(productToAddId,amountToAdd);
 
         JsonUtils.saveBranches();
-        System.out.println("Updated branches employees successfully");
+        Logger.log(amountToAdd+" units of product ID "+productToAddId+" have been added to branch ID "+branchID, Logger.LogType.SALE);
+
+        System.out.println("Updated branches inventory successfully");
     }
 
     public void removeEmployeeFromBranch(int branchID) {
