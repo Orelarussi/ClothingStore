@@ -48,6 +48,7 @@ public class ClientHandler extends Thread {
                 outputStream.println(response);//send response to client
             }
           } catch (SocketException e){
+           // socketData.getSocket().get
             System.out.println("Socket Closed from client");
           } catch (IOException e) {
             error(e, outputStream);

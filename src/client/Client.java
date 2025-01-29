@@ -839,7 +839,7 @@ public class Client {
             // Check server response
             if (in.ready()) {
                 String response = in.readLine();
-                JsonObject serverResponse = ServerDecoder.convertToJsonObject(response);//גיל
+                JsonObject serverResponse = ServerDecoder.convertToJsonObject(response);
                 int chatId = serverResponse.get("chatId").getAsInt();
                 executor.shutdownNow();
                 joinChat(chatId, in, out, consoleInput);

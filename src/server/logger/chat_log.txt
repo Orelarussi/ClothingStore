@@ -40,3 +40,31 @@
 
 [29/01/2025 14:26] Chat between orelarussi inua 2 and neta halfon 212opened. chat ID: 1
 
+[29/01/2025 15:24] Chat 1 closed successfully. Messages:
+[14:35] orelarussi inua: exit
+[15:21] neta halfon: hiiii
+[15:21] orelarussi inua: what is upp
+[15:24] neta halfon: bye bye
+
+[29/01/2025 15:24] Chat between aokok momaa 4 and neta halfon 212opened. chat ID: 2
+
+[29/01/2025 15:29] Chat between Assaf Lotz 2 and Gary Hamburgary 212opened. chat ID: 1
+
+[29/01/2025 16:22] Chat between Assaf Lotz 2 and Gary Hamburgary 212opened. chat ID: 1
+
+[29/01/2025 16:22] Chat 1 closed successfully. Messages:
+[16:22] Assaf Lotz: hi
+[16:22] Assaf Lotz: bye bye
+
+[29/01/2025 16:23] Chat between Assaf Lotz 2 and Gary Hamburgary 212opened. chat ID: 2
+
+[29/01/2025 16:23] Chat 2 closed successfully. Messages:
+[16:23] Gary Hamburgary: hi
+[16:23] Gary Hamburgary: bye bye
+
+[29/01/2025 16:23] Chat between Moti Luchim 4 and Gary Hamburgary 212opened. chat ID: 3
+
+[29/01/2025 16:26] Chat between Moti Luchim 4 and Gary Hamburgary 212opened. chat ID: 1
+
+[29/01/2025 16:27] Shift manager with ID 2 joined chat with ID 1
+

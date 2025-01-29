@@ -4,7 +4,7 @@
     "employeeAmount": 4,
     "address": "Tel Aviv",
     "inventory": {
-      "1": 17,
+      "1": 20,
       "2": 23,
       "3": 50,
       "4": 89
@@ -16,7 +16,7 @@
     "address": "Jerusalem",
     "inventory": {
       "1": 17,
-      "2": 23,
+      "2": 25,
       "3": 50,
       "4": 89
     }

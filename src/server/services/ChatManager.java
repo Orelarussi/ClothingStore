@@ -1,5 +1,6 @@
 package server.services;
 
+import server.database.SocketData;
 import server.logger.Logger;
 import server.models.Employee;
 import server.models.chat.ChatSession;
@@ -50,7 +51,7 @@ public class ChatManager {
         int shiftManagerBranchId = getBranchIdByEmployeeId(managerId);
         if (chatSession.isRelevantForShiftManager(shiftManagerBranchId)) {
             chatSession.setShiftManagerID(managerId);
-            Logger.log("Shift manager with ID " + managerId + " joined chat with ID " + targetChatId+"\n", Logger.LogType.CHAT);
+            Logger.log("Shift manager with ID " + managerId + " joined chat with ID " + targetChatId + "\n", Logger.LogType.CHAT);
             System.out.println("Manager with ID " + managerId + " joined chat with ID " + targetChatId);
             return true;
         }
@@ -65,27 +66,34 @@ public class ChatManager {
 
     public Integer waitingForChatRequest(int selectedBranchId, int employeeId) {
         synchronized (getBranchLock(selectedBranchId)) {
+            int availableEmployeeID;
             Queue<Integer> availableQueue = availableEmployeesByBranch.get(selectedBranchId);
-            if (availableQueue.isEmpty()) {
-                addWaitingEmployee(selectedBranchId, employeeId);
-                return null;
+            while (!availableQueue.isEmpty()) {
+                availableEmployeeID = availableQueue.poll();
+                SocketData soketData = SessionManager.getInstance().getConnections().get(availableEmployeeID);
+                if (soketData != null) {
+                    return createChat(employeeId, availableEmployeeID);
+                }
             }
-            int availableEmployeeID = availableQueue.poll();
-            return createChat(employeeId, availableEmployeeID);
+            addWaitingEmployee(selectedBranchId, employeeId);
+            return null;
         }
-
     }
 
     public Integer availableForChatRequest(int employeeId) {
         int branchId = getBranchIdByEmployeeId(employeeId);
         synchronized (getBranchLock(branchId)) {
+            int waitingEmployeeID;
             Queue<Integer> waitingQueue = waitingEmployeesByBranch.get(branchId);
-            if (waitingQueue.isEmpty()) {
-                addAvailableEmployee(branchId, employeeId);
-                return null;
+            while (!waitingQueue.isEmpty()) {
+                waitingEmployeeID = waitingQueue.poll();
+                SocketData soketData = SessionManager.getInstance().getConnections().get(waitingEmployeeID);
+                if (soketData != null) {
+                    return createChat(waitingEmployeeID, employeeId);
+                }
             }
-            int waitingEmployeeID = waitingQueue.poll();
-            return createChat(waitingEmployeeID, employeeId);
+            addAvailableEmployee(branchId, employeeId);
+            return null;
         }
     }
 
@@ -93,25 +101,23 @@ public class ChatManager {
         int chatSessionId = getNewChatSessionId();
         ChatSession chatSession = new ChatSession(employee1Id, employee2Id, chatSessionId);
         activeChatSessions.put(chatSessionId, chatSession);
-        Logger.log(chatSession.toString()+"opened. chat ID: "+chatSessionId+"\n", Logger.LogType.CHAT);
-        System.out.println(chatSession.toString()+". chat ID: "+chatSessionId);
+        Logger.log(chatSession.toString() + "opened. chat ID: " + chatSessionId + "\n", Logger.LogType.CHAT);
+        System.out.println(chatSession.toString() + ". chat ID: " + chatSessionId);
         return chatSessionId;
     }
 
     public void closeChat(int chatSessionId) {
         //update the log
-        ChatSession chatSession= activeChatSessions.get(chatSessionId);
+        ChatSession chatSession = activeChatSessions.get(chatSessionId);
         String logMessage = "Chat " + chatSessionId + " closed successfully. Messages:\n";
-        for(Message message :chatSession.getMessages()){
-            logMessage+=message.toString()+"\n";
+        for (Message message : chatSession.getMessages()) {
+            logMessage += message.toString() + "\n";
         }
         Logger.log(logMessage, Logger.LogType.CHAT);
         System.out.println("Chat " + chatSessionId + " closed successfully.");
         //close
         activeChatSessions.remove(chatSessionId);//The chat object will be eligible for garbage collection if no other references exist
     }
-
-
 
 
     //the synchronized is not! inside the add func ,need to surround.
