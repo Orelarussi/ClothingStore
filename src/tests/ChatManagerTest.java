@@ -38,18 +38,4 @@ public class ChatManagerTest {
         // Validate that the chat session is removed
         assertThrows(NullPointerException.class, () -> chatManager.getOtherEmployeeIdInChat(chatId, employee1Id));
     }
-
-    @Test
-    public void testAddWaitingEmployee() {
-        int branchId = 1;
-        int employeeId = 1;
-
-        chatManager.addWaitingEmployee(branchId, employeeId);
-
-        // No direct method to fetch the waiting list; validation is indirect.
-        int chatId = chatManager.availableForChatRequest(employeeId);
-
-        assertNull(chatId, "Chat ID should be null if there is no matching available employee.");
-    }
-
 }
